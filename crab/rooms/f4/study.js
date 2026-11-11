@@ -133,7 +133,7 @@ const LAYOUT = {
     ask: { p: [0.9, 2.85], r: -4, s: 0.78 },
     solve: { p: [-0.9, 4.15], r: 10, s: 0.95 },
     map: { p: [0.72, 4.3], r: -4, s: 0.7 },
-    cam: { fov: 38, target: [0.14, 0.6, 1.05], elev: 37, minDist: 10.5, halfW: 2.02 },
+    cam: { fov: 38, target: [0.42, 0.72, -0.1], elev: 24, minDist: 6, halfW: 1.45 },   // phones: crab big, in the middle, between the words and the index
   },
 };
 // where each tag's thread ends (prop space) and how the crab answers a hover

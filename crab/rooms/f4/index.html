@@ -251,16 +251,26 @@
   /* no script: the same first screen, the seven names as a plain list */
   html.no-js .hero .cta { display: none; }
 
-  /* narrow screens: not designed yet (desktop first); keep everything reachable in one column */
+  /* phones (portrait): words on top, the crab in the middle of the screen, the index under it (scroll for the rest) */
   @media (max-width: 767px) {
     body { overflow: auto; }
-    .stage { height: auto; min-height: 100svh; overflow: visible; padding: 86px 0 20px; display: flex; flex-direction: column; gap: 18px; }
+    .stage { height: auto; min-height: 100svh; overflow: visible; padding: 74px 0 16px; display: flex; flex-direction: column; }
     .view { position: fixed; }
-    .view::after { background: rgba(14, 9, 28, .62); }
+    .view::after { background: linear-gradient(to bottom, rgba(14, 9, 28, .82) 0%, rgba(14, 9, 28, .55) 30%, rgba(14, 9, 28, 0) 42%, rgba(14, 9, 28, 0) 62%, rgba(14, 9, 28, .6) 78%, rgba(14, 9, 28, .75) 100%); }
+    .top { padding-top: max(14px, env(safe-area-inset-top)); }
+    .top a { padding: 7px 10px; }
+    .top a.switch { font-size: 12.5px; padding: 6px 10px 7px; white-space: nowrap; }
     .hero, .index { position: relative; left: auto; top: auto; bottom: auto; margin: 0 var(--pad); width: auto; }
+    .hero h1 { font-size: 24px; }
+    .hero .sub { font-size: 13.5px; line-height: 1.6; margin-top: 6px; }
+    .hero .cta { margin-top: 12px; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px 14px; }
+    .btn-main { font-size: 16px; padding: 13px 16px; }
+    .btn-link { font-size: 13.5px; }
+    .index { margin-top: max(46svh, 300px); }
     .card { position: fixed; right: var(--pad); left: var(--pad); width: auto; top: auto; bottom: 12px; translate: 0 0; max-height: 78svh; }
     .ctl { display: none; }
   }
+  @media (max-width: 430px) { .top .ig { display: none; } }
   @media (prefers-reduced-motion: reduce) { .bubble p, .tag b, .card { transition-duration: 1ms; } .zzz span { animation: none; opacity: .8; } }
 </style>
 </head>
