@@ -14,19 +14,21 @@
   const SIMPLE = html.dataset.view === 'simple';
   const WEEK = 7 * 864e5;
 
-  /* ---------------------------------------------------------------- the 33 lessons (../../../syllabus.js) */
+  /* ---------------------------------------------------------------- the map, version 7 (../../../roadmap7.js): 3 stages, 12 modules, 208 lessons.
+     The first release opens 8 of them; STAGES here are the five modules of stage 1, each with its open lessons. */
   const STAGES = Array.isArray(window.STAGES) ? window.STAGES : [];
   const LESSONS = [];
   STAGES.forEach((s, si) => s.lessons.forEach((l) => LESSONS.push(Object.assign({}, l, { stage: si }))));
   const byId = {}; LESSONS.forEach((l) => { byId[l.id] = l; });
-  const TOTAL = LESSONS.length || 33;
+  const TOTAL = LESSONS.length || 8;
+  const MAP7 = window.ROADMAP7 || null;   // the whole map (module names, lesson counts), for showing what comes later
   const ROUTES = {}; (Array.isArray(window.CRAB_ROUTES) ? window.CRAB_ROUTES : []).forEach((r) => { ROUTES[r.id] = r; });
-  const lessonHref = (l) => (l && l.page ? '../../../' + l.page : null);
+  const lessonHref = (l) => (l && window.LESSON_PAGES && window.LESSON_PAGES[l.id]) || null;   // ../../routes.js: filled in once each lesson page exists
 
   // the seven things on the desk: what they are called here, and one plain line each
   const ENTRY = {
-    pick: { name: '幫我挑', line: '回答 3 題，告訴你從第幾課開始。' },
-    map: { name: '學習地圖', line: '33 課從簡單排到難，會的可以跳過。' },
+    pick: { name: '幫我挑', line: '回答 3 題，告訴你從哪一課開始。' },
+    map: { name: '學習地圖', line: '208 課分三個階段，第一版先開 8 課，會的可以跳過。' },
     free: { name: '領取資源', line: 'IG 留言領的 Skill 檔、PDF、提示詞都在這。' },
     solve: { name: '解決一件事', line: '例如整理共筆、回一堆信，帶來一步步用 AI 做完。' },
     words: { name: 'AI 名詞小字典', line: 'Skill、MCP、Agent 是什麼？一個詞一句話，附例子。' },
@@ -37,12 +39,15 @@
   /* ---------------------------------------------------------------- what this browser remembers: things done and learned, not things clicked */
   const CARRY = KEY + '.carry';
   let switched = false;                    // you came here from the other version a moment ago
+  // progress saved before 2026-11-12 used the old 33-lesson ids: carry over what still means something, drop the rest
+  const OLD_IDS = { 'what-is-ai': 'L0-04', hallucination: 'L0-04', 'tools-plans': 'L0-01', 'first-chat': 'L1-01', instructions: 'L1-07', 'files-web': 'L2-01', skills: 'L4-01' };
+  const newId = (id) => (byId[id] ? id : OLD_IDS[id] && byId[OLD_IDS[id]] ? OLD_IDS[id] : null);
   function load() {
     let s = {}; let carried = null;
     // the other version of this page may have just handed its progress over (the switch does that): take it, it is the newest
     try { carried = sessionStorage.getItem(CARRY); if (carried) sessionStorage.removeItem(CARRY); } catch (e) { carried = null; }
     try { if (carried) { s = JSON.parse(carried) || {}; s.visits = Math.max(0, (s.visits || 1) - 1); switched = true; } else if (!Q.has('fresh')) s = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { s = {}; }
-    return { known: Array.isArray(s.known) ? s.known.filter((id) => byId[id]) : [], done: s.done || {}, log: Array.isArray(s.log) ? s.log : [], start: byId[s.start] ? s.start : null, goal: s.goal || null, level: s.level == null ? null : s.level, visits: (s.visits || 0) + 1, last: s.last || null };
+    return { known: Array.isArray(s.known) ? [...new Set(s.known.map(newId).filter(Boolean))] : [], done: s.done || {}, log: Array.isArray(s.log) ? s.log : [], start: newId(s.start), goal: s.goal || null, level: s.level == null ? null : s.level, visits: (s.visits || 0) + 1, last: s.last || null };
   }
   const state = load();
   const save = () => { try { if (!Q.has('fresh') || Q.has('keep')) localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* private mode */ } };
@@ -53,7 +58,7 @@
     if (!state.done.t1) return { kind: 'task', label: '60 秒任務', min: 1 };
     if (!state.start) return { kind: 'pick', label: '幫我挑', min: 1 };
     const l = byId[state.start];
-    return { kind: 'lesson', label: `第 ${l.n} 課「${l.title}」`, short: `第 ${l.n} 課`, min: l.min, lesson: l };
+    return { kind: 'lesson', label: `${l.id}「${l.title}」`, short: l.id, min: l.min, lesson: l };
   }
   function greeting() {
     const n = nextStep(); const w = weekCount();
@@ -152,28 +157,30 @@
   /* ---- pick for me: three questions, then where to start, with what you already know ticked off */
   const P = { step: 0, level: null, goal: null, checks: {} };
   const LEVELS = ['沒用過', '用過幾次', '常常用'];
-  const GOALS = ['讀書', '工作', '生活'];
-  const SKILLS = [['chat', '開新對話，問它問題'], ['files', '上傳檔案或圖片給它讀'], ['project', '用 Project 放一個主題的資料']];
-  function recommend(level, checks) {
-    const known = [];
-    if (level >= 1) known.push('what-is-ai');
-    if (checks.chat) known.push('tools-plans');
-    if (checks.files) known.push('files-web');
-    if (checks.project) known.push('projects');
-    const has = (id) => known.includes(id);
-    let start;
-    if (level === 2 && checks.project) start = 'skills';                       // already settled in: go straight to making it work your way
-    else if (level === 2) start = ['instructions', 'projects'].find((id) => !has(id));
-    else start = (LESSONS.find((l) => !has(l.id)) || LESSONS[0] || {}).id;
-    return { known: known.filter((id) => byId[id]), start: byId[start] ? start : (LESSONS[0] || {}).id };
+  const GOALS = ['問得更好', '讀資料、整理筆記', '做一個小工具', '學 Skills'];
+  const GOAL_START = { '問得更好': 'L1-01', '讀資料、整理筆記': 'L2-01', '做一個小工具': 'L3-03', '學 Skills': 'L4-01' };
+  const SKILLS = [['L0-01', '拍照問它問題'], ['L1-01', '把需求講清楚，第一次就拿到能用的答案'], ['L2-01', '上傳檔案，叫它只根據檔案回答'], ['L4-01', '知道 Skill 是什麼']];
+  // 2026-11-12 (Thomas): never used → L0-01; used a few times → L0-04; uses it a lot → by what they want to learn.
+  // What they tick in question 3 counts as learned; if the start is one of those, move on to the next lesson not learned.
+  function recommend(level, goal, checks) {
+    const known = SKILLS.map(([id]) => id).filter((id) => checks[id] && byId[id]);
+    if (level >= 1 && !known.includes('L0-01')) known.push('L0-01');
+    let start = level === 0 ? 'L0-01' : level === 1 ? 'L0-04' : GOAL_START[goal] || 'L1-01';
+    if (known.includes(start)) {
+      const i = LESSONS.findIndex((l) => l.id === start);
+      const after = LESSONS.slice(i + 1).concat(LESSONS.slice(0, i)).find((l) => !known.includes(l.id));
+      start = after ? after.id : start;
+    }
+    return { known, start: byId[start] ? start : (LESSONS[0] || {}).id };
   }
   function openPick(step) {
     if (step == null) { P.step = 0; P.level = null; P.goal = null; P.checks = {}; } else P.step = step;
-    const head = `<p class="kicker">幫我挑</p><p class="steps">${P.step + 1} / 3</p>`;
+    const many = P.level === 2;                     // only people who use it a lot get the 'what do you want to learn' question
+    const head = `<p class="kicker">幫我挑</p><p class="steps">${P.step === 0 ? 1 : P.step === 1 ? 2 : many ? 3 : 2} / ${P.step === 0 ? 3 : many ? 3 : 2}</p>`;
     if (P.step === 0) {
       show('pick', 'pick', head + `<h2>你用過 Claude 或 ChatGPT 嗎？</h2><div class="opts">${LEVELS.map((t, i) => `<button type="button" class="opt" data-k="${i + 1}" data-act="level" data-v="${i}">${t}</button>`).join('')}</div>`);
     } else if (P.step === 1) {
-      show('pick', 'pick', head + `<h2>想先拿 AI 做什麼？</h2><div class="opts">${GOALS.map((t, i) => `<button type="button" class="opt" data-k="${i + 1}" data-act="goal" data-v="${t}">${t}</button>`).join('')}</div>`);
+      show('pick', 'pick', head + `<h2>想先學什麼？</h2><div class="opts">${GOALS.map((t, i) => `<button type="button" class="opt" data-k="${i + 1}" data-act="goal" data-v="${t}">${t}</button>`).join('')}</div>`);
     } else {
       show('pick', 'pick', head + `<h2>這些你會了嗎？</h2><p class="small">會的點一下。都還不會，直接看結果就好。</p>
         <div class="opts">${SKILLS.map(([k, t]) => `<button type="button" class="opt check" data-k="" data-act="check" data-v="${k}" aria-pressed="${P.checks[k] ? 'true' : 'false'}">${t}</button>`).join('')}</div>
@@ -182,40 +189,47 @@
     if (step == null) announce('幫我挑，共 3 題。第 1 題：你用過 Claude 或 ChatGPT 嗎？');
   }
   function pickResult() {
-    const r = recommend(P.level || 0, P.checks);
+    const r = recommend(P.level || 0, P.goal, P.checks);
     const first = !state.start;
     state.known = r.known; state.start = r.start; state.goal = P.goal; state.level = P.level || 0;
     if (first) did('pick'); save();
     const l = byId[r.start]; const n = r.known.length; const href = lessonHref(l);
-    const line = `${n ? `你已經會 ${n} 件，先幫你打勾了。` : ''}從第 ${l.n} 課「${l.title}」開始，大約 ${l.min} 分鐘。`;
+    const line = `${n ? `你已經會 ${n} 課，先幫你打勾了。` : ''}從 ${l.id}「${l.title}」開始，大約 ${l.min} 分鐘。`;
     show('pick', 'pick', `
       <p class="kicker">幫我挑</p>
       <h2>${esc(line)}</h2>
       <p>學完你能：${esc(l.can)}。</p>
-      ${P.goal ? `<p class="small">你說想先用在「${esc(P.goal)}」，記下來了。${l.n > 2 ? '前面的課想回頭看，地圖上都在。' : ''}</p>` : ''}
+      ${P.goal && P.level === 2 ? `<p class="small">你說想先學「${esc(P.goal)}」，就從這課開始。${l.n > 2 ? '前面的課想回頭看，地圖上都在。' : ''}</p>` : ''}
       ${href ? '' : `<p class="small">這一課還在做，上線後會亮在地圖上。先做下面這個，不會白等。</p>`}
       <div class="row">
-        ${href ? `<a class="go" href="${esc(href)}">開始第 ${l.n} 課</a>` : (state.done.t1 ? `<a class="go" href="https://claude.ai" target="_blank" rel="noopener">打開 Claude 試一次</a>` : `<button type="button" class="go" data-act="task">先做 60 秒任務</button>`)}
+        ${href ? `<a class="go" href="${esc(href)}">開始 ${esc(l.id)}</a>` : (state.done.t1 ? `<a class="go" href="https://claude.ai" target="_blank" rel="noopener">打開 Claude 試一次</a>` : `<button type="button" class="go" data-act="task">先做 60 秒任務</button>`)}
         <button type="button" class="go alt" data-act="map">看學習地圖</button>
       </div>`);
     announce(line);
     refresh(); emit('pick:done', { first, known: r.known, start: r.start });
   }
 
-  /* ---- the map: where you are among the 33 */
+  /* ---- the map (version 7): stage 1's five modules with the lessons open now; stages 2 and 3 come later */
   function openMap() {
     const k = state.known.length; const w = weekCount(); const n = nextStep();
     const here = n.kind === 'lesson' ? n.lesson.stage : (state.done.t1 ? 0 : -1);
+    const all = MAP7 ? MAP7.total : 208;
+    const s1 = MAP7 && MAP7.stages[0], later = MAP7 ? MAP7.stages.slice(1) : [];
     show('map', 'map', `
       <p class="kicker">學習地圖</p>
-      <h2>${k ? `你會了 ${k} / ${TOTAL} 課。` : `${TOTAL} 課，從簡單排到難。`}</h2>
+      <h2>${k ? `你會了 ${k} / ${TOTAL} 課。` : `第一版先開 ${TOTAL} 課，全部 ${all} 課。`}</h2>
       <p class="small">${w ? `這週做了 ${w} 件。` : ''}會的可以跳過，順序只是建議。</p>
+      ${s1 ? `<p class="small map-stage">階段 1　${esc(s1.name)}：${esc(s1.desc)}</p>` : ''}
       <ol class="stages">${STAGES.map((s, i) => {
         const d = s.lessons.filter((l) => state.known.includes(l.id)).length;
-        return `<li class="${i === here ? 'is-here' : ''}">${esc(s.name)}<span>${d} / ${s.lessons.length}</span><small>${i === here && n.kind === 'lesson' ? `下一步：第 ${n.lesson.n} 課「${esc(n.lesson.title)}」，約 ${n.lesson.min} 分鐘` : esc(s.for)}</small></li>`;
+        const soon = (s.count || s.lessons.length) - s.lessons.length;
+        const nextId = n.kind === 'lesson' ? n.lesson.id : null;
+        const ls = s.lessons.map((l) => `${state.known.includes(l.id) ? '✓ ' : ''}${esc(l.id)} ${esc(l.title)}${l.id === nextId ? `<b class="map-next">下一步，約 ${l.min} 分鐘</b>` : ''}`).join('<br>');
+        return `<li class="${i === here ? 'is-here' : ''}">${esc(s.name)}<span>${d} / ${s.lessons.length}</span><small>${ls}${soon ? `<br>還有 ${soon} 課即將推出` : ''}</small></li>`;
       }).join('')}</ol>
+      ${later.length ? `<p class="small map-later">${later.map((g) => `階段 ${esc(g.no)}　${esc(g.name)}（${g.modules.map((m) => esc(m.id)).join('、')}）即將推出`).join('<br>')}</p>` : ''}
       <div class="row">${nextButton()}${n.kind === 'lesson' && !lessonHref(n.lesson) ? '<span class="small" style="font-size:13px;color:var(--grape-2)">課程頁還在做，先用這個練。</span>' : ''}</div>`);
-    announce(k ? `學習地圖：你會了 ${k} / ${TOTAL} 課。` : `學習地圖：${TOTAL} 課，從簡單排到難。`);
+    announce(k ? `學習地圖：你會了 ${k} / ${TOTAL} 課。` : `學習地圖：第一版先開 ${TOTAL} 課，全部 ${all} 課。`);
   }
 
   /* ---- a thing that is not built yet: say so, and give the next step instead of a dead end */
@@ -248,7 +262,7 @@
     else if (a === 'task') openTask();
     else if (a === 'pick') openPick();
     else if (a === 'map') showMap();
-    else if (a === 'level') { P.level = +v; openPick(1); }
+    else if (a === 'level') { P.level = +v; if (P.level !== 2) P.goal = null; openPick(P.level === 2 ? 1 : 2); }
     else if (a === 'goal') { P.goal = v; openPick(2); }
     else if (a === 'check') { P.checks[v] = !P.checks[v]; b.setAttribute('aria-pressed', P.checks[v] ? 'true' : 'false'); }
     else if (a === 'result') pickResult();

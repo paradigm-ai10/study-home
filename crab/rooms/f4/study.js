@@ -2073,9 +2073,12 @@ async function boot() {
     if (REDUCED || STILL || CAPTURE && !window.__f4LeaveTest || F4.card || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault(); if (leavingNow || packHook && !packHook.over) return;   // (a press during the arrival has already ended it: pack-land.js skip; a second press while it packs changes nothing)
     leavingNow = true; const href = a.href; let went = false;
-    const go = () => { if (went) return; went = true; try { sessionStorage.setItem('paradigm.f4.switching', JSON.stringify({ to: 'simple', at: Date.now(), pack: 1 })); } catch (x) { /* then it just changes page */ } location.href = href; };
+    const go = (skip) => { if (went) return; went = true; try { sessionStorage.setItem('paradigm.f4.switching', JSON.stringify({ to: 'simple', at: Date.now(), pack: 1, skip: skip ? 1 : 0 })); } catch (x) { /* then it just changes page */ } location.href = href; };
+    /* a key press, or someone who has had the story twice already (pack-boot.js counts): the page just changes, a 0.2 s cross-fade */
+    let plain = e.detail === 0; try { const q = new URLSearchParams(location.search); if (!q.has('long') && !(q.has('fresh') && !q.has('keep')) && +localStorage.getItem('paradigm.f4.packSeen') >= 2) plain = true; } catch (x) { /* private mode: the story */ }
+    if (plain) { go(true); return; }
     unfocus();
-    import('./pack-land.js').then((m) => { packHook = m.leave(packCtx, go); window.__f4Leave = packHook; }).catch(go);
+    import('./pack-land.js').then((m) => { packHook = m.leave(packCtx, () => go(false)); window.__f4Leave = packHook; }).catch(() => go(true));
   }));
   window.addEventListener('pageshow', (e) => { if (e.persisted && html.classList.contains('pk-leaving')) location.reload(); });   // Back to a desk the crab has left: start it again
 

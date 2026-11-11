@@ -15,6 +15,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';   // crab-f4.glb is meshopt-compressed (src/squeeze_crab.mjs)
 import { makeBundle } from './pack-bundle.js';
+import { suck, quadMatrix, suckFade } from './pack-genie.js';
 
 const html = document.documentElement;
 const $ = (s) => document.querySelector(s);
@@ -27,28 +28,40 @@ const inOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
 const ring = (x, decay, hz) => (x <= 0 ? 0 : Math.exp(-decay * x) * Math.cos(Math.PI * 2 * hz * x));   // a damped wobble that starts at 1
 
 /* ------------------------------------------------------------------ when things happen (seconds) */
+/* 2026-11-12, after Thomas and 薛 watched it: "too fast, too sloppy; make the things visibly sucked in, like Doraemon's pocket".
+   So: everything slower, and each thing on the page goes into the cloth's pocket one at a time, stretched as it goes
+   (pack-genie.js). The first ones slowly, so you see what is happening; then quicker. */
 const FULL = {
-  dip: 0.10,                       // the photo ducks until here, then pops and the crab is out
-  touch: 0.42,                     // the crab lands on the page
-  cloth: [0.48, 0.72],             // its parcel comes off its head and opens into the cloth
-  pack0: 0.70, step: 0.08,         // the first thing peels off; one more every step
-  fold: 0.15, fly: 0.24,           // each: peel and fold, then over to the pile
-  wrap: [1.91, 2.15],              // corners up, tied
-  hoist: [2.15, 2.43],             // onto its back
-  squat: [2.43, 2.57],             // the page is empty: the one held beat
-  leap: [2.57, 3.04],              // up at you (biggest about 2.8, the desk already showing behind it), then over your head
-  fall: [2.60, 2.88],              // the cream page drops
-  end: 3.06,
+  dip: 0.12,                       // the photo ducks until here, then pops and the crab is out
+  touch: 0.52,                     // the crab lands on the page
+  cloth: [0.66, 1.00],             // its parcel comes off its head and opens into the cloth; the pocket in it opens
+  pack0: 1.22, gap: (k) => (k < 3 ? 0.25 - 0.03 * k : 0.10),   // the first thing lifts off; the next three follow slowly (so you see what is happening), the rest in a quick stream
+  lift: 0.14, suck: 0.52,          // each: off the page, then into the pocket
+  then: {                          // counted from the moment the last thing is in (however many things the page has)
+    wrap: [0.10, 0.44],            // the pocket shuts, corners up, tied
+    hoist: [0.44, 0.78],           // onto its back
+    squat: [0.78, 0.94],           // the page is empty: the one held beat
+    leap: [0.94, 1.44],            // up at you (the desk already showing behind it), then over your head
+    fall: [0.98, 1.26],            // the cream page drops
+    end: 1.46,
+  },
 };
-/* the second time on: the same story in a breath. No cloth: out of the photo, everything on the page goes straight into
-   the bundle on its back at once, and it is away. */
+/* the short one (?short, or Enter on the link): no cloth. Out of the photo, the bundle is on its back at once and everything
+   on the page is sucked straight into it, quickly but still one after another. */
 const QUICK = {
-  dip: 0.08, touch: 0.36, cloth: [9, 9.2], pack0: 0.40, step: 0.016, fold: 0.10, fly: 0.20,
-  wrap: [0.70, 0.88], hoist: [0.756, 0.766], squat: [0.90, 1.00], leap: [1.00, 1.47], fall: [1.03, 1.31], end: 1.49,
+  dip: 0.08, touch: 0.36, cloth: [9, 9.2], wrap: [0.40, 0.56], hoist: [0.50, 0.51], pack0: 0.62, step: 0.06, step1: 0.045, lift: 0.07, suck: 0.34,
+  then: { squat: [0.03, 0.15], leap: [0.15, 0.62], fall: [0.18, 0.46], end: 0.64 },
 };
-/* coming back from the desk (3D → plain): it drops in with the bundle, the things fly back to their places, it hops into the photo */
-const BACK = { fall: [0, 0.30], burst0: 0.40, step: 0.03, fly: 0.36, shrink: [0.40, 1.02], home: [1.10, 1.40], end: 1.56 };
-export let T = FULL;
+/* the timetable for one run: the part after the packing starts when the last thing is in */
+const lay = (base, packEnd) => { const o = { ...base }; for (const [k, v] of Object.entries(base.then)) o[k] = Array.isArray(v) ? v.map((x) => +(packEnd + x).toFixed(3)) : +(packEnd + v).toFixed(3); return o; };
+/* coming back from the desk (3D → plain): it drops in with the bundle, the things are pulled back out of it one by one (the
+   headline first), each to its own place, and it hops into the photo */
+const BACK0 = { fall: [0, 0.36], burst0: 0.62, step: 0.13, fly: 0.50 };   // then: the bundle is empty when the last thing is out, a breath, home
+let BACK = { ...BACK0, shrink: [0.62, 2.55], home: [2.68, 3.08], end: 3.24 };
+/* ?tempo=0.8 plays all of it slower, ?tempo=1.3 faster (kept for the tab, so the desk's half follows): for choosing a speed */
+const SPEED = 1.25;   // how fast all of it plays, against the timetables as written (Thomas, 2026-11-12: "a bit faster"). Keep the two files alike.
+const TEMPO = (() => { let v = NaN; try { const q = new URLSearchParams(location.search).get('tempo'); if (q) sessionStorage.setItem('paradigm.f4.tempo', q); v = +(q || sessionStorage.getItem('paradigm.f4.tempo')); } catch (e) { /* private mode */ } return v > 0.2 && v < 5 ? v : SPEED; })();
+export let T = lay(FULL, 3.9);
 /* nearest to the crab first, the headline last: the page empties from the bottom right to the top left.
    [selector, the size it is folded down to (px), does the crab snap a claw for it] */
 const ITEMS = [
@@ -60,6 +73,7 @@ const ITEMS = [
   ['aside .sec-h',             [70, 36], 0],
   ['.note',                    [86, 66], 1],
   ['#map',                     [108, 78], 1],
+  ['.sc-lane',                 [0, 0], 0, 'bare'],      // the little social crabs under the headline (social-crabs.js); no paper behind them
   ['.hero .cta',               [82, 44], 0],
   ['.hero .sub',               [88, 38], 1],
   ['.hero h1',                 [98, 54], 1],
@@ -221,8 +235,9 @@ export function prepare() {
     const bundle = makeBundle(THREE, { fill: 1 }); bundle.visible = false; scene.add(bundle);
     /* the cloth while it lies open is part of the page, not of the 3D scene: the folded things (real page elements) have to lie on top of it */
     const cloth = document.createElement('div'); cloth.className = 'pk-cloth'; cloth.setAttribute('aria-hidden', 'true'); document.body.append(cloth);
+    const mouth = document.createElement('div'); mouth.className = 'pk-mouth'; cloth.append(mouth);   // the pocket in the cloth
 
-    R = { canvas, renderer, scene, camera, key, floor, crabRoot, squash, model, nodes, mixer, acts, bundle, cloth };
+    R = { canvas, renderer, scene, camera, key, floor, crabRoot, squash, model, nodes, mixer, acts, bundle, cloth, mouth };
     size();
     crabRoot.position.set(0, 0, 0); bundle.visible = true; nodes['part:parcel'] && (nodes['part:parcel'].visible = true);
     try { await renderer.compileAsync(scene, camera); } catch (e) { /* older three: compiles on first draw */ }
@@ -277,22 +292,25 @@ function arm(opts = {}) {
   const cloth = R.cloth; cloth.style.width = cloth.style.height = CS + 'px'; cloth.style.display = 'block';
   const GB = groundAt(cc[0], cc[1] + CS * 0.46);                                    // where the tied bundle sits
 
-  const items = ITEMS.map(([sel, mini0, snap], k) => {
+  let at = T.pack0, ord = 0; const nI = ITEMS.length;
+  const items = ITEMS.map(([sel, , snap, bare], k) => {
     const el = $(sel); if (!el) return null;
-    const r = el.getBoundingClientRect(); const at = T.pack0 + k * T.step;
-    if (!r.width || r.bottom < -300 || r.top > H + 500) { el.style.visibility = 'hidden'; return { el, skip: true, at, snap }; }
+    const mine = at; at += T.gap ? T.gap(ord++) : lerp(T.step, T.step1 == null ? T.step : T.step1, nI > 1 ? k / (nI - 1) : 0);
+    const r = el.getBoundingClientRect();
+    if (!r.width || r.bottom < -300 || r.top > H + 500) { el.style.visibility = 'hidden'; return { el, skip: true, at: mine, snap }; }
     el.classList.add('pk-item');
-    const mini = short ? [mini0[0] * 0.5, mini0[1] * 0.5] : mini0;
-    const tx = cc[0] + JX[k] * CS / 220 * (short ? 0.4 : 1), ty = cc[1] + (short ? 0 : 22 - k * 5.4);
-    return { el, k, at, snap, paper: !el.classList.contains('note'), cx: r.left + r.width / 2, cy: r.top + r.height / 2, tx, ty,
-      msx: mini[0] / r.width, msy: mini[1] / r.height, rot: JR[k], dir: k % 2 ? 1 : -1, arc: 34 + Math.hypot(tx - (r.left + r.width / 2), ty - (r.top + r.height / 2)) * 0.1, state: '', op: '' };
+    /* the crab stands between the right-hand things and the pocket: those go over its head, not through it */
+    let bend = null; const bx = r.left + r.width / 2, by = r.top + r.height / 2, edge = x1 - 130;
+    if (!short && bx > edge && cc[0] < edge) { const p = clamp((bx - edge) / (bx - cc[0]), 0.08, 0.92), need = by + (cc[1] - by) * p - (gy - 320); if (need > 0) bend = [0, -Math.min(380, need / Math.sin(Math.PI * p))]; }
+    return { el, k, at: mine, snap, bend, paper: !bare && !el.classList.contains('note'), cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: el.offsetWidth || r.width, h: el.offsetHeight || r.height, state: '', op: '' };
   }).filter(Boolean);
-  const lands = items.map((i) => i.at + T.fold + T.fly);
-  const snaps = items.filter((i) => i.snap).map((i, n) => ({ at: i.at + T.fold + T.fly, side: n % 2 ? 'snap_L' : 'snap_R' }));
+  const lands = items.filter((i) => !i.skip).map((i) => i.at + T.lift + T.suck * 0.9);          // when each one is swallowed
+  const base = T; T = lay(base, items.length ? items[items.length - 1].at + base.lift + base.suck : base.pack0);   // the knot and the leap follow the last one in
+  const snaps = items.filter((i) => i.snap && !i.skip).map((i, n) => ({ at: i.at + T.lift + T.suck * 0.5, side: n % 2 ? 'snap_L' : 'snap_R' }));
   const rule = $('.wrap > hr.rule'), ruleAt = (items.find((i) => i.el.id === 'map') || { at: 1.4 }).at;
   const main = $('main'); const mr = main.getBoundingClientRect();
   main.style.transformOrigin = `${(W / 2 - mr.left).toFixed(1)}px ${(H * 0.3 - mr.top).toFixed(1)}px`;
-  M = { short, W, H, photo, seen, G0, G1, PL, PC, GB, S, s0, CS, cc, head: [x1, gy - 170], items, lands, snaps, rule, ruleAt, main, cloth, sheet: boot.sheet(), photoSrc: photo.getAttribute('src'), empty: false, night: false, clothT: '' };
+  M = { mouthW: short ? 30 : Math.round(CS * 0.2), mouthT: '', short, W, H, photo, seen, G0, G1, PL, PC, GB, S, s0, CS, cc, head: [x1, gy - 170], items, lands, snaps, rule, ruleAt, main, cloth, sheet: boot.sheet(), photoSrc: photo.getAttribute('src'), empty: false, night: false, clothT: '' };
 }
 
 /* ------------------------------------------------------------------ one frame */
@@ -317,47 +335,27 @@ export function frame(t) {
   /* ---- what has landed on the pile so far: the cloth and the crab both feel each one */
   let thump = 0; for (const c of m.lands) thump += ring(t - c, 18, 6);
 
-  /* ---- the cloth: thrown open, lies there while the pile grows, then its corners come up */
+  /* ---- the cloth: thrown open, a pocket opens in the middle of it and swallows the page; then the pocket shuts and its corners come up */
   {
-    const cu = seg(t, T.cloth[0], T.cloth[1]); let tr = 'none', op = 1, rad = 7;
+    const cu = seg(t, T.cloth[0], T.cloth[1]); let tr = 'none', op = 1, rad = 7; const gulp = Math.max(0, thump);
     if (t >= T.cloth[0] && w < 0.8) {
       const e = outCubic(cu);
       const x = lerp(m.head[0], cc[0], e), y = lerp(m.head[1], cc[1], e) - 70 * Math.sin(Math.PI * cu);
       const open = t - T.cloth[1];
       let sx = lerp(0.1, 1, outCubic(seg(cu, 0, 0.8))) * (1 + 0.07 * ring(open, 13, 5)), sy = lerp(0.1, 1, outCubic(seg(cu, 0.15, 1))) * (1 + 0.07 * ring(open - 0.03, 13, 5));
-      const g = inOut(w); const pinch = 1 - 0.24 * g; sx *= pinch * (1 + 0.02 * thump); sy *= pinch * (1 - 0.03 * thump);
+      const g = inOut(w); const pinch = 1 - 0.24 * g; sx *= pinch * (1 + 0.05 * gulp); sy *= pinch * (1 + 0.05 * gulp);
       rad = lerp(7, CS / 2, g); op = 1 - seg(w, 0.5, 0.8);
       tr = `translate3d(${(x - CS / 2).toFixed(1)}px,${(y - CS / 2).toFixed(1)}px,0) rotate(${(lerp(46, -5, e) + 30 * g).toFixed(2)}deg) scale(${sx.toFixed(4)},${sy.toFixed(4)})`;
     }
     const key = tr + op.toFixed(2);
     if (key !== m.clothT) { m.clothT = key; const s = m.cloth.style; if (tr === 'none') s.visibility = 'hidden'; else { s.visibility = 'visible'; s.transform = tr; s.opacity = op.toFixed(3); s.borderRadius = rad.toFixed(1) + 'px'; } }
+    /* the pocket: opens once the cloth lies flat, widens at every swallow, shuts before the knot */
+    const mo = m.short ? 0 : outBack(seg(t, T.cloth[1] - 0.02, T.cloth[1] + 0.2)) * (1 - seg(t, T.wrap[0] - 0.12, T.wrap[0] + 0.06));
+    const ms = 0.3 + 0.7 * mo;                                        // (never from nothing: it starts a third of its size, and fades in)
+    const mk = mo <= 0 ? '' : `translate(-50%,-50%) rotate(5deg) scale(${(ms * (1 + 0.22 * gulp)).toFixed(3)},${(ms * (1 + 0.5 * gulp)).toFixed(3)})|${clamp(mo * 3, 0, 1).toFixed(2)}`;
+    if (mk !== m.mouthT) { m.mouthT = mk; const [tf, op] = mk.split('|'); R.mouth.style.transform = tf || ''; R.mouth.style.opacity = op || ''; }
   }
 
-  /* ---- the things on the page: peel off as paper, fold in half twice, over to the pile; they stay there, a little stack */
-  for (const it of m.items) {
-    if (it.skip) continue;
-    const a = it.at, b = a + T.fold, c = b + T.fly; let state = '', op = '';
-    if (t >= a) {
-      const f = seg(t, a, b);
-      let x = 0, y = -9 * outCubic(seg(f, 0, 0.4)), sy = 1 - 0.45 * outCubic(seg(f, 0, 0.55)), sx = 1 - 0.4 * outCubic(seg(f, 0.45, 1)), rot = it.dir * 2.5 * f;
-      if (t >= b) {
-        const p = seg(t, b, c), q = inOut(p), g = outCubic(p);
-        x = (it.tx - it.cx) * q; y = lerp(-9, it.ty - it.cy, q) - it.arc * Math.sin(Math.PI * p);
-        sx = lerp(0.6, it.msx, g); sy = lerp(0.55, it.msy, g); rot = lerp(it.dir * 2.5, it.rot, q);
-      }
-      if (t >= c) { const z = ring(t - c, 20, 7); sy *= 1 - 0.2 * z; sx *= 1 + 0.1 * z; }
-      if (w > 0) { const g = inOut(w); x += (cc[0] - it.tx) * g; y += (cc[1] - it.ty) * g; sx *= 1 - 0.45 * g; sy *= 1 - 0.45 * g; rot += 30 * g; op = (1 - seg(w, 0.3, 0.6)).toFixed(3); }
-      state = w >= 0.6 ? 'gone' : `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) rotate(${rot.toFixed(2)}deg) scale(${sx.toFixed(4)},${sy.toFixed(4)})`;
-    }
-    if (state === it.state && op === it.op) continue;
-    const s = it.el.style;
-    if (state === 'gone') { s.visibility = 'hidden'; s.transform = ''; s.opacity = ''; }
-    else {
-      if (!it.state !== !state) { s.zIndex = state ? 10 + it.k : ''; s.willChange = state ? 'transform' : ''; if (it.paper) it.el.classList.toggle('pk-paper', !!state); }
-      s.visibility = ''; s.transform = state; s.opacity = op;
-    }
-    it.state = state; it.op = op;
-  }
   if (m.rule) m.rule.style.opacity = t < m.ruleAt ? '' : (1 - seg(t, m.ruleAt, m.ruleAt + 0.15)).toFixed(3);
 
   /* ---- the crab */
@@ -416,10 +414,38 @@ export function frame(t) {
       } else {
         bundle.position.copy(tmpB); squash.getWorldQuaternion(tmpQ); bundle.quaternion.copy(tmpQ);
         const got = ring(t - T.hoist[1], 14, 4.5); const k = scale / S;
-        bundle.scale.set(r * k * (1 + 0.12 * got), r * k * (1 - 0.16 * got) * (lp > 0 ? 1 : lerp(1, 0.92, outCubic(sq))), r * k * (1 + 0.12 * got));
+        const gl = m.short ? 0.14 * Math.max(0, thump) : 0;                 // (the short one: it swallows straight into the bundle)
+        bundle.scale.set(r * k * (1 + 0.12 * got + gl), r * k * (1 - 0.16 * got + gl) * (lp > 0 ? 1 : lerp(1, 0.92, outCubic(sq))), r * k * (1 + 0.12 * got + gl));
       }
     }
   }
+  /* ---- the things on the page: each lifts off as a sheet of paper and is sucked into the pocket, its near side first, so it
+     stretches into a funnel and the rest is dragged in after (pack-genie.js). The short one: straight into the bundle on its back. */
+  {
+    const mouthAt = m.short && bundle.visible ? screenOf(bundle.position) : cc;
+    for (const it of m.items) {
+      if (it.skip) continue;
+      let state = '', op = '';
+      if (t >= it.at) {
+        const u = seg(t, it.at + T.lift, it.at + T.lift + T.suck);
+        if (u >= 1) state = 'gone';
+        else {
+          const lift = outCubic(seg(t, it.at, it.at + T.lift));
+          state = quadMatrix(it.w, it.h, suck(it.w, it.h, mouthAt[0] - it.cx, mouthAt[1] - it.cy, u, m.mouthW, -8 * lift, Infinity, it.bend));
+          const f = suckFade(u); op = f < 1 ? f.toFixed(3) : '';
+        }
+      }
+      if (state === it.state && op === it.op) continue;
+      const s = it.el.style;
+      if (state === 'gone') { s.visibility = 'hidden'; s.transform = ''; s.opacity = ''; }
+      else {
+        if (!it.state !== !state) { s.zIndex = state ? 10 + it.k : ''; s.willChange = state ? 'transform' : ''; if (it.paper) it.el.classList.toggle('pk-paper', !!state); }
+        s.visibility = ''; s.transform = state; s.opacity = op;
+      }
+      it.state = state; it.op = op;
+    }
+  }
+
   floor.material.opacity = 0.2 * (1 - seg(t, T.leap[0], T.leap[0] + 0.1));
 
   /* ---- the cream page drops; the top line stays and turns into the desk's */
@@ -442,11 +468,14 @@ export async function play(href, opts = {}) {
   const done = (skipped) => { cancelAnimationFrame(raf); if (skipOff) skipOff(); window.__packBoot.go(href, skipped === true, !!opts.short); };
   const skip = (e) => { if (e.type === 'keydown' && e.key !== 'Escape') return; e.preventDefault(); done(true); };
   setTimeout(() => { if (!playing || mode !== 'go') return; addEventListener('pointerdown', skip, true); addEventListener('keydown', skip, true); }, 450);   // not at once: the second press of a double click is not "skip this"
-  skipOff = () => { removeEventListener('pointerdown', skip, true); removeEventListener('keydown', skip, true); skipOff = null; };
+  /* a second in, a quiet line says a press skips it (the whole story only: the short one is over by then) */
+  const hint = document.createElement('div'); hint.className = 'pk-skip'; hint.textContent = '點一下跳過'; hint.setAttribute('aria-hidden', 'true'); if (!opts.short) html.append(hint);
+  const hintT = setTimeout(() => { if (playing && mode === 'go') hint.classList.add('is-on'); }, 1000);
+  skipOff = () => { removeEventListener('pointerdown', skip, true); removeEventListener('keydown', skip, true); clearTimeout(hintT); hint.remove(); skipOff = null; };
   let t0 = 0;
   const tick = (now) => {
     if (!t0) t0 = now;                                               // the clock starts on the first frame that is actually drawn
-    const t = (now - t0) / 1000; frame(Math.min(t, T.end));
+    const t = (now - t0) / 1000 * TEMPO; frame(Math.min(t, T.end));
     if (t >= T.end) done(); else raf = requestAnimationFrame(tick);
   };
   frame(0); raf = requestAnimationFrame(tick);
@@ -463,7 +492,7 @@ export function reset() {
     M = null;
   }
   html.classList.remove('pk-night');
-  if (R) { R.bundle.visible = false; R.renderer.clear(); const s = R.cloth.style; s.display = 'none'; s.visibility = 'hidden'; s.transform = ''; }
+  if (R) { R.bundle.visible = false; R.renderer.clear(); const s = R.cloth.style; s.display = 'none'; s.visibility = 'hidden'; s.transform = ''; R.mouth.style.transform = ''; R.mouth.style.opacity = ''; }
   window.__packBoot.stage(false);
 }
 
@@ -472,23 +501,6 @@ export function reset() {
 export function frameBack(t) {
   const { renderer, scene, camera, crabRoot, squash, nodes, mixer, acts, bundle } = R; const m = M; const B = BACK;
   const { G0, G1, S, s0, cc } = m;
-  /* the things: out of the bundle, growing back into themselves, each to its own place */
-  for (const it of m.items) {
-    if (it.skip) continue;
-    const a = B.burst0 + (m.items.length - 1 - it.k) * B.step; const u = seg(t, a, a + B.fly); const s = it.el.style;
-    let state;
-    if (u <= 0) state = 'gone'; else if (u >= 1) state = '';
-    else {
-      const e = outCubic(u), g = inOut(u);
-      const x = (it.tx - it.cx) * (1 - g), y = (it.ty - it.cy) * (1 - g) - it.arc * Math.sin(Math.PI * u);
-      const land = u > 0.8 ? 1 + 0.04 * Math.sin(Math.PI * (u - 0.8) / 0.2) : 1;
-      state = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) rotate(${(it.rot * (1 - g)).toFixed(2)}deg) scale(${(lerp(it.msx, 1, e) * land).toFixed(4)},${(lerp(it.msy, 1, e) * land).toFixed(4)})`;
-    }
-    if (state === it.state) continue;
-    if (state === 'gone') { s.visibility = 'hidden'; }
-    else { s.visibility = 'visible'; s.transform = state; s.zIndex = state ? 10 + it.k : ''; if (it.paper) it.el.classList.toggle('pk-paper', !!state && u < 0.8); s.opacity = state && u < 0.2 ? (u / 0.2).toFixed(3) : ''; }
-    it.state = state;
-  }
   if (m.rule) m.rule.style.opacity = seg(t, B.burst0 + 0.2, B.burst0 + 0.5).toFixed(3);
   /* the crab: down from above with the bundle, a thump, then home into the photo the way it came out */
   const f = seg(t, B.fall[0], B.fall[1]), u = seg(t, B.home[0], B.home[1]), out = 1 - u;
@@ -517,6 +529,24 @@ export function frameBack(t) {
     const th = f < 1 ? 0 : ring(t - B.fall[1], 14, 4.2); const r = S * 1.45 * 0.98 * (1 - 0.72 * inOut(shrink));
     bundle.scale.set(r * (1 + 0.18 * th), r * (1 - 0.26 * th), r * (1 + 0.18 * th));
   }
+  /* the things: pulled back out of the bundle one by one (the far side first, the near side lets go last), each to its own place */
+  {
+    let mouthAt = cc;
+    if (bundle.visible) mouthAt = screenOf(bundle.position); else if (crabRoot.visible) { crabRoot.getWorldPosition(tmpB); tmpB.y += 1.3 * S; mouthAt = screenOf(tmpB); }
+    const n = m.items.length;
+    for (const it of m.items) {
+      if (it.skip) continue;
+      const a = B.burst0 + (n - 1 - m.items.indexOf(it)) * B.step; const u = seg(t, a, a + B.fly); const s = it.el.style;
+      let state;
+      if (u <= 0) state = 'gone'; else if (u >= 1) state = '';
+      else state = quadMatrix(it.w, it.h, suck(it.w, it.h, mouthAt[0] - it.cx, mouthAt[1] - it.cy, 1 - u, 30, -8 * (1 - outCubic(seg(u, 0.75, 1)))));
+      if (state === it.state) continue;
+      if (state === 'gone') { s.visibility = 'hidden'; }
+      else { s.visibility = 'visible'; s.transform = state; s.zIndex = state ? 10 + it.k : ''; if (it.paper) it.el.classList.toggle('pk-paper', !!state && u < 0.9); s.opacity = state && u < 0.14 ? (u / 0.14).toFixed(3) : ''; }
+      it.state = state;
+    }
+  }
+
   R.floor.material.opacity = 0.2;
   /* the photo gets its crab back, with a little pop */
   { const x = t - (B.home[0] + (B.home[1] - B.home[0]) * 0.9); const empty = x < 0; if (empty !== m.empty) { m.empty = empty; m.photo.src = empty ? 'crab-small-empty.webp' : m.photoSrc; }
@@ -525,6 +555,7 @@ export function frameBack(t) {
 }
 function armBack() {
   arm({ short: true });
+  { const last = BACK0.burst0 + Math.max(0, M.items.length - 1) * BACK0.step + BACK0.fly; BACK = { ...BACK0, shrink: [BACK0.burst0, +(last + 0.03).toFixed(3)], home: [+(last + 0.16).toFixed(3), +(last + 0.56).toFixed(3)], end: +(last + 0.72).toFixed(3) }; }
   M.items.forEach((it) => { if (!it.skip) { it.el.style.visibility = 'hidden'; it.state = 'gone'; } });
   if (M.rule) M.rule.style.opacity = '0';
   M.empty = true; M.photo.src = 'crab-small-empty.webp'; M.back = true;
@@ -540,7 +571,7 @@ export async function playBack() {
   setTimeout(() => { if (!playing) return; addEventListener('pointerdown', skip, true); addEventListener('keydown', skip, true); }, 0);
   skipOff = () => { removeEventListener('pointerdown', skip, true); removeEventListener('keydown', skip, true); skipOff = null; };
   let t0 = 0;
-  const tick = (now) => { if (!t0) t0 = now; const t = (now - t0) / 1000; frameBack(Math.min(t, BACK.end)); if (t >= BACK.end) reset(); else raf = requestAnimationFrame(tick); };
+  const tick = (now) => { if (!t0) t0 = now; const t = (now - t0) / 1000 * TEMPO; frameBack(Math.min(t, BACK.end)); if (t >= BACK.end) reset(); else raf = requestAnimationFrame(tick); };
   frameBack(0); raf = requestAnimationFrame(tick);
 }
 
@@ -552,4 +583,4 @@ export function release() {
   R.canvas.remove(); R.cloth.remove(); R = null; prepare.p = null;
 }
 
-window.__pack = { release, get drawn() { return R ? R.renderer.info.render.frame : -1; }, get T() { return T; }, BACK, ITEMS, prepare, arm: async (opts) => { await prepare(); if (M) reset(); arm(opts); frame(0); }, armBack: async () => { await prepare(); if (M) reset(); html.dataset.arrive = 'unpack'; armBack(); frameBack(0); }, frame, frameBack, play, playBack, reset, get ready() { return !!R; }, get m() { return M; } };
+window.__pack = { release, get drawn() { return R ? R.renderer.info.render.frame : -1; }, get T() { return T; }, get BACK() { return BACK; }, ITEMS, prepare, arm: async (opts) => { await prepare(); if (M) reset(); arm(opts); frame(0); }, armBack: async () => { await prepare(); if (M) reset(); html.dataset.arrive = 'unpack'; armBack(); frameBack(0); }, frame, frameBack, play, playBack, reset, get ready() { return !!R; }, get m() { return M; } };

@@ -107,11 +107,12 @@ html.is-capture[data-arrive="pack"] .index, html.is-capture[data-arrive="pack"] 
 /* the way back with the bundle (3D → plain). On the desk: html.pk-leaving while the crab gathers up and jumps off.
    On the plain page: html[data-arrive="unpack"] until the crab is there to hand the things back (pack-fx.js playBack);
    the cream page comes up from below over the night, the way it dropped. */
-html.pk-leaving .hero, html.pk-leaving .index, html.pk-leaving .ctl, html.pk-leaving .bubble, html.pk-leaving .tag { opacity: 0 !important; transition: opacity 180ms ease-out !important; }
+html.pk-leaving .ctl, html.pk-leaving .bubble, html.pk-leaving .tag,
+html.pk-took-hero .hero, html.pk-took-index .index { opacity: 0 !important; transition: opacity 180ms ease-out !important; }   /* the words and the index go when their own slip is taken (pack-land.js) */
 html.pk-leaving #view { view-transition-name: none; }
 html[data-arrive="unpack"] #desk-photo { view-transition-name: none; content: url("crab-small-empty.webp"); }
 html[data-arrive="unpack"] #ways a, html[data-arrive="unpack"] aside .sec-h, html[data-arrive="unpack"] .note, html[data-arrive="unpack"] #map,
-html[data-arrive="unpack"] .wrap > hr.rule, html[data-arrive="unpack"] .hero .cta, html[data-arrive="unpack"] .hero .sub, html[data-arrive="unpack"] .hero h1 { visibility: hidden; }
+html[data-arrive="unpack"] .sc-lane, html[data-arrive="unpack"] .wrap > hr.rule, html[data-arrive="unpack"] .hero .cta, html[data-arrive="unpack"] .hero .sub, html[data-arrive="unpack"] .hero h1 { visibility: hidden; }
 :root[data-fx="pack"][data-view="simple"]::view-transition-old(root) { animation: f4-hold 440ms linear both; mix-blend-mode: normal; transform: none; }
 :root[data-fx="pack"][data-view="simple"]::view-transition-new(root) { animation: f4-rise 440ms var(--f4-out) both; mix-blend-mode: normal; transform-origin: 50% 50%; }
 :root[data-fx="pack"][data-view="simple"]::view-transition-image-pair(root) { isolation: auto; }
@@ -129,3 +130,21 @@ html[data-arrive="unpack"] .wrap > hr.rule, html[data-arrive="unpack"] .hero .ct
   :root::view-transition-new(root) { animation-name: f4-fade-in !important; }
   :root::view-transition { background: none !important; animation: none !important; }
 }
+
+/* "a press skips this": a quiet line at the top middle, a second into the crab's move (pack-fx.js, pack-land.js) */
+.pk-skip {
+  position: fixed; left: 50%; top: 16px; z-index: 41; transform: translateX(-50%); pointer-events: none; white-space: nowrap;
+  font-size: 12.5px; line-height: 1; letter-spacing: .08em; padding: 7px 11px 8px; border-radius: 999px;
+  color: #3A2E5C; background: rgba(255, 244, 224, .88); box-shadow: 0 0 0 1px rgba(58, 46, 92, .16);
+  opacity: 0; transition: opacity 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.pk-skip.is-on { opacity: 1; }
+
+/* a change of page with no show, either way (a key press, someone who has had the story twice, or a show cut short): a plain 0.22 s cross-fade.
+   !important: the plain page's own rules above (the photo pulling back, 940 ms in all) would otherwise keep the transition, and
+   a page that ignores clicks, alive for a second */
+:root[data-fx="plain"]::view-transition-group(*), :root[data-fx="plain"]::view-transition-image-pair(*),
+:root[data-fx="plain"]::view-transition-old(*), :root[data-fx="plain"]::view-transition-new(*) { animation-duration: 220ms !important; animation-delay: 0s !important; }
+:root[data-fx="plain"]::view-transition { animation: none !important; background: none !important; }   /* (the rain behind the old move ran 1200 ms and held the page that long) */
+:root[data-fx="plain"]::view-transition-old(root) { animation: f4-fade-out 220ms ease-out both !important; transform: none !important; mix-blend-mode: normal; }
+:root[data-fx="plain"]::view-transition-new(root) { animation: f4-fade-in 220ms ease-out both !important; mix-blend-mode: normal; }

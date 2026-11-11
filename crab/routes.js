@@ -10,3 +10,17 @@ window.CRAB_ROUTES = [
   { id: 'news',  part: 'bubbles',    zh: 'AI 新聞',       en: 'AI news',           hint: '每週整理好，學生也看得懂',             href: null },
   { id: 'free',  part: 'parcel',     zh: '領取資源',      en: 'Free stuff',        hint: 'skill 檔、PDF、提示詞，直接帶走',      href: null },
 ];
+
+/* 學習站第一版的 8 課（2026-11-12 定案，見 網站/學習站/第一版課程.md）。
+   每課的網址放這裡，首頁的「開始」按鈕、學習地圖、幫我挑都從這裡讀；還沒寫好的放 null，首頁會先給替代的下一步。
+   網址相對於首頁資料夾（環境/f4-雨夜書桌/），或寫完整網址。 */
+window.LESSON_PAGES = {
+  'L0-01': null,
+  'L0-04': null,
+  'L1-01': null,
+  'L1-07': null,
+  'L2-01': null,
+  'L3-03': null,
+  'L4-01': null,
+  'L4-06': null,
+};

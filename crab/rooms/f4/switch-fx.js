@@ -13,7 +13,7 @@
       setTimeout(function () { if (!window.__f4Landing) delete root.dataset.arrive; }, 4500);
     }
     // the same on the way back: the plain page starts with its things still in the crab's bundle (pack-boot.js → pack-fx.js playBack)
-    if (n0 && n0.pack && n0.to === 'simple' && root.dataset.view === 'simple' && Date.now() - n0.at < 8000 && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+    if (n0 && n0.pack && !n0.skip && n0.to === 'simple' && root.dataset.view === 'simple' && Date.now() - n0.at < 8000 && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) {
       root.dataset.arrive = 'unpack';
       setTimeout(function () { if (!window.__packBack) delete root.dataset.arrive; }, 2600);
     }
@@ -26,6 +26,7 @@
     try { note = JSON.parse(sessionStorage.getItem(NOTE) || 'null'); sessionStorage.removeItem(NOTE); } catch (x) { note = null; }
     var simple = document.documentElement.dataset.view === 'simple';
     if (!note || note.to !== (simple ? 'simple' : '3d') || Date.now() - note.at > 8000) { vt.skipTransition(); document.documentElement.dataset.fx = 'skipped'; return; }
+    if (note.pack && note.skip) { document.documentElement.dataset.fx = 'plain'; return; }   // no show, either way (a key press, the third time on, or you cut it short): the two pages just cross-fade, 0.22 s
     if (note.pack) { document.documentElement.dataset.fx = 'pack'; return; }   // the crab packed the plain page up and the desk is already showing (pack-fx.js): a short cross-fade, see switch-fx.css
     // where the cream page rushes past / comes back from: the little desk photo on the plain page
     var x = note.ox, y = note.oy;

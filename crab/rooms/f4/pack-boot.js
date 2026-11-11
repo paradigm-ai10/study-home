@@ -14,8 +14,11 @@
   const calm = matchMedia('(prefers-reduced-motion: reduce)');
   const NOTE = 'paradigm.f4.switching', SEEN = 'paradigm.f4.packSeen';
   const Q = new URLSearchParams(location.search), keep = !Q.has('fresh') || Q.has('keep');
-  // the whole story once; after that the short one (?short and ?long force either, for checking)
-  const isShort = () => { if (Q.has('long')) return false; if (Q.has('short')) return true; try { return keep && localStorage.getItem(SEEN) === '1'; } catch (e) { return false; } };
+  /* How much of the story you get goes by how many times you have had it (2026-11-12, Thomas, after the motion review):
+     the first time all of it, the second time the short one, from the third time on the page just changes (a 0.2 s cross-fade).
+     A key press (Enter on the link) always just changes the page. ?long, ?short and ?plain force one; ?fresh counts as a first time. */
+  const seen = () => { try { return keep ? (+localStorage.getItem(SEEN) || 0) : 0; } catch (e) { return 0; } };
+  const kind = () => (Q.has('long') ? 'full' : Q.has('short') ? 'short' : Q.has('plain') ? 'plain' : seen() >= 2 ? 'plain' : seen() === 1 ? 'short' : 'full');
   let mod = null, busy = false, sheet = null, anims = [];
 
   /* the stage: night behind the page, and the page as a cream sheet that can drop (styles: pack-fx.css) */
@@ -24,13 +27,14 @@
     stage(on) { boot.sheet(); html.classList.toggle('pk-on', on); if (!on) html.classList.remove('pk-night'); },
     go(href, skipped, short) {                                       // skipped: you cut it short, so the desk does not play its half either
       try { sessionStorage.setItem(NOTE, JSON.stringify({ to: '3d', at: Date.now(), pack: 1, skip: skipped ? 1 : 0, short: short ? 1 : 0 })); } catch (e) { /* then it just changes page */ }
-      try { if (!skipped && keep) localStorage.setItem(SEEN, '1'); } catch (e) { /* private mode: it will be the long one again */ }
+      try { if (!skipped && keep) localStorage.setItem(SEEN, String(Math.min(9, seen() + 1))); } catch (e) { /* private mode: it will be the long one again */ }
       location.href = href;
     },
   };
 
   const warm = () => mod || (mod = import('./pack-fx.js').then((m) => m.prepare().then(() => m)).catch((e) => { console.info('[pack] no crab, short version:', e && e.message); return null; }));
-  links.forEach((a) => { ['pointerenter', 'focus', 'touchstart'].forEach((ev) => a.addEventListener(ev, warm, { passive: true })); });
+  const reach = () => { if (kind() !== 'plain') warm(); };           // (someone who only gets the cross-fade never needs the crab)
+  links.forEach((a) => { ['pointerenter', 'focus', 'touchstart'].forEach((ev) => a.addEventListener(ev, reach, { passive: true })); });
   /* and, on a computer with a decent connection, a few quiet seconds after the page is up: so a first visit gets the whole story
      even if the click comes fast (Thomas, 2026-11-11). Not on phones, data-saver, slow connections or less-motion systems,
      and not for someone who has picked the plain version (they pressed "切到簡潔版" on an earlier visit): they asked for no 3D,
@@ -39,7 +43,7 @@
   const light = calm.matches || conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '') || matchMedia('(max-width: 767px) and (pointer: coarse) and (hover: none)').matches || /Instagram|FBAN|FBAV|Line\//i.test(navigator.userAgent || '');
   let picked = null; try { picked = keep ? localStorage.getItem('paradigm.f4.view') : null; } catch (e) { /* private mode: treated as a first visit */ }
   if (!light && picked !== 'simple' && html.dataset.arrive !== 'unpack') {
-    const soon = () => setTimeout(() => (window.requestIdleCallback ? requestIdleCallback(() => { if (!document.hidden) warm(); }, { timeout: 3000 }) : warm()), 2500);
+    const soon = () => setTimeout(() => (window.requestIdleCallback ? requestIdleCallback(() => { if (!document.hidden) reach(); }, { timeout: 3000 }) : reach()), 2500);
     if (document.readyState === 'complete') soon(); else addEventListener('load', soon);
   }
   /* a tab left in the background does not keep the crab's canvas: it is let go after half a minute and fetched again when you reach for the link */
@@ -50,7 +54,7 @@
   });
   if (!calm.matches) {                                               // reaching toward a link counts: the fetch gets a head start on the click
     const near = (e) => {
-      for (const a of links) { const r = a.getBoundingClientRect(); if (e.clientX > r.left - 220 && e.clientX < r.right + 220 && e.clientY > r.top - 160 && e.clientY < r.bottom + 160) { removeEventListener('pointermove', near); warm(); return; } }
+      for (const a of links) { const r = a.getBoundingClientRect(); if (e.clientX > r.left - 220 && e.clientX < r.right + 220 && e.clientY > r.top - 160 && e.clientY < r.bottom + 160) { removeEventListener('pointermove', near); reach(); return; } }
     };
     addEventListener('pointermove', near, { passive: true });
   }
@@ -71,11 +75,12 @@
     if (html.classList.contains('has-card')) return;                 // a task card is open (only the keyboard can get here): just change page, nothing to pack around it
     if (!window.WebGL2RenderingContext && !document.startViewTransition) return;       // very old browser: just change page
     e.preventDefault(); if (busy) return; busy = true;
-    const href = a.href, viaKey = e.detail === 0;                    // Enter on the link: the short one, a key press should not start a long show
+    const href = a.href, how = e.detail === 0 ? 'plain' : kind();      // Enter on the link: no show at all, a key press just changes the page
+    if (how === 'plain') { boot.go(href, true, false); return; }
     if (photo) photo.classList.add('pk-wait');                       // answers the press at once, while the crab is (maybe) still on its way
     Promise.race([warm(), new Promise((r) => setTimeout(() => r(null), 1200))]).then((m) => {
       if (photo) photo.classList.remove('pk-wait');
-      if (m) m.play(href, { short: isShort() || viaKey }).catch(() => short(href)); else short(href);
+      if (m) m.play(href, { short: how === 'short' }).catch(() => short(href)); else short(href);
     });
   }));
 
