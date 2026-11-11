@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="zh-Hant" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#171429">
+<title>Paradigm｜不會寫程式，也能學會用 AI</title>
+<meta name="description" content="給學生和上班族的免費中文課：不會寫程式，也能讓 AI 幫你做事。先做一個 60 秒的小任務，再看從第幾課開始。">
+<script>document.documentElement.classList.replace('no-js', 'js');</script>
+<script>
+  /* two versions of this page. If you chose the plain one last time, or your system asks for less motion and you have not chosen yet,
+     go straight there. ?view=3d keeps you here whatever was stored; ?fresh ignores what was stored. */
+  (function () {
+    try {
+      var q = new URLSearchParams(location.search);
+      if (q.has('view')) return;
+      var v = q.has('fresh') ? null : localStorage.getItem('paradigm.f4.view');
+      var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (v === 'simple' || (!v && calm)) location.replace('simple.html' + location.search + location.hash);
+    } catch (e) { /* stay here */ }
+  })();
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 13 7%27%3E%3Cpath fill=%27%23D97757%27 d=%27M2 0h9v2h2v2h-2v1H2V4H0V2h2z%27/%3E%3Cpath fill=%27%23D97757%27 d=%27M3 5h1v2H3zM5 5h1v2H5zM7 5h1v2H7zM9 5h1v2H9z%27/%3E%3Cpath fill=%27%231a1a1a%27 d=%27M4 1h1v2H4zM8 1h1v2H8z%27/%3E%3C/svg%3E">
+<link rel="preload" as="image" href="poster.webp" fetchpriority="high">
+<link rel="stylesheet" href="switch-fx.css">
+<link rel="expect" href="#view" blocking="render">
+<script src="switch-fx.js"></script>
+<link rel="preload" as="font" href="fonts/huninn-f4.woff2" type="font/woff2" crossorigin fetchpriority="low">
+<style>
+  /* fonts live here, cut down to the characters this page uses (see src/fonts.py) */
+  @font-face { font-family: "Huninn"; src: url("fonts/huninn-f4.woff2") format("woff2"); font-display: swap; }
+  @font-face { font-family: "Outfit"; font-weight: 500; src: url("fonts/outfit-500.woff2") format("woff2"); font-display: swap; }
+  @font-face { font-family: "Outfit"; font-weight: 600; src: url("fonts/outfit-600.woff2") format("woff2"); font-display: swap; }
+  :root {
+    --cream: #FFF4E0;
+    --grape: #3A2E5C;
+    --grape-2: rgba(58, 46, 92, .78);
+    --grape-3: rgba(58, 46, 92, .62);
+    --grape-4: rgba(58, 46, 92, .26);
+    --coral: #FF6B57;
+    --coral-ink: #c83a26;
+    --sun: #FFC857;
+    --dusk: #171429;
+    --zh: "Huninn", "PingFang TC", "Noto Sans TC", system-ui, sans-serif;
+    --en: "Outfit", "Huninn", system-ui, sans-serif;
+    --spring: cubic-bezier(.2, .9, .25, 1.15);
+    --out: cubic-bezier(.2, .8, .2, 1);
+    --card-shadow: 0 1px 2px rgba(14, 10, 30, .34), 0 6px 18px rgba(14, 10, 30, .26);
+    --pad: clamp(16px, 2.8vw, 40px);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--dusk); color: var(--cream); font-family: var(--zh);
+    -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; overflow: hidden;
+  }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  :focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; border-radius: 4px; }
+  button { font: inherit; }
+
+  .stage { position: relative; height: 100vh; height: 100svh; min-height: 560px; overflow: hidden; }
+
+  /* ---------- the picture: the poster is there from the first paint; the live desk fades in over it when it is ready ---------- */
+  .view { position: absolute; inset: 0; overflow: hidden; background: #241b33; }
+  .poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; pointer-events: none; }
+  .view canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none;
+    opacity: 0; transition: opacity 700ms ease-out; touch-action: none;
+  }
+  html.is-3d .view canvas { opacity: 1; }
+  html.is-intro .view canvas { transition-duration: 260ms; }      /* the entrance starts on a crab lying flat: swap from the poster quickly, so it reads as a duck, not a ghost */
+  html.is-capture .view canvas, html.is-capture .bubble, html.is-capture .bubble p, html.is-capture .tag, html.is-capture .tag b, html.is-capture .card, html.is-capture .ctl { transition: none !important; }
+  html.is-hot .view canvas { cursor: pointer; }
+  html.is-drag .view canvas { cursor: grabbing; }
+  .view::after {
+    /* the left edge is where the words are: darken it so they read on any frame */
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 46% 60% at 0% 22%, rgba(14, 9, 28, .78) 0%, rgba(14, 9, 28, .5) 45%, rgba(14, 9, 28, 0) 100%),
+      radial-gradient(ellipse 120% 105% at 50% 46%, rgba(10, 7, 22, 0) 55%, rgba(10, 7, 22, .5) 100%);
+  }
+
+  /* ---------- top line ---------- */
+  .top {
+    position: absolute; z-index: 6; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: max(18px, env(safe-area-inset-top)) var(--pad) 0;
+    font-family: var(--en); font-size: 12.5px; pointer-events: none;
+  }
+  .top a { pointer-events: auto; text-decoration: none; background: var(--cream); color: var(--grape); padding: 8px 12px; border-radius: 5px; box-shadow: var(--card-shadow); }
+  .wordmark { font-weight: 600; letter-spacing: .26em; }
+  .top .right { display: flex; gap: 8px; align-items: center; }
+  .top a.switch { font-family: var(--zh); font-size: 13.5px; letter-spacing: .04em; padding: 7px 12px 8px; }
+  .ig { font-weight: 500; letter-spacing: .03em; }
+
+  /* ---------- what this is, and the one thing to press ---------- */
+  .hero { position: absolute; z-index: 5; left: var(--pad); top: clamp(78px, 10.5vh, 104px); width: min(318px, calc(100vw - 2 * var(--pad))); }
+  .hero h1 { margin: 0; font-weight: 400; font-size: clamp(25px, 2.05vw, 30px); line-height: 1.38; letter-spacing: .03em; text-wrap: balance; }
+  .hero .sub { margin: 10px 0 0; font-size: 14.5px; line-height: 1.7; letter-spacing: .03em; color: rgba(255, 244, 224, .86); }
+  .hero .cta { margin: 16px 0 0; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+  .btn-main {
+    appearance: none; border: 0; cursor: pointer; background: var(--sun); color: var(--grape);
+    font-size: 17px; letter-spacing: .05em; line-height: 1; padding: 15px 20px 15px; border-radius: 10px;
+    box-shadow: 0 2px 0 #c9942a, 0 10px 22px -8px rgba(10, 6, 24, .8);
+    transition: translate 120ms ease-out, box-shadow 120ms ease-out, background-color 140ms ease-out;
+  }
+  .btn-main:hover { background: #ffd373; }
+  .btn-main:active { translate: 0 2px; box-shadow: 0 0 0 #c9942a, 0 6px 14px -8px rgba(10, 6, 24, .8); }
+  .btn-main small { font-family: var(--en); font-weight: 600; font-size: 12px; letter-spacing: .06em; margin-left: 8px; opacity: .7; }
+  .btn-link {
+    appearance: none; border: 0; background: none; cursor: pointer; color: var(--cream); padding: 4px 0;
+    font-size: 14.5px; letter-spacing: .04em; text-decoration: underline; text-decoration-color: rgba(255, 244, 224, .5); text-underline-offset: 5px;
+  }
+  .btn-link:hover { text-decoration-color: var(--sun); }
+  /* a card is open and the desk is live: the stage belongs to the crab and the card; the words come back when it closes */
+  .hero { transition: opacity 220ms ease-out, visibility 0s; }
+  html.is-3d.has-card .hero { opacity: 0; visibility: hidden; transition: opacity 220ms ease-out, visibility 0s linear 220ms; }
+  html.is-capture .hero { transition: none !important; }
+  .hero.is-done .btn-main { background: var(--cream); box-shadow: 0 2px 0 #cdbf9f, 0 10px 22px -8px rgba(10, 6, 24, .8); }
+
+  /* ---------- the index card, bottom left: always there, always clickable ---------- */
+  .index {
+    position: absolute; z-index: 5; left: var(--pad); bottom: clamp(18px, 4.4vh, 40px); width: min(318px, calc(100vw - 2 * var(--pad)));
+    background: var(--cream); color: var(--grape); border-radius: 8px; padding: 11px 16px 10px; box-shadow: var(--card-shadow);
+  }
+  .index h2 { margin: 0 0 2px; font-weight: 400; font-size: 13px; letter-spacing: .14em; color: var(--grape-3); }
+  .index .progress { margin: 0 0 4px; font-size: 13px; letter-spacing: .03em; color: var(--coral-ink); }
+  .index .progress:empty { display: none; }
+  .index a { display: block; color: inherit; text-decoration: none; padding: 4px 0 4px 16px; position: relative; outline-offset: 2px; }
+  .index a::before { content: ""; position: absolute; left: 0; top: 12px; width: 6px; height: 6px; border-radius: 1px; background: var(--grape-4); transition: background-color 160ms ease-out, scale 220ms var(--out); }
+  .index a b { font-weight: 400; font-size: 16.5px; letter-spacing: .04em; }
+  .index a i { display: block; font-style: normal; font-size: 12.5px; line-height: 1.5; letter-spacing: .02em; color: var(--grape-2); }
+  .index a.is-on, .index a:hover { color: var(--coral-ink); }
+  .index a.is-on::before, .index a:hover::before { background: var(--coral); scale: 1.35; }
+  .index .more { margin-top: 5px; padding-top: 7px; border-top: 1px solid var(--grape-4); display: flex; flex-wrap: wrap; gap: 2px 14px; }
+  .index .more a { padding: 3px 0 3px 12px; }
+  .index .more a::before { top: 10px; width: 4px; height: 4px; }
+  .index .more a b { font-size: 14px; color: var(--grape-2); }
+  .index .more a.is-on b, .index .more a:hover b { color: var(--coral-ink); }
+  html.has-card .index a:not(.is-on) { opacity: .5; }
+
+  /* ---------- the card the crab hands you: the task, the three questions, the map, "not built yet, here is what to do instead" ---------- */
+  .card {
+    position: absolute; z-index: 8; right: var(--pad); top: 50%; width: min(404px, calc(100vw - 2 * var(--pad)));
+    translate: 0 -46%; background: var(--cream); color: var(--grape); border-radius: 12px; padding: 20px 22px 20px;
+    box-shadow: 0 2px 4px rgba(14, 10, 30, .34), 0 18px 44px -10px rgba(14, 10, 30, .6);
+    opacity: 0; visibility: hidden; scale: .96; transform-origin: 80% 60%;
+    transition: opacity 180ms ease-out, scale 320ms var(--spring), visibility 0s linear 180ms;
+    max-height: calc(100% - 150px); overflow: auto;
+  }
+  .card.on { opacity: 1; visibility: visible; scale: 1; transition: opacity 180ms ease-out, scale 320ms var(--spring); }
+  .card .x {
+    position: absolute; right: 8px; top: 8px; width: 36px; height: 36px; border: 0; background: none; cursor: pointer; border-radius: 8px;
+    color: var(--grape-3); font-size: 22px; line-height: 1;
+  }
+  .card .x:hover { background: rgba(58, 46, 92, .08); color: var(--grape); }
+  .card .kicker { margin: 0 0 6px; font-size: 13px; letter-spacing: .12em; color: var(--coral-ink); }
+  .card h2:focus { outline: none; }
+  .card h2 { margin: 0 34px 12px 0; font-weight: 400; font-size: 20px; line-height: 1.5; letter-spacing: .03em; }
+  .card p { margin: 0 0 12px; font-size: 15px; line-height: 1.7; letter-spacing: .02em; }
+  .card p.small { font-size: 13.5px; color: var(--grape-2); }
+  .card .opts { display: grid; gap: 10px; margin: 0 0 4px; }
+  .card .opt {
+    appearance: none; text-align: left; cursor: pointer; width: 100%;
+    background: #fffaf0; color: var(--grape); border: 1.5px solid var(--grape-4); border-radius: 10px; padding: 12px 14px 12px 44px; position: relative;
+    font-size: 15px; line-height: 1.65; letter-spacing: .02em; transition: border-color 140ms ease-out, background-color 140ms ease-out;
+  }
+  .card .opt::before {
+    content: attr(data-k); position: absolute; left: 12px; top: 12px; width: 22px; height: 22px; border-radius: 6px; background: var(--grape); color: var(--cream);
+    font: 600 12.5px/22px var(--en); text-align: center;
+  }
+  .card .opt:hover { border-color: var(--grape); }
+  .card .opt.is-right { border-color: #2f7d5b; background: #eef7ee; }
+  .card .opt.is-right::before { background: #2f7d5b; content: "✓"; }
+  .card .opt.is-chosen:not(.is-right) { border-color: var(--grape-3); background: #f6ecd8; }
+  .card .opt[disabled] { cursor: default; }
+  .card .opt[aria-pressed="true"] { border-color: var(--grape); background: #fff; box-shadow: inset 0 0 0 1px var(--grape); }
+  .card .opt.check { padding-left: 44px; }
+  .card .opt.check::before { content: ""; background: #fff; border: 1.5px solid var(--grape-3); }
+  .card .opt.check[aria-pressed="true"]::before { content: "✓"; background: var(--grape); border-color: var(--grape); }
+  .card .why { margin: 12px 0 0; padding: 12px 14px; border-radius: 10px; background: #fff; font-size: 14.5px; line-height: 1.7; }
+  .card .win { margin: 14px 0 6px; font-size: 21px; letter-spacing: .03em; color: var(--coral-ink); }
+  .card .row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; align-items: center; }
+  .card .go {
+    appearance: none; border: 0; cursor: pointer; text-decoration: none; display: inline-block;
+    background: var(--grape); color: var(--cream); font-size: 15.5px; letter-spacing: .05em; line-height: 1; padding: 13px 16px; border-radius: 9px;
+  }
+  .card .go:hover { background: #2b2148; }
+  .card .go.alt { background: none; color: var(--grape); box-shadow: inset 0 0 0 1.5px var(--grape-3); }
+  .card .go.alt:hover { box-shadow: inset 0 0 0 1.5px var(--grape); background: rgba(58, 46, 92, .05); }
+  .card .steps { margin: 0 0 10px; font: 600 12px/1 var(--en); letter-spacing: .12em; color: var(--grape-3); }
+  .card ol.stages { list-style: none; margin: 4px 0 8px; padding: 0; display: grid; gap: 7px; }
+  .card ol.stages li { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 8px 12px; border-radius: 9px; background: #fffaf0; font-size: 14.5px; line-height: 1.5; }
+  .card ol.stages li.is-here { box-shadow: inset 0 0 0 1.5px var(--coral); background: #fff; }
+  .card ol.stages li span { font-family: var(--en); font-weight: 600; font-size: 13px; color: var(--grape-3); align-self: center; }
+  .card ol.stages li small { grid-column: 1 / 3; font-size: 12.5px; color: var(--grape-2); }
+  .card :focus-visible { outline-color: var(--coral-ink); }
+  .index :focus-visible, .ctl :focus-visible, .top :focus-visible { outline-color: var(--coral-ink); box-shadow: 0 0 0 2px var(--cream); }
+
+  /* one small paper tag, tied to the thing you are pointing at */
+  .tag { position: absolute; z-index: 4; left: 0; top: 0; pointer-events: none; will-change: transform; opacity: 0; transition: opacity 160ms ease-out; padding-bottom: 13px; }
+  .tag.on { opacity: 1; }
+  .tag b {
+    display: block; position: relative; font-weight: 400; white-space: nowrap; font-size: 15.5px; line-height: 1; letter-spacing: .06em; color: var(--grape);
+    padding: 8px 12px 8px 22px; background: var(--sun); clip-path: polygon(9px 0, 100% 0, 100% 100%, 9px 100%, 0 50%);
+    translate: 0 4px; transition: translate 260ms var(--spring);
+  }
+  .tag.on b { translate: 0 0; }
+  .tag b::before { content: ""; position: absolute; left: 10px; top: 50%; width: 5px; height: 5px; margin-top: -2.5px; border-radius: 50%; background: var(--grape); opacity: .55; }
+  .tag::after { content: ""; position: absolute; left: 12px; bottom: 0; width: 1px; height: 22px; transform-origin: 50% 0; background: rgba(255, 244, 224, .6); transform: translateY(-9px) rotate(14deg); }
+
+  /* the crab talks */
+  .bubble { position: absolute; z-index: 5; left: 0; top: 0; pointer-events: none; will-change: transform; opacity: 0; transition: opacity 180ms ease-out; }
+  .bubble.on { opacity: 1; }
+  .bubble p {
+    margin: 0; position: relative; width: max-content; max-width: min(17.5em, calc(100vw - 48px));
+    translate: -50% -100%; padding: 11px 16px 12px; border-radius: 16px;
+    background: var(--cream); color: var(--grape); font-size: 15.5px; line-height: 1.55; letter-spacing: .04em;
+    scale: .92; transform-origin: 50% 100%; transition: scale 320ms var(--spring); box-shadow: 0 10px 24px -12px rgba(10, 5, 25, .7);
+  }
+  .bubble.on p { scale: 1; }
+  .bubble p::after { content: ""; position: absolute; left: 50%; bottom: -6px; width: 14px; height: 14px; margin-left: -7px; background: var(--cream); rotate: 45deg; border-radius: 0 0 3px 0; }
+  .bubble b { font-weight: 400; display: block; font-size: 13px; letter-spacing: .1em; opacity: .7; margin-bottom: 2px; }
+
+  .zzz { position: absolute; z-index: 5; left: 0; top: 0; pointer-events: none; opacity: 0; transition: opacity 500ms ease-out; font-family: var(--en); font-weight: 600; color: var(--cream); }
+  .zzz.on { opacity: 1; }
+  .zzz span { position: absolute; left: 0; top: 0; opacity: 0; animation: zzz 3.2s ease-out infinite; text-shadow: 0 2px 8px rgba(20, 10, 40, .6); }
+  .zzz span:nth-child(1) { font-size: 15px; }
+  .zzz span:nth-child(2) { font-size: 20px; animation-delay: 1.05s; }
+  .zzz span:nth-child(3) { font-size: 26px; animation-delay: 2.1s; }
+  @keyframes zzz { 0% { opacity: 0; transform: translate(0, 0) rotate(-8deg); } 18% { opacity: .9; } 100% { opacity: 0; transform: translate(34px, -62px) rotate(10deg); } }
+
+  /* bottom right: three quiet switches for the room (only once the live desk is up) */
+  .ctl { position: absolute; z-index: 5; right: var(--pad); bottom: clamp(18px, 4.4vh, 40px); display: flex; gap: 6px; opacity: 0; pointer-events: none; transition: opacity 500ms ease-out; }
+  html.is-3d .ctl { opacity: 1; pointer-events: auto; }
+  .ctl button {
+    appearance: none; cursor: pointer; border: 0; border-radius: 6px; padding: 8px 10px; line-height: 1;
+    background: rgba(255, 244, 224, .92); color: var(--grape); font-size: 13.5px; letter-spacing: .04em; box-shadow: var(--card-shadow);
+    display: inline-flex; align-items: baseline; gap: 6px; transition: background-color 140ms ease-out, scale 140ms ease-out;
+  }
+  .ctl button b { font-weight: 400; font-size: 12.5px; color: var(--grape-3); min-width: 1.2em; }
+  .ctl button[aria-pressed="true"] { background: var(--grape); color: var(--cream); }
+  .ctl button[aria-pressed="true"] b { color: var(--sun); }
+  .ctl button:active { scale: .97; }
+
+  html:not(.is-3d) .tag, html:not(.is-3d) .bubble, html:not(.is-3d) .zzz { display: none; }
+  .fade { position: fixed; inset: 0; z-index: 20; background: var(--cream); opacity: 0; pointer-events: none; transition: opacity 320ms ease-in; }
+  .fade.on { opacity: 1; }
+
+  /* no script: the same first screen, the seven names as a plain list */
+  html.no-js .hero .cta { display: none; }
+
+  /* narrow screens: not designed yet (desktop first); keep everything reachable in one column */
+  @media (max-width: 767px) {
+    body { overflow: auto; }
+    .stage { height: auto; min-height: 100svh; overflow: visible; padding: 86px 0 20px; display: flex; flex-direction: column; gap: 18px; }
+    .view { position: fixed; }
+    .view::after { background: rgba(14, 9, 28, .62); }
+    .hero, .index { position: relative; left: auto; top: auto; bottom: auto; margin: 0 var(--pad); width: auto; }
+    .card { position: fixed; right: var(--pad); left: var(--pad); width: auto; top: auto; bottom: 12px; translate: 0 0; max-height: 78svh; }
+    .ctl { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .bubble p, .tag b, .card { transition-duration: 1ms; } .zzz span { animation: none; opacity: .8; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="wordmark" href="../../../index.html">PARADIGM</a>
+  <span class="right">
+    <a class="switch" href="simple.html" data-view-to="simple" title="同樣的內容，沒有 3D 和動畫">切到簡潔版</a>
+    <a class="ig" href="https://www.instagram.com/paradigmai_tw/" rel="noopener">IG @paradigmai_tw</a>
+  </span>
+</header>
+
+<main class="stage" id="stage">
+  <div class="view" id="view">
+    <img class="poster" src="poster.webp" width="1600" height="1000" fetchpriority="high" decoding="async"
+         alt="下雨的晚上，一張開著暖黃檯燈的書桌。桌子中間站著一隻橘色小螃蟹，旁邊擺著地圖、字典、收音機、包裹、筆筒和一封信，窗玻璃上有雨滴。">
+  </div>
+
+  <section class="hero" id="hero">
+    <h1>不會寫程式，<br>也能讓 AI 幫你做事</h1>
+    <p class="sub">給學生和上班族的免費中文課。一課做一件事，照著做完就會。</p>
+    <p class="cta">
+      <button type="button" class="btn-main" id="btn-task">給我一個 60 秒任務</button>
+      <button type="button" class="btn-link" id="btn-pick">我會一點了，幫我挑從哪課開始</button>
+    </p>
+  </section>
+
+  <nav class="index" id="ways" aria-label="從這裡開始">
+    <h2>從這裡開始</h2>
+    <p class="progress" id="progress"></p>
+    <a href="#pick" data-id="pick"><b>幫我挑</b><i>回答 3 題，告訴你從第幾課開始</i></a>
+    <a href="#map" data-id="map"><b>學習地圖</b><i>33 課從簡單排到難，會的可以跳過</i></a>
+    <a href="#free" data-id="free"><b>領取資源</b><i>IG 留言領的 Skill 檔、PDF、提示詞都在這</i></a>
+    <div class="more">
+      <a href="#solve" data-id="solve"><b>解決一件事</b></a>
+      <a href="#words" data-id="words"><b>AI 名詞小字典</b></a>
+      <a href="#news" data-id="news"><b>AI 新聞</b></a>
+      <a href="#ask" data-id="ask"><b>你想學什麼</b></a>
+    </div>
+  </nav>
+
+  <section class="card" id="card" role="dialog" aria-modal="false" aria-labelledby="card-title" tabindex="-1"></section>
+  <p class="sr" id="live" role="status" aria-live="polite"></p>
+
+  <div class="tag" id="tag" aria-hidden="true"><b></b></div>
+  <div class="bubble" id="bubble" aria-hidden="true"><p></p></div>
+  <div class="zzz" id="zzz" aria-hidden="true"><span>z</span><span>z</span><span>Z</span></div>
+
+  <div class="ctl" id="ctl" aria-label="書桌的開關">
+    <button type="button" id="btn-rain" aria-pressed="false">雨聲<b>關</b></button>
+    <button type="button" id="btn-lamp" aria-pressed="true">檯燈<b>開</b></button>
+    <button type="button" id="btn-curtain" aria-pressed="true">窗簾<b>開</b></button>
+  </div>
+</main>
+<div class="fade" id="fade"></div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<!-- the three small scripts that make the first screen work go ahead of the picture and the font on a slow line -->
+<script src="../../routes.js" defer fetchpriority="high"></script>
+<script src="../../../syllabus.js" defer fetchpriority="high"></script>
+<script src="app.js" defer fetchpriority="high"></script>
+</body>
+</html>

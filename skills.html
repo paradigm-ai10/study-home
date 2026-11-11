@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Skills：把做法存起來｜Paradigm 學 AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Outfit:wght@400;700&family=Silkscreen&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><span id="logo"></span>PARADIGM</a>
+  <nav><a href="index.html">全部課程</a><a href="#">學習路線</a><a href="#">AI 新聞</a></nav>
+</div></header>
+
+<div class="crumb"><div class="read">
+  <a href="index.html">← 全部課程</a><span>·</span><span>把做法存起來</span><span>·</span><span>6 分鐘</span><span>·</span><span>更新 2026-11-06</span>
+</div></div>
+
+<main class="read lesson">
+  <p class="kicker" style="margin-top:30px">LESSON · SKILLS</p>
+  <h1>Skills：把做法存起來</h1>
+  <p class="lede">一件事你已經跟 Claude 做順了，就把做法寫成一份說明書。以後說一句「出題」，它就照說明書做，不用再教一次。</p>
+
+  <div class="goals"><b>學完你會</b><ul>
+    <li>把一個做順的流程存成 Skill</li>
+    <li>分得出 Skill、Project、Instructions 的差別</li>
+    <li>開新對話測一次，確定它真的照做</li>
+  </ul></div>
+  <p class="pre">先看過：<a href="#">拆解流程：哪些交給 AI</a>（沒看也可以，這課會從頭講）　·　免費版就能用</p>
+
+  <div class="reel">
+    <div class="phone"><div><span id="reelArt"></div>阿糰 60 秒示範<br>Reel 準備中</div></div>
+    <p>先看阿糰怎麼把「講義出題」存成 Skill，再照下面三步自己做一次。</p>
+  </div>
+
+  <h2>三步做出你的第一個 Skill</h2>
+  <ol class="steps">
+    <li>
+      <h3>先在對話裡做順三次</h3>
+      <p>挑一件你每週都在做的事，例如上傳講義請它出題。照平常的方式跟它來回，做到結果滿意為止，重複三次。</p>
+    </li>
+    <li>
+      <h3>請它把做法寫成說明書</h3>
+      <p>在同一個對話裡說：「把我們剛剛的做法寫成一個 Skill 的說明。」它會給你一段文字，裡面有名稱、什麼時候用、步驟。</p>
+      <div class="shot"><div class="bar"><i></i><i></i><i></i>Claude 對話（示意）</div>
+        <div class="say"><div class="me">把我們剛剛的做法寫成一個 Skill 的說明</div><div class="tag">Claude 回你：名稱｜什麼時候用｜步驟｜輸出格式</div></div></div>
+    </li>
+    <li>
+      <h3>存進 Customize › Skills</h3>
+      <p>設定 → Customize → Skills → ＋ 新增，把那段文字貼進「內容」。也可以按「從對話建立」，它會幫你填好。</p>
+      <div class="shot"><div class="bar"><i></i><i></i><i></i>設定 › Customize › Skills（示意）</div>
+        <div class="row"><div>講義出題<small>上傳講義說「出題」時用</small></div><span class="on"></span></div>
+        <div class="row"><div>週報初稿<small>每週五，從信件抓三個成果</small></div><span class="on"></span></div>
+        <div class="row"><span class="add">＋ 新增 Skill</span><small>從對話建立</small></div></div>
+    </li>
+  </ol>
+
+  <h2>現在就試</h2>
+  <div class="try">
+    <b>複製這段，貼給 Claude</b>
+    <pre id="prompt">我每次上傳講義都會請你出題。請幫我寫一個 Skill 的說明：
+名稱：講義出題
+什麼時候用：我上傳講義並說「出題」
+步驟：先列 10 條重點 → 出 15 題選擇題 → 一次給一題 → 錯的整理成觀念卡（問題｜答案｜頁碼）</pre>
+    <button class="btn accent copy" id="copy">複製</button>
+    <p class="expect" style="margin-top:12px">做對的樣子：存好後開新對話，上傳講義說「出題」，回答上方會出現「使用 Skill 講義出題」。</p>
+  </div>
+
+  <h2>三個很像的東西，怎麼分</h2>
+  <ul class="compare">
+    <li><b>Instructions</b>你是誰、你的偏好。每個對話都會用到。</li>
+    <li><b>Project</b>一個主題的背景和檔案。只在這個 Project 裡有效。</li>
+    <li><b>Skill</b>一件事的做法。做那件事的時候才拿出來。</li>
+  </ul>
+  <p>原則：一個 Skill 只做一件事。「做週報」是一個，「做週報順便整理行事曆」是兩個。</p>
+
+  <h2>常見卡關</h2>
+  <details><summary>說了「出題」，它沒有用 Skill</summary><p>檢查「什麼時候用」那格有沒有寫到你說的那句話。寫得越像你平常講的話，它越會判斷要用。</p></details>
+  <details><summary>找不到 Customize</summary><p>點左下角你的名字 → 設定，左側就有 Customize。手機 app 的位置可能不同，建議先用電腦設定。</p></details>
+  <details><summary>Skill 和 Project 該用哪個？</summary><p>要放檔案、背景資料，用 Project；要它記住「怎麼做」，用 Skill。兩個可以一起用。</p></details>
+
+  <div class="finish">
+    <button class="btn ghost done-btn" id="done" aria-pressed="false">我做完了</button>
+    <button class="btn ghost" onclick="window.print()">下載這課 PDF</button>
+  </div>
+  <a class="next" href="#"><small>下一課</small><b>Connectors：讓它讀真實資料 →</b></a>
+
+  <div class="mail">每週一封信，告訴你新上了哪幾課、這週 AI 有什麼新功能。
+    <form onsubmit="event.preventDefault()"><input type="email" placeholder="你的 email" aria-label="email"><button class="btn accent">訂閱</button></form>
+  </div>
+</main>
+
+<footer><div class="wrap">Paradigm · 阿糰和阿薛 · 畫面為示意，照 2026-11 的 Claude 版本畫</div></footer>
+
+<script src="pixel.js"></script>
+<script>
+document.getElementById('logo').innerHTML = PIXEL.critterIcon()
+document.getElementById('reelArt').innerHTML = PIXEL.critterIcon()
+const KEY = 'pd-done', ID = 'skills'
+const read = () => { try { return JSON.parse(localStorage.getItem(KEY) || '[]') } catch { return [] } }
+const btn = document.getElementById('done')
+const paint = () => { const on = read().includes(ID); btn.setAttribute('aria-pressed', on); btn.textContent = on ? '✓ 已完成' : '我做完了' }
+btn.onclick = () => {
+  let d = read(); d = d.includes(ID) ? d.filter(x => x !== ID) : [...d, ID]
+  try { localStorage.setItem(KEY, JSON.stringify(d)) } catch {}
+  paint()
+}
+paint()
+document.getElementById('copy').onclick = async e => {
+  try { await navigator.clipboard.writeText(document.getElementById('prompt').textContent); e.target.textContent = '已複製' } catch { e.target.textContent = '請手動選取' }
+}
+</script>
+</body>
+</html>

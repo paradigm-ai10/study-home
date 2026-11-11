@@ -1,0 +1,33 @@
+/* The plain page while the crab packs it up (pack-boot.js, pack-fx.js). Nothing here applies until html.pk-on. */
+
+/* the crab: one clear canvas over the whole window, beside <body> so the page can drop without it */
+.pk-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 40; pointer-events: none; display: none; }
+html.pk-on .pk-canvas { display: block; }
+
+/* the page as a thing that can fall: the cream moves to a sheet behind the content, and behind the sheet is the desk at night */
+.pk-sheet { position: fixed; inset: -14vh -14vw; z-index: -1; display: none; background: #FFF4E0; box-shadow: 0 -18px 60px rgba(10, 6, 24, .55); will-change: transform; }
+html.pk-on { overflow: hidden; background: #120e22 url("img/desk-empty.webp") 50% 50% / cover no-repeat fixed; }
+html.pk-on body { background: transparent; }
+html.pk-on .pk-sheet { display: block; }
+html.pk-night main { will-change: transform; }
+
+/* the cloth, lying open on the page (the tied bundle on the crab's back is 3D: pack-bundle.js, same coral and dots) */
+.pk-cloth {
+  position: fixed; left: 0; top: 0; z-index: 5; display: none; visibility: hidden; pointer-events: none; border-radius: 7px; will-change: transform;
+  background: radial-gradient(circle, #FFF4E0 3.1px, transparent 3.7px) 0 0 / 24px 24px, radial-gradient(circle, #FFF4E0 3.1px, transparent 3.7px) 12px 12px / 24px 24px, #FF6B57;
+  box-shadow: inset 0 0 0 2px rgba(192, 53, 31, .35), 0 12px 18px -12px rgba(58, 46, 92, .6);
+}
+/* a thing from the page, once it has peeled off: a sheet of paper that can be folded and stacked */
+.pk-item { position: relative; }
+.pk-paper { background-color: #FFFAF0; border-radius: 4px; box-shadow: 0 0 0 9px #FFFAF0, 0 0 0 10px rgba(58, 46, 92, .2), 0 10px 16px -4px rgba(58, 46, 92, .3); }
+html.pk-on #desk-photo { view-transition-name: none; transition: none; }   /* this run ends in its own move (switch-fx.css, data-fx="pack"), not the photo growing */
+
+/* the top line does not fall: it turns into the desk's top line (cream tabs on the night) */
+html.pk-on .top a { transition: background-color 160ms ease-out, box-shadow 160ms ease-out; }
+html.pk-night .top a { background: #FFF4E0; border-radius: 5px; }
+html.pk-night .top .wordmark, html.pk-night .top .ig { box-shadow: -12px 0 0 #FFF4E0, 12px 0 0 #FFF4E0; text-decoration: none; }
+html.pk-night .top .switch { box-shadow: none; }
+
+/* pressed, and the crab is still on its way: the photo rattles, something is about to come out of it */
+@keyframes pk-rattle { 0%, 100% { transform: rotate(0) scale(.97); } 25% { transform: rotate(-2.5deg) scale(.97); } 75% { transform: rotate(2.5deg) scale(.97); } }
+#desk-photo.pk-wait { animation: pk-rattle 160ms linear infinite; }
