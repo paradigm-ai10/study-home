@@ -73,24 +73,19 @@ async function main() {
   });
   const play = (c, n, speed = 1) => { const act = c.a[n]; if (!act) return; act.reset(); act.setEffectiveTimeScale(speed); act.setEffectiveWeight(1); act.play(); };
 
-  /* the strip of desk they live on: where the bottom of the screen meets the desk, between the index card and the switches */
-  const ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), v2 = new THREE.Vector2(), hitP = new THREE.Vector3();
-  const lane = { a: new THREE.Vector3(), b: new THREE.Vector3(), len: 1, ok: false };
-  function onDesk(px, py, out) {
-    const r = canvas.getBoundingClientRect(); v2.set((px - r.left) / r.width * 2 - 1, -((py - r.top) / r.height) * 2 + 1);
-    ray.setFromCamera(v2, camera); return ray.ray.intersectPlane(plane, out);
-  }
-  function fitLane() {
-    const idx = document.getElementById('ways'), ctl = document.getElementById('ctl');
-    const W = innerWidth, H = innerHeight;
-    const l = (idx ? idx.getBoundingClientRect().right : W * 0.25) + W * 0.07, rr = (ctl && ctl.offsetWidth ? ctl.getBoundingClientRect().left : W * 0.8) - W * 0.06;
-    const y = H * 0.94;
-    lane.ok = !!(onDesk(l, y, lane.a) && onDesk(rr, y, lane.b)); lane.len = lane.a.distanceTo(lane.b);
-  }
-  const at = (u, out) => out.lerpVectors(lane.a, lane.b, u);
+  /* where they live (Thomas, 11/12: 「社群小螃蟹要在大 crab 附近，偶爾跟牠有互動」): one on each side of the big crab, a little in front,
+     pacing a short beat; when the big crab walks off to something on the desk, they trot after it */
+  const ray = new THREE.Raycaster(), v2 = new THREE.Vector2();
+  const big = new THREE.Vector3(), anchor = new THREE.Vector3(), tmp = new THREE.Vector3(), camXZ = new THREE.Vector3();
+  let bigW = 0, anchorSet = false;
+  const bigBox = new THREE.Box3();
+  function measureBig() { bigBox.setFromObject(src); const w = bigBox.max.x - bigBox.min.x; if (w > 0.2 && w < 6) bigW = w; }
+  const BIG_MOVES = ['wave_L', 'wave_R', 'hop', 'sorry', 'shell_puff', 'eyes_wide', 'legs_tap', 'parcel_wiggle', 'lean_bubbles', 'wiggle', 'intro', 'shift_L', 'shift_R'];
+  const bigBusy = () => BIG_MOVES.some((n) => acts[n] && acts[n].isRunning());
+  const bigPlay = (n) => { const x = acts[n]; if (!x || x.isRunning()) return; x.reset(); x.timeScale = 1; x.setEffectiveWeight(1); x.play(); };   // the same as study.js play()
 
-  /* who is on: the wide desk only, and not while the crab packs up or a big card covers things */
-  const active = () => S.layout === 'wide' && html.classList.contains('is-3d') && !html.classList.contains('pk-leaving') && !html.dataset.arrive && !html.classList.contains('has-map');
+  /* who is on: the live desk, not while the crab packs up, the big map is open, or the poster is all there is */
+  const active = () => html.classList.contains('is-3d') && !html.classList.contains('pk-leaving') && !html.dataset.arrive && !html.classList.contains('has-map') && S.introDone && bigW > 0;
   let shown = null;
   function setShown(on) {
     if (on === shown) return; shown = on;
@@ -124,40 +119,85 @@ async function main() {
 
   /* moving */
   const rnd = (a, b) => a + Math.random() * (b - a);
-  const tmp = new THREE.Vector3(), camXZ = new THREE.Vector3();
-  function pick(c) {
-    const other = crabs.find((o) => o !== c); let to = c.x;
-    for (let i = 0; i < 12; i++) { to = rnd(0.04, 0.96); if (Math.abs(to - c.x) > 0.14 && Math.abs(to - other.to) > 0.22 && Math.abs(to - other.x) > 0.22) break; }
-    c.to = to; c.speed = rnd(0.55, 0.85) / Math.max(1, lane.len);   // lane fractions per second
+  crabs.forEach((c, i) => { c.side = i === 0 ? -1 : 1; c.off = rnd(-0.6, 0.6); c.to = c.off; c.mode = 'roam'; c.t = 0; });
+  // its spot beside the big crab (off = -1..1 inside that spot)
+  function home(c, off, out) {
+    const m = c.size.x;
+    if (S.layout === 'tall') return out.set(anchor.x + c.side * (bigW * 0.24 + off * m * 0.3), 0, anchor.z + bigW * 0.5 + off * m * 0.15);   // phones: the big crab fills the width, so in front of its feet
+    return out.set(anchor.x + c.side * (bigW * 0.62 + m * 0.75 + off * m * 0.8), 0, anchor.z + bigW * 0.22 + off * m * 0.25);
   }
-  crabs.forEach((c, i) => { c.x = c.to = i === 0 ? 0.2 : 0.72; });
-  fitLane(); addEventListener('resize', () => setTimeout(fitLane, 60));
-  setTimeout(fitLane, 1200);
+  // in front of the big crab, to say hello
+  const greetSpot = (c, out) => out.set(anchor.x + c.side * c.size.x * 0.75, 0, anchor.z + bigW * 0.62);
+
+  /* now and then (every 20 to 40 seconds), only when nothing else is going on: say hello, or copy what the big crab does */
+  let nextShow = performance.now() + rnd(14000, 22000), lastKind = 'mimic', lastCopy = 0;
+  const calm = () => S.introDone && !S.busy && !S.walk && !S.focus && !S.celebrating && !(window.F4 && window.F4.card) && !held && S.t - (S.lastInteract || -99) > 4 && !bigBusy();
+  function copyBig(n, why) {           // both little ones do what the big one just did, a beat apart
+    lastCopy = performance.now();
+    crabs.forEach((c, i) => { if (c.mode === 'roam' && !c.held) setTimeout(() => play(c, n), 380 + i * 240); });
+  }
+  function startShow(now) {
+    const kind = lastKind === 'greet' ? 'mimic' : 'greet'; lastKind = kind;
+    if (kind === 'greet') {
+      const c = crabs[Math.random() < 0.5 ? 0 : 1]; c.mode = 'greet'; c.t = 0;
+    } else {
+      const n = ['hop', 'wave_R', 'wave_L', 'shell_puff'][Math.floor(Math.random() * 4)];
+      bigPlay(n); copyBig(n, 'show');
+    }
+    nextShow = now + rnd(20000, 40000);
+  }
+  // the big crab's own moves (hover, poke, idle life): sometimes the little ones join in
+  const wasRunning = {};
+  function watchBig(now) {
+    ['hop', 'wave_R', 'wave_L', 'shell_puff', 'wiggle'].forEach((n) => {
+      const r = !!(acts[n] && acts[n].isRunning());
+      if (r && !wasRunning[n] && now - lastCopy > 12000 && Math.random() < 0.35) copyBig(n, 'join');
+      wasRunning[n] = r;
+    });
+  }
 
   let last = performance.now();
   function tick(now) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
-    setShown(active() && lane.ok);
+    if (!bigW && S.introDone && !S.walk) measureBig();
+    src.getWorldPosition(big); big.y = 0;
+    if (!anchorSet) { anchor.copy(big); anchorSet = true; }
+    else anchor.lerp(big, 1 - Math.exp(-dt * 2.2));          // they follow the big crab, a little behind
+    setShown(active());
     if (shown) {
       camera.getWorldPosition(camXZ);
+      if (!REDUCED && now > nextShow) { if (calm()) startShow(now); else nextShow = now + 3000; }
+      if (!REDUCED) watchBig(now);
       crabs.forEach((c) => {
-        let walking = false;
-        if (!c.held && !REDUCED) {
-          if (c.wait > 0) { c.wait -= dt; if (c.wait <= 0) pick(c); }
-          else {
-            const d = c.to - c.x;
-            if (Math.abs(d) < 0.003) { c.x = c.to; c.wait = rnd(1.4, 3.6); const r = Math.random(); if (r < 0.25) play(c, 'blink'); else if (r < 0.45) play(c, Math.random() < 0.5 ? 'shift_L' : 'shift_R'); else if (r < 0.55) play(c, 'eyes_wide'); }
-            else { c.x += Math.sign(d) * Math.min(Math.abs(d), c.speed * dt); walking = true; c.face = Math.sign(d); }
+        let goal = tmp;
+        if (c.mode === 'greet') {
+          c.t += dt; greetSpot(c, goal);
+          if (c.t > 0.2 && c.root.position.distanceTo(goal) < 0.03 && !c.said) {   // arrived: hop; the big crab looks, then waves back
+            c.said = true; play(c, 'hop'); bigPlay('eyes_wide');
+            setTimeout(() => bigPlay(c.side < 0 ? 'wave_L' : 'wave_R'), 420);
+            setTimeout(() => { c.mode = 'roam'; c.said = false; c.off = c.to = rnd(-0.5, 0.5); }, 2000);
           }
+          if (c.t > 8 || !calm() && c.t > 0.5 && (S.busy || S.walk || S.focus)) { c.mode = 'roam'; c.said = false; }
+        } else {
+          if (!c.held && !REDUCED) {
+            if (c.wait > 0) { c.wait -= dt; if (c.wait <= 0) { c.to = rnd(-1, 1); c.speed = rnd(0.5, 0.8); } }
+            else if (Math.abs(c.to - c.off) < 0.02) { c.off = c.to; c.wait = rnd(1.6, 4.2); const r = Math.random(); if (r < 0.25) play(c, 'blink'); else if (r < 0.4) play(c, Math.random() < 0.5 ? 'shift_L' : 'shift_R'); }
+            else c.off += Math.sign(c.to - c.off) * Math.min(Math.abs(c.to - c.off), c.speed * dt);
+          }
+          home(c, c.off, goal);
         }
-        at(c.x, tmp); c.root.position.copy(tmp);
-        // walking: quick sideways steps, a little bob and lean; the legs tap along
+        // step toward the goal (fast enough to keep up when the big crab walks away)
+        const p = c.root.position; const dx = goal.x - p.x, dz = goal.z - p.z; const dist = Math.hypot(dx, dz);
+        const speed = c.mode === 'greet' ? c.size.x * 2.2 : Math.max(c.size.x * 1.4, dist * 2.4);
+        const walking = dist > 0.004 && !c.held;
+        if (walking) { const k = Math.min(1, speed * dt / dist); p.x += dx * k; p.z += dz * k; c.face = Math.sign(dx) || c.face; }
         c.phase += dt * (walking ? 14 : 2);
         c.body.position.y = walking ? Math.abs(Math.sin(c.phase)) * c.size.y * 0.09 : 0;
         c.body.rotation.z = walking ? -c.face * 0.07 + Math.sin(c.phase) * 0.03 : 0;
         if (walking && c.a.legs_tap && !c.a.legs_tap.isRunning()) play(c, 'legs_tap', 2.2);
-        // it faces you; held: it turns a little more toward the pointer side
-        const yaw = Math.atan2(camXZ.x - c.root.position.x, camXZ.z - c.root.position.z) + (walking ? c.face * 0.18 : 0);
+        // facing: you, or the big crab while saying hello
+        const lookAt = c.mode === 'greet' && c.said ? anchor : camXZ;
+        const yaw = Math.atan2(lookAt.x - p.x, lookAt.z - p.z) + (walking ? c.face * 0.18 : 0);
         c.turn.rotation.y += (yaw - c.turn.rotation.y) * Math.min(1, dt * 6);
         c.mixer.update(dt);
       });
@@ -166,7 +206,7 @@ async function main() {
         const r = canvas.getBoundingClientRect();
         label.style.transform = `translate(${(r.left + (tmp.x * 0.5 + 0.5) * r.width).toFixed(1)}px, ${(r.top + (-tmp.y * 0.5 + 0.5) * r.height).toFixed(1)}px) translate(-50%, -100%)`;
       }
-    }
+    } else crabs.forEach((c) => { home(c, c.off, c.root.position); });   // out of sight: wait at their spots
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
@@ -196,6 +236,6 @@ async function main() {
     });
     r.dispose(); return out;
   }
-  window.__mini = { crabs, lane, fitLane, setShown, sprites };
+  window.__mini = { crabs, setShown, sprites, show: () => startShow(performance.now()), get anchor() { return anchor; }, get bigW() { return bigW; } };
 }
 main().catch((e) => console.info('[mini-crabs] staying flat:', e && e.message));

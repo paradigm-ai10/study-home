@@ -93,3 +93,10 @@ html.pk-leaving .sc-lane, html[data-arrive] .sc-lane { opacity: 0; transition: o
 .sc-crab.is-held .sc-sign, .sc-crab:focus-visible .sc-sign { display: flex; }
 .sc-sign::after { display: none; }
 @media (prefers-reduced-motion: reduce) { .sc-crab .sc-fa, .sc-crab .sc-fb { animation: none !important; } }
+
+/* plain page: the two pictures stand on the top edge of the big crab's photo */
+.sc-lane.is-photo { position: relative; height: 0; margin: 0; z-index: 2; }
+.sc-lane.is-photo .sc-crab { width: 66px; height: 62px; }
+.sc-lane.is-photo .sc-body { height: 62px; }
+.sc-lane.is-photo .sc-sign { bottom: 56px; }
+.sc-crab.is-hop .sc-body { animation: sc-hop 380ms cubic-bezier(0.23, 1, 0.32, 1) 1; }

@@ -60,17 +60,20 @@
   let W = 0, mode = '';
   function place() {
     const narrow = narrowQ.matches;
-    const want = SIMPLE ? 'simple' : narrow ? 'phone' : 'desk';
+    const photo = SIMPLE && document.getElementById('desk-photo');
+    const want = photo ? 'photo' : SIMPLE ? 'simple' : narrow ? 'phone' : 'desk';   // plain page (11/12, Thomas): beside the photo of the big crab
     if (want !== mode) {
       mode = want;
       lane.classList.toggle('is-fixed', want === 'desk');
       lane.classList.toggle('is-flow', want === 'phone');
       lane.classList.toggle('is-wrap', want === 'simple');
+      lane.classList.toggle('is-photo', want === 'photo');
       lane.style.left = lane.style.right = '';
       if (want === 'simple') {             // a .wrap shell keeps the strip on the same column as the words
         const shell = document.createElement('div'); shell.className = 'wrap sc-shell'; shell.appendChild(lane);
         const lead = document.querySelector('main .lead') || document.getElementById('hero'); lead.after(shell);
       }
+      else if (want === 'photo') { photo.closest('.desk').before(lane); crabs.forEach((c) => { c.el.style.transform = 'none'; }); }
       else if (want === 'phone') { const ways = document.getElementById('ways'); (ways || document.body).after(lane); }
       else document.body.appendChild(lane);
     }
@@ -80,6 +83,10 @@
       const cr = ctl && ctl.offsetWidth ? ctl.getBoundingClientRect().left : innerWidth - 24;
       lane.style.left = Math.round(l) + 'px';
       lane.style.right = Math.round(innerWidth - cr + 28) + 'px';
+    }
+    if (mode === 'photo') {           // standing on the top edge of the photo, one at each corner
+      const lr = lane.getBoundingClientRect(), pr = photo.getBoundingClientRect();
+      crabs.forEach((c, i) => { const w = c.el.offsetWidth || 66; c.el.style.left = Math.round(pr.left - lr.left + (i ? pr.width - w * 0.62 : -w * 0.38)) + 'px'; c.el.style.top = Math.round(pr.top - lr.top - (c.el.offsetHeight || 62) + 24) + 'px'; c.el.style.bottom = 'auto'; });
     }
     W = lane.clientWidth;
 
@@ -100,9 +107,11 @@
     c.to = to; c.speed = rnd(42, 72);
   }
   function draw(c) {
+    if (mode === 'photo') { c.el.style.transform = 'none'; return; }
     c.el.style.transform = 'translate3d(' + c.x.toFixed(1) + 'px,0,0)';
   }
   function step(dt) {
+    if (mode === 'photo') return;     // the photo ones stay put (see fidget)
     crabs.forEach((c) => {
       if (c.held) return;
       if (c.wait > 0) {
@@ -142,6 +151,13 @@
     setTimeout(place, 1500);
     narrowQ.addEventListener && narrowQ.addEventListener('change', place);
     if (REDUCED) return;                      // less motion: they stand still, still clickable
+    // beside the photo: now and then one shuffles its feet or gives a little hop
+    (function fidget() {
+      setTimeout(() => {
+        if (mode === 'photo') { const c = crabs[Math.random() < 0.5 ? 0 : 1]; if (!c.held) { const k = Math.random() < 0.5 ? 'is-walking' : 'is-hop'; c.el.classList.add(k); setTimeout(() => c.el.classList.remove(k), k === 'is-hop' ? 420 : 700); } }
+        fidget();
+      }, 2500 + Math.random() * 3000);
+    })();
     let last = performance.now();
     const tick = (now) => {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
