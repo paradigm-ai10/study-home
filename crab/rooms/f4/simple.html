@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#FFF4E0">
 <title>Paradigm｜不會寫程式，也能學會用 AI</title>
-<meta name="description" content="給學生和上班族的免費中文課：不會寫程式，也能讓 AI 幫你做事。先做一個 60 秒的小任務，再看從哪一課開始。">
+<meta name="description" content="給學生和上班族的免費中文課：不會寫程式，也能讓 AI 幫你做事。先完成 60 秒體驗，再透過程度評估決定起始課程。">
 <script>document.documentElement.classList.replace('no-js', 'js');</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 13 7%27%3E%3Cpath fill=%27%23D97757%27 d=%27M2 0h9v2h2v2h-2v1H2V4H0V2h2z%27/%3E%3Cpath fill=%27%23D97757%27 d=%27M3 5h1v2H3zM5 5h1v2H5zM7 5h1v2H7zM9 5h1v2H9z%27/%3E%3Cpath fill=%27%231a1a1a%27 d=%27M4 1h1v2H4zM8 1h1v2H8z%27/%3E%3C/svg%3E">
 <link rel="preload" as="font" href="fonts/huninn-f4.woff2" type="font/woff2" crossorigin>
@@ -201,7 +201,7 @@
 <header class="top wrap">
   <a class="wordmark" href="../../../index.html">PARADIGM</a>
   <nav aria-label="版本和 IG">
-    <a class="switch" href="index.html" data-view-to="3d" title="同樣的內容，有會動的螃蟹和書桌">切到 3D 書桌</a>
+    <a class="switch" href="index.html" data-view-to="3d" title="同樣的內容，有會動的螃蟹和書桌">切換至 3D 版</a>
     <a class="ig" href="https://www.instagram.com/paradigmai_tw/" rel="noopener">IG @paradigmai_tw</a>
   </nav>
 </header>
@@ -210,20 +210,20 @@
   <div class="lead wrap">
     <section class="hero" id="hero">
       <h1>不會寫程式，<br>也能讓 AI 幫你做事</h1>
-      <p class="sub">給學生和上班族的免費中文課。一課做一件事，照著做完就會。</p>
+      <p class="sub">學生與職場工作者的免費中文 AI 課程。<br>每課對應一項實作，完成即具備該能力。</p>
       <p class="cta">
-        <button type="button" class="btn-main" id="btn-task">給我一個 60 秒任務</button>
-        <button type="button" class="btn-link" id="btn-pick">我會一點了，幫我挑從哪課開始</button>
+        <button type="button" class="btn-main" id="btn-task">開始 60 秒體驗</button>
+        <button type="button" class="btn-link" id="btn-pick">已有基礎？進行程度評估</button>
       </p>
     </section>
 
     <section class="note" aria-labelledby="note-h">
-      <h2 id="note-h">你的進度</h2>
-      <p class="next" id="note-next">從 60 秒任務開始</p>
+      <h2 id="note-h">學習進度</h2>
+      <p class="next" id="note-next">起點：60 秒體驗</p>
       <p class="what" id="note-what" hidden></p>
       <p class="mins" id="note-min">約 1 分鐘</p>
       <div class="strip" id="note-strip" aria-hidden="true"></div>
-      <p class="count" id="note-count">8 課，還沒開始。</p>
+      <p class="count" id="note-count">已完成 0 / 8 課</p>
       <p id="progress" hidden></p>
     </section>
   </div>
@@ -234,23 +234,23 @@
     <section id="map" aria-labelledby="map-h">
       <div class="sec-h">
         <h2 id="map-h" tabindex="-1">學習地圖</h2>
-        <p id="map-sub">208 課分三個階段，第一版先開 8 課。會的可以跳過。</p>
+        <p id="map-sub">3 階段・12 模組・208 課；首波開放 8 課，可依程度跳過。</p>
       </div>
       <ol class="stages" id="stages"></ol>
     </section>
 
     <aside aria-labelledby="more-h">
-      <div class="sec-h"><h2 id="more-h">還有這些可以用</h2></div>
+      <div class="sec-h"><h2 id="more-h">其他資源</h2></div>
       <nav class="ways" id="ways" aria-label="其他入口">
-        <a href="#free" data-id="free"><b>領取資源</b><i>IG 留言領的 Skill 檔、PDF、提示詞都在這</i></a>
-        <a href="#solve" data-id="solve"><b>解決一件事</b><i>例如整理共筆、回一堆信，帶來一步步用 AI 做完</i></a>
-        <a href="#words" data-id="words"><b>AI 名詞小字典</b><i>Skill、MCP、Agent 是什麼？一個詞一句話，附例子</i></a>
-        <a href="#news" data-id="news"><b>AI 新聞</b><i>每週四整理一次，只挑跟你有關的</i></a>
-        <a href="#ask" data-id="ask"><b>你想學什麼</b><i>留一句話，我們挑來做下一支片</i></a>
+        <a href="#free" data-id="free"><b>資源下載</b><i>Skill 檔案、PDF 講義與提示詞範本</i></a>
+        <a href="#solve" data-id="solve"><b>實作案例</b><i>以實際任務示範 AI 工作流程：文件整理、郵件處理等</i></a>
+        <a href="#words" data-id="words"><b>AI 名詞辭典</b><i>Skill、MCP、Agent 等術語的定義與範例</i></a>
+        <a href="#news" data-id="news"><b>AI 新聞</b><i>每週四更新：模型、功能與工具動態精選</i></a>
+        <a href="#ask" data-id="ask"><b>主題提案</b><i>提出想學的主題，作為後續內容規劃依據</i></a>
       </nav>
       <a class="desk" href="index.html" data-view-to="3d">
         <img id="desk-photo" src="crab-small.webp" width="240" height="180" alt="檯燈下的書桌，中間站著一隻橘色小螃蟹。" decoding="async">
-        <span>想看螃蟹動起來？<br><u>切到 3D 書桌</u></span>
+        <span>3D 互動版<br><u>切換至 3D 版</u></span>
       </a>
     </aside>
   </div>

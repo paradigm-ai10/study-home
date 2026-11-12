@@ -469,7 +469,7 @@ export async function play(href, opts = {}) {
   const skip = (e) => { if (e.type === 'keydown' && e.key !== 'Escape') return; e.preventDefault(); done(true); };
   setTimeout(() => { if (!playing || mode !== 'go') return; addEventListener('pointerdown', skip, true); addEventListener('keydown', skip, true); }, 450);   // not at once: the second press of a double click is not "skip this"
   /* a second in, a quiet line says a press skips it (the whole story only: the short one is over by then) */
-  const hint = document.createElement('div'); hint.className = 'pk-skip'; hint.textContent = '點一下跳過'; hint.setAttribute('aria-hidden', 'true'); if (!opts.short) html.append(hint);
+  const hint = document.createElement('div'); hint.className = 'pk-skip'; hint.textContent = '點擊略過'; hint.setAttribute('aria-hidden', 'true'); if (!opts.short) html.append(hint);
   const hintT = setTimeout(() => { if (playing && mode === 'go') hint.classList.add('is-on'); }, 1000);
   skipOff = () => { removeEventListener('pointerdown', skip, true); removeEventListener('keydown', skip, true); clearTimeout(hintT); hint.remove(); skipOff = null; };
   let t0 = 0;

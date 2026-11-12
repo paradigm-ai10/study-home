@@ -66,7 +66,7 @@
     // the pin: where you are now
     const [hx, hy] = AT[hereMod] || AT.L0;
     out += `<g class="mv-here" aria-hidden="true"><path d="M${hx - 34} ${hy - 78} c -13 0 -22 10 -22 22 c 0 16 22 34 22 34 s 22 -18 22 -34 c 0 -12 -9 -22 -22 -22 z" fill="#3A2E5C"/><circle cx="${hx - 34}" cy="${hy - 56}" r="7.5" fill="#FFC857"/></g>`;
-    out += `<text class="mv-legend" x="40" y="${Math.round(720 * SY) - 18}">紅色的站有課可以學，灰色的站即將推出。點一個站看裡面的課。</text></svg>`;
+    out += `<text class="mv-legend" x="40" y="${Math.round(720 * SY) - 18}">紅色：已開放　灰色：即將推出　點選模組查看課程</text></svg>`;
     return out;
   }
 
@@ -75,28 +75,28 @@
   function sideOverview() {
     const st = F4.state, n = F4.nextStep(), known = new Set(st.known); const nextId = n.kind === 'lesson' ? n.lesson.id : null;
     const open = MODS.flatMap((m) => m.lessons);
-    return `<p class="kick">怎麼走</p><h3>從 L0 出發，一站一站往右走</h3>
-      <p class="dim">${known.size ? `你會了 ${known.size} / ${open.length} 課。` : ''}${nextId ? `下一步是 ${esc(nextId)}。` : n.kind === 'task' ? '還沒開始的話，先做 60 秒任務。' : '不知道從哪開始，就用「幫我挑」。'}會的可以跳過，順序只是建議。</p>
-      <p class="kick">第一版開放的 ${open.length} 課</p><ol>${open.map((l) => lesBtn(l, known, nextId)).join('')}</ol>`;
+    return `<p class="kick">學習路徑</p><h3>建議順序：L0 → L4</h3>
+      <p class="dim">${known.size ? `已完成 ${known.size} / ${open.length} 課。` : ''}${nextId ? `下一步：${esc(nextId)}。` : n.kind === 'task' ? '尚未開始：建議先完成 60 秒體驗。' : '起點未定：建議進行程度評估。'}可依程度跳過；順序為建議路徑。</p>
+      <p class="kick">首波開放課程（${open.length}）</p><ol>${open.map((l) => lesBtn(l, known, nextId)).join('')}</ol>`;
   }
   function sideModule(id) {
     const m = MODS.find((x) => x.id === id); if (!m) return sideOverview();
     const st = F4.state, n = F4.nextStep(), known = new Set(st.known); const nextId = n.kind === 'lesson' ? n.lesson.id : null;
     const s = M7.stages[m.stage]; const openIds = new Set(m.lessons.map((l) => l.id));
     const rest = m.all.filter(([lid]) => !openIds.has(lid));
-    return `<button type="button" class="mv-back" data-act="overview">← 整張地圖</button>
+    return `<button type="button" class="mv-back" data-act="overview">← 返回總覽</button>
       <p class="kick">階段 ${esc(s.no)}・${esc(m.id)}</p><h3>${esc(m.name)}</h3><p>${esc(m.tagline)}</p>
-      <p class="dim">共 ${m.count} 課${m.hours ? `，必修約 ${m.hours} 小時` : ''}。${m.lessons.length ? `第一版先開 ${m.lessons.length} 課。` : '這一站還沒開放，即將推出。'}</p>
+      <p class="dim">共 ${m.count} 課${m.hours ? `，必修約 ${m.hours} 小時` : ''}。${m.lessons.length ? `首波開放 ${m.lessons.length} 課。` : '本模組即將推出。'}</p>
       ${m.lessons.length ? `<ol>${m.lessons.map((l) => lesBtn(l, known, nextId)).join('')}</ol>` : ''}
-      ${rest.length ? `<details class="mv-soon"${m.lessons.length ? '' : ' open'}><summary>還有 ${rest.length} 課即將推出</summary><ul>${rest.map(([lid, t]) => `<li><span>${esc(lid)}</span>${esc(t)}</li>`).join('')}</ul></details>` : ''}`;
+      ${rest.length ? `<details class="mv-soon"${m.lessons.length ? '' : ' open'}><summary>其餘 ${rest.length} 課即將推出</summary><ul>${rest.map(([lid, t]) => `<li><span>${esc(lid)}</span>${esc(t)}</li>`).join('')}</ul></details>` : ''}`;
   }
   function sideLesson(id) {
     const m = modOf[id]; const l = m && m.lessons.find((x) => x.id === id); if (!l) return sideOverview();
     const href = pageOf(id); const known = F4.state.known.includes(id);
     return `<button type="button" class="mv-back" data-act="mod" data-mod="${m.id}">← ${esc(m.id)} ${esc(m.name)}</button>
-      <p class="kick">${esc(l.id)}・約 ${l.min} 分鐘${known ? '・✓ 你會了' : ''}</p><h3>${esc(l.title)}</h3>
-      <div class="mv-box"><p>學完你能：${esc(l.can)}。</p></div>
-      ${href ? `<a class="mv-go" href="${esc(href)}">開始上課</a>` : `<p class="dim">課程頁即將上線，做好會在這裡打開。</p><span class="mv-go is-off" aria-disabled="true">課程頁即將上線</span>`}`;
+      <p class="kick">${esc(l.id)}・約 ${l.min} 分鐘${known ? '・✓ 已完成' : ''}</p><h3>${esc(l.title)}</h3>
+      <div class="mv-box"><p>學習成果：${esc(l.can)}</p></div>
+      ${href ? `<a class="mv-go" href="${esc(href)}">開始上課</a>` : `<p class="dim">課程頁即將上線。</p><span class="mv-go is-off" aria-disabled="true">課程頁即將上線</span>`}`;
   }
 
   /* ---------- the sheet ---------- */
@@ -207,7 +207,7 @@
   // the plain page keeps its list too; a button above it opens the big map
   const sub = document.getElementById('map-sub');
   if (SIMPLE && sub && !document.getElementById('mv-open')) {
-    const b = document.createElement('button'); b.type = 'button'; b.id = 'mv-open'; b.className = 'btn-link'; b.textContent = '打開大地圖';
+    const b = document.createElement('button'); b.type = 'button'; b.id = 'mv-open'; b.className = 'btn-link'; b.textContent = '展開學習地圖';
     b.addEventListener('click', () => open(b)); sub.after(b);
   }
   window.F4map = { open, shut, select, get open_() { return isOpen; } };

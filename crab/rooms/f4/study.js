@@ -307,7 +307,7 @@ function drawMap(ctx, w, h, st) {
   // title, top right, and how far you are
   ctx.textAlign = 'right'; ctx.fillStyle = '#3a2e5c';
   ctx.font = `66px ${FONT_ZH}`; ctx.fillText('學習地圖', 0.955 * w, 0.14 * h);
-  const line = st.known ? `你會了 ${st.known} / ${st.total} 課` : st.done ? '第 1 站亮了' : `${st.total} 課`;
+  const line = st.known ? `已完成 ${st.known} / ${st.total} 課` : st.done ? '第 1 站：已完成' : `${st.total} 課`;
   ctx.font = `34px ${FONT_ZH}`; ctx.fillStyle = st.known || st.done ? '#c83a26' : 'rgba(58,46,92,0.62)'; ctx.fillText(line, 0.95 * w, 0.255 * h);
   // compass, top left
   ctx.save(); ctx.translate(0.075 * w, 0.17 * h); ctx.strokeStyle = 'rgba(58,46,92,0.5)'; ctx.fillStyle = 'rgba(58,46,92,0.6)'; ctx.lineWidth = 2;
@@ -350,7 +350,7 @@ function drawCard(ctx, w, h) {
   ctx.fillStyle = '#f6ecd6'; ctx.fillRect(0, 0, w, h);
   speckle(ctx, w, h, 300, 'rgba(120,90,50,0.06)');
   ctx.fillStyle = '#3a2e5c'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-  ctx.font = `64px ${FONT_ZH}`; ctx.fillText('你想學什麼？', 0.09 * w, 0.3 * h);
+  ctx.font = `64px ${FONT_ZH}`; ctx.fillText('主題提案', 0.09 * w, 0.3 * h);
   ctx.strokeStyle = '#ff6b57'; ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.setLineDash([2, 16]);
   ctx.beginPath(); ctx.moveTo(0.09 * w, 0.58 * h); ctx.lineTo(0.9 * w, 0.58 * h); ctx.stroke();
   ctx.strokeStyle = 'rgba(58,46,92,0.3)'; ctx.lineWidth = 4;
@@ -374,13 +374,13 @@ function drawEnvelope(ctx, w, h) {
 function drawSpine(ctx, w, h) {
   ctx.fillStyle = '#2f5d50'; ctx.fillRect(0, 0, w, h);
   ctx.fillStyle = '#f1dfa8'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.font = `${Math.round(h * 0.5)}px ${FONT_ZH}`; ctx.fillText('AI 名詞小字典', w / 2, h * 0.53);
+  ctx.font = `${Math.round(h * 0.5)}px ${FONT_ZH}`; ctx.fillText('AI 名詞辭典', w / 2, h * 0.53);
   ctx.fillRect(0.04 * w, 0.1 * h, 0.92 * w, 4); ctx.fillRect(0.04 * w, 0.9 * h - 4, 0.92 * w, 4);
 }
 function drawCoverLabel(ctx, w, h) {
   ctx.fillStyle = '#f1e4c6'; ctx.fillRect(0, 0, w, h);
   ctx.fillStyle = '#2f5d50'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.font = `${Math.round(h * 0.29)}px ${FONT_ZH}`; ctx.fillText('AI 名詞小字典', w / 2, h * 0.42);
+  ctx.font = `${Math.round(h * 0.29)}px ${FONT_ZH}`; ctx.fillText('AI 名詞辭典', w / 2, h * 0.42);
   ctx.font = `500 ${Math.round(h * 0.17)}px ${FONT_EN}`; ctx.globalAlpha = 0.7; ctx.fillText('A  —  Z', w / 2, h * 0.78); ctx.globalAlpha = 1;
 }
 function drawDial(ctx, w, h) {
@@ -2000,7 +2000,7 @@ async function boot() {
     if (!S.hinted && !STILL && t > 9.5 && t - S.lastInteract > 9 && !F4.card && !F4.state.done.t1 && !sayKind && !hot) {
       S.hinted = true; LIFE.lastActive = t;
       if (!REDUCED) play('wave_L', { force: true });
-      say('不知道點哪個？按左上的「給我一個 60 秒任務」就好。', { hold: 5.5 });
+      say('不知道點哪個？按左上的「開始 60 秒體驗」就好。', { hold: 5.5 });
     }
 
     wiper.step(renderer, dt); skyMat.uniforms.tWipe.value = wiper.texture;

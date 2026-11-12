@@ -50,7 +50,7 @@ export function land(c) {
   /* what comes out, in this order: what you need first, then round the desk */
   const chips = [
     { id: 'title', text: hero.querySelector('h1').textContent.trim(), cls: 'is-title', to: () => mid(hero.querySelector('h1')), arrive: () => html.classList.add('pk-hero') },
-    { id: 'index', text: '你的進度', cls: 'is-note', to: () => mid(index), arrive: () => html.classList.add('pk-index') },
+    { id: 'index', text: '學習進度', cls: 'is-note', to: () => mid(index), arrive: () => html.classList.add('pk-index') },
     ...['map', 'words', 'pick', 'news', 'free', 'solve', 'ask'].filter((id) => IDS.includes(id)).map((id) => ({
       id, text: nameOf(id), to: () => { const p = props[id]; return scr(v.copy(p.pos).setY(p.size.y * 0.55 + 0.05)); }, prop: props[id] })),
   ];
@@ -63,7 +63,7 @@ export function land(c) {
 
   let tau = 0, hitAt = -1, offDone = false, waved = false, over = false;
   /* the quiet line that says a press skips this (the whole story only) */
-  const hint = document.createElement('div'); hint.className = 'pk-skip'; hint.textContent = '點一下跳過'; hint.setAttribute('aria-hidden', 'true');
+  const hint = document.createElement('div'); hint.className = 'pk-skip'; hint.textContent = '點擊略過'; hint.setAttribute('aria-hidden', 'true');
   if (!c.short) { document.body.append(hint); requestAnimationFrame(() => requestAnimationFrame(() => hint.classList.add('is-on'))); }
 
   function cleanup() {
@@ -183,7 +183,7 @@ export function leave(c, done) {
   const nameOf = (id) => { const b = index.querySelector(`a[data-id="${id}"] b`); return b ? b.textContent : id; };
   const chips = [
     ...['ask', 'solve', 'free', 'news', 'pick', 'words', 'map'].filter((id) => IDS.includes(id)).map((id) => ({ text: nameOf(id), from: (() => { const p = props[id]; return scr(v.copy(p.pos).setY(p.size.y * 0.55 + 0.05)); })(), prop: props[id] })),
-    { text: '你的進度', cls: 'is-note', from: mid(index), take: 'pk-took-index' },
+    { text: '學習進度', cls: 'is-note', from: mid(index), take: 'pk-took-index' },
     { text: hero.querySelector('h1').textContent.trim(), cls: 'is-title', from: mid(hero.querySelector('h1')), take: 'pk-took-hero' },
   ];
   chips.forEach((ch, i) => {

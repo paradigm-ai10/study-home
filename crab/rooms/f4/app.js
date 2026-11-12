@@ -27,13 +27,13 @@
 
   // the seven things on the desk: what they are called here, and one plain line each
   const ENTRY = {
-    pick: { name: '幫我挑', line: '回答 3 題，告訴你從哪一課開始。' },
-    map: { name: '學習地圖', line: '208 課分三個階段，第一版先開 8 課，會的可以跳過。' },
-    free: { name: '領取資源', line: 'IG 留言領的 Skill 檔、PDF、提示詞都在這。' },
-    solve: { name: '解決一件事', line: '例如整理共筆、回一堆信，帶來一步步用 AI 做完。' },
-    words: { name: 'AI 名詞小字典', line: 'Skill、MCP、Agent 是什麼？一個詞一句話，附例子。' },
-    news: { name: 'AI 新聞', line: '每週四整理一次，只挑跟你有關的。' },
-    ask: { name: '你想學什麼', line: '留一句話，我們挑來做下一支片。' },
+    pick: { name: '程度評估', line: '3 題評估，推薦起始課程。' },
+    map: { name: '學習地圖', line: '3 階段・12 模組・208 課，首波開放 8 課。' },
+    free: { name: '資源下載', line: 'Skill 檔案、PDF 講義與提示詞範本。' },
+    solve: { name: '實作案例', line: '以實際任務示範 AI 工作流程：文件整理、郵件處理等。' },
+    words: { name: 'AI 名詞辭典', line: 'Skill、MCP、Agent 等術語的定義與範例。' },
+    news: { name: 'AI 新聞', line: '每週四更新：模型、功能與工具動態精選。' },
+    ask: { name: '主題提案', line: '提出想學的主題，作為後續內容規劃依據。' },
   };
 
   /* ---------------------------------------------------------------- what this browser remembers: things done and learned, not things clicked */
@@ -55,19 +55,19 @@
   const weekCount = () => state.log.filter((t) => Date.now() - t < WEEK).length;
   const did = (what) => { state.log.push(Date.now()); state.last = what; if (state.log.length > 200) state.log = state.log.slice(-200); };
   function nextStep() {
-    if (!state.done.t1) return { kind: 'task', label: '60 秒任務', min: 1 };
-    if (!state.start) return { kind: 'pick', label: '幫我挑', min: 1 };
+    if (!state.done.t1) return { kind: 'task', label: '60 秒體驗', min: 1 };
+    if (!state.start) return { kind: 'pick', label: '程度評估', min: 1 };
     const l = byId[state.start];
     return { kind: 'lesson', label: `${l.id}「${l.title}」`, short: l.id, min: l.min, lesson: l };
   }
   function greeting() {
     const n = nextStep(); const w = weekCount();
-    const week = w >= 2 ? `這週做了 ${w} 件。` : '';
+    const week = w >= 2 ? `本週完成 ${w} 項。` : '';
     if (state.visits <= 1 && !state.done.t1 && !state.start) return '第一次來嗎？先試一個小的，60 秒就好。';
-    if (switched) return n.kind === 'task' ? '要不要先試那個 60 秒的？' : n.kind === 'pick' ? '進度帶過來了。下一步：幫我挑，3 題就好。' : `進度帶過來了。下一步是${n.short}，大約 ${n.min} 分鐘。`;
+    if (switched) return n.kind === 'task' ? '要不要先試那個 60 秒的？' : n.kind === 'pick' ? '進度已同步。下一步：程度評估（3 題）。' : `進度帶過來了。下一步是${n.short}，大約 ${n.min} 分鐘。`;
     if (n.kind === 'task') return '你回來了。要不要先試那個 60 秒的？';
-    if (n.kind === 'pick') return `你回來了！上次做完 60 秒任務。${week}下一步：幫我挑，3 題就好。`;
-    return `你回來了！${state.known.length ? `你會了 ${state.known.length} 課。` : ''}${week}下一步是${n.short}，大約 ${n.min} 分鐘。`;
+    if (n.kind === 'pick') return `歡迎回來。60 秒體驗已完成。${week}下一步：程度評估（3 題）。`;
+    return `你回來了！${state.known.length ? `已完成 ${state.known.length} 課。` : ''}${week}下一步是${n.short}，大約 ${n.min} 分鐘。`;
   }
 
   /* ---------------------------------------------------------------- a tiny bus the live desk listens to */
@@ -79,11 +79,11 @@
   /* ---------------------------------------------------------------- the first screen keeps itself up to date */
   function refresh() {
     const n = nextStep(); const w = weekCount(); const k = state.known.length;
-    const parts = []; if (k) parts.push(`你會了 ${k} / ${TOTAL} 課`); if (w) parts.push(`這週做了 ${w} 件`);
+    const parts = []; if (k) parts.push(`已完成 ${k} / ${TOTAL} 課`); if (w) parts.push(`本週完成 ${w} 項`);
     progressEl.textContent = parts.join('・');
-    btnTask.textContent = n.kind === 'task' ? '給我一個 60 秒任務' : n.kind === 'pick' ? '下一步：幫我挑（3 題）' : `下一步：${n.short}（約 ${n.min} 分鐘）`;
+    btnTask.textContent = n.kind === 'task' ? '開始 60 秒體驗' : n.kind === 'pick' ? '下一步：程度評估（3 題）' : `下一步：${n.short}（約 ${n.min} 分鐘）`;
     btnTask.dataset.next = n.kind;
-    btnPick.textContent = state.start ? '重新幫我挑' : state.done.t1 ? '再做一次 60 秒任務' : '我會一點了，幫我挑從哪課開始';
+    btnPick.textContent = state.start ? '重新評估' : state.done.t1 ? '再次進行 60 秒體驗' : '已有基礎？進行程度評估';
     btnPick.dataset.next = state.start ? 'pick' : state.done.t1 ? 'task' : 'pick';
     emit('state', state);
   }
@@ -109,57 +109,57 @@
   }
   const nextButton = (cls = 'go') => {
     const n = nextStep();
-    if (n.kind === 'task') return `<button type="button" class="${cls}" data-act="task">先做 60 秒任務</button>`;
-    if (n.kind === 'pick') return `<button type="button" class="${cls}" data-act="pick">幫我挑從哪課開始</button>`;
+    if (n.kind === 'task') return `<button type="button" class="${cls}" data-act="task">先進行 60 秒體驗</button>`;
+    if (n.kind === 'pick') return `<button type="button" class="${cls}" data-act="pick">進行程度評估</button>`;
     const href = lessonHref(n.lesson);
-    return href ? `<a class="${cls}" href="${esc(href)}">開始${esc(n.short)}</a>` : `<a class="${cls}" href="https://claude.ai" target="_blank" rel="noopener">打開 Claude 試一次</a>`;
+    return href ? `<a class="${cls}" href="${esc(href)}">開始 ${esc(n.short)}</a>` : `<a class="${cls}" href="https://claude.ai" target="_blank" rel="noopener">前往 Claude 實測</a>`;
   };
 
   /* ---- the 60-second task: one question, answered right here, no login */
   const TASK = {
-    q: '這兩句問 AI 的話，哪一句會得到比較好的答案？',
+    q: '以下兩則提示，何者能取得較高品質的回答？',
     a: '幫我寫讀書計畫。',
     b: '我大二，下週三考微積分第 3 到 5 章，每天晚上只有 2 小時。幫我排 5 天的讀書計畫，用表格。',
-    why: 'B 說了你是誰、要做什麼、有什麼限制。AI 不用猜，答案就會準。',
+    why: 'B 明確提供背景、任務與限制條件，模型無須推測需求，輸出因此更精準。這即是結構化提示（L1-01）的核心原則。',
   };
   function openTask() {
     show('task', 'solve', `
-      <p class="kicker">60 秒任務</p>
+      <p class="kicker">60 秒體驗</p>
       <h2>${esc(TASK.q)}</h2>
       <div class="opts">
         <button type="button" class="opt" data-k="A" data-act="answer" data-v="a">${esc(TASK.a)}</button>
         <button type="button" class="opt" data-k="B" data-act="answer" data-v="b">${esc(TASK.b)}</button>
       </div>`);
-    announce('60 秒任務：' + TASK.q);
+    announce('60 秒體驗：' + TASK.q);
   }
   function answerTask(v) {
     const first = !state.done.t1;
     state.done.t1 = state.done.t1 || Date.now(); if (first) did('t1'); save();
     const count = Object.keys(state.done).length;
     show('task', 'solve', `
-      <p class="kicker">60 秒任務</p>
-      <h2>${v === 'b' ? '對，是 B。' : '差一點，是 B。'}</h2>
+      <p class="kicker">60 秒體驗</p>
+      <h2>${v === 'b' ? '正確：B。' : '正確答案：B。'}</h2>
       <div class="opts">
         <button type="button" class="opt${v === 'a' ? ' is-chosen' : ''}" data-k="A" disabled>${esc(TASK.a)}</button>
         <button type="button" class="opt is-right${v === 'b' ? ' is-chosen' : ''}" data-k="B" disabled>${esc(TASK.b)}</button>
       </div>
       <p class="why">${esc(TASK.why)}</p>
-      <p class="win">你做到第 ${count} 件了！</p>
-      <p class="small">把 B 那句換成你自己的事，貼給 Claude 試一次，就是真的會了。</p>
+      <p class="win">已完成 ${count} 項任務。</p>
+      <p class="small">建議將 B 改寫為自身情境，於 Claude 實際測試一次。</p>
       <div class="row">
-        <a class="go" href="https://claude.ai" target="_blank" rel="noopener">打開 Claude 試一次</a>
-        <button type="button" class="go alt" data-act="pick">下一步：幫我挑</button>
+        <a class="go" href="https://claude.ai" target="_blank" rel="noopener">前往 Claude 實測</a>
+        <button type="button" class="go alt" data-act="pick">下一步：程度評估</button>
       </div>`);
-    announce(`你做到第 ${count} 件了！${TASK.why}`);
+    announce(`已完成 ${count} 項任務。${TASK.why}`);
     refresh(); emit('task:done', { first, right: v === 'b' });
   }
 
   /* ---- pick for me: three questions, then where to start, with what you already know ticked off */
   const P = { step: 0, level: null, goal: null, checks: {} };
-  const LEVELS = ['沒用過', '用過幾次', '常常用'];
-  const GOALS = ['問得更好', '讀資料、整理筆記', '做一個小工具', '學 Skills'];
-  const GOAL_START = { '問得更好': 'L1-01', '讀資料、整理筆記': 'L2-01', '做一個小工具': 'L3-03', '學 Skills': 'L4-01' };
-  const SKILLS = [['L0-01', '拍照問它問題'], ['L1-01', '把需求講清楚，第一次就拿到能用的答案'], ['L2-01', '上傳檔案，叫它只根據檔案回答'], ['L4-01', '知道 Skill 是什麼']];
+  const LEVELS = ['尚未使用', '偶爾使用', '經常使用'];
+  const GOALS = ['提升提示品質（Prompt）', '文件分析與知識整理', '建立互動工具（Artifact）', 'Skills 與擴充功能'];
+  const GOAL_START = { '提升提示品質（Prompt）': 'L1-01', '文件分析與知識整理': 'L2-01', '建立互動工具（Artifact）': 'L3-03', 'Skills 與擴充功能': 'L4-01' };
+  const SKILLS = [['L0-01', '影像輸入提問'], ['L1-01', '結構化提示（背景、任務、限制、格式）'], ['L2-01', '以上傳文件為依據回答'], ['L4-01', 'Connector／Skill／Plugin 的差異']];
   // 2026-11-12 (Thomas): never used → L0-01; used a few times → L0-04; uses it a lot → by what they want to learn.
   // What they tick in question 3 counts as learned; if the start is one of those, move on to the next lesson not learned.
   function recommend(level, goal, checks) {
@@ -176,17 +176,17 @@
   function openPick(step) {
     if (step == null) { P.step = 0; P.level = null; P.goal = null; P.checks = {}; } else P.step = step;
     const many = P.level === 2;                     // only people who use it a lot get the 'what do you want to learn' question
-    const head = `<p class="kicker">幫我挑</p><p class="steps">${P.step === 0 ? 1 : P.step === 1 ? 2 : many ? 3 : 2} / ${P.step === 0 ? 3 : many ? 3 : 2}</p>`;
+    const head = `<p class="kicker">程度評估</p><p class="steps">${P.step === 0 ? 1 : P.step === 1 ? 2 : many ? 3 : 2} / ${P.step === 0 ? 3 : many ? 3 : 2}</p>`;
     if (P.step === 0) {
-      show('pick', 'pick', head + `<h2>你用過 Claude 或 ChatGPT 嗎？</h2><div class="opts">${LEVELS.map((t, i) => `<button type="button" class="opt" data-k="${i + 1}" data-act="level" data-v="${i}">${t}</button>`).join('')}</div>`);
+      show('pick', 'pick', head + `<h2>Claude／ChatGPT 使用經驗</h2><div class="opts">${LEVELS.map((t, i) => `<button type="button" class="opt" data-k="${i + 1}" data-act="level" data-v="${i}">${t}</button>`).join('')}</div>`);
     } else if (P.step === 1) {
-      show('pick', 'pick', head + `<h2>想先學什麼？</h2><div class="opts">${GOALS.map((t, i) => `<button type="button" class="opt" data-k="${i + 1}" data-act="goal" data-v="${t}">${t}</button>`).join('')}</div>`);
+      show('pick', 'pick', head + `<h2>優先學習目標</h2><div class="opts">${GOALS.map((t, i) => `<button type="button" class="opt" data-k="${i + 1}" data-act="goal" data-v="${t}">${t}</button>`).join('')}</div>`);
     } else {
-      show('pick', 'pick', head + `<h2>這些你會了嗎？</h2><p class="small">會的點一下。都還不會，直接看結果就好。</p>
+      show('pick', 'pick', head + `<h2>已具備的能力</h2><p class="small">勾選已熟悉的項目（可複選）；若皆未接觸，直接查看結果。</p>
         <div class="opts">${SKILLS.map(([k, t]) => `<button type="button" class="opt check" data-k="" data-act="check" data-v="${k}" aria-pressed="${P.checks[k] ? 'true' : 'false'}">${t}</button>`).join('')}</div>
-        <div class="row"><button type="button" class="go" data-act="result">看結果</button></div>`);
+        <div class="row"><button type="button" class="go" data-act="result">查看評估結果</button></div>`);
     }
-    if (step == null) announce('幫我挑，共 3 題。第 1 題：你用過 Claude 或 ChatGPT 嗎？');
+    if (step == null) announce('程度評估，共 3 題。第 1 題：Claude／ChatGPT 使用經驗。');
   }
   function pickResult() {
     const r = recommend(P.level || 0, P.goal, P.checks);
@@ -194,16 +194,16 @@
     state.known = r.known; state.start = r.start; state.goal = P.goal; state.level = P.level || 0;
     if (first) did('pick'); save();
     const l = byId[r.start]; const n = r.known.length; const href = lessonHref(l);
-    const line = `${n ? `你已經會 ${n} 課，先幫你打勾了。` : ''}從 ${l.id}「${l.title}」開始，大約 ${l.min} 分鐘。`;
+    const line = `建議起點：${l.id}「${l.title}」（約 ${l.min} 分鐘）。${n ? `已標記完成 ${n} 課。` : ''}`;
     show('pick', 'pick', `
-      <p class="kicker">幫我挑</p>
+      <p class="kicker">程度評估</p>
       <h2>${esc(line)}</h2>
-      <p>學完你能：${esc(l.can)}。</p>
-      ${P.goal && P.level === 2 ? `<p class="small">你說想先學「${esc(P.goal)}」，就從這課開始。${l.n > 2 ? '前面的課想回頭看，地圖上都在。' : ''}</p>` : ''}
-      ${href ? '' : `<p class="small">這一課還在做，上線後會亮在地圖上。先做下面這個，不會白等。</p>`}
+      <p>學習成果：${esc(l.can)}</p>
+      ${P.goal && P.level === 2 ? `<p class="small">依優先目標「${esc(P.goal)}」安排。${l.n > 2 ? '先修課程可於學習地圖查閱。' : ''}</p>` : ''}
+      ${href ? '' : `<p class="small">課程頁製作中，上線後將於學習地圖開放。</p>`}
       <div class="row">
-        ${href ? `<a class="go" href="${esc(href)}">開始 ${esc(l.id)}</a>` : (state.done.t1 ? `<a class="go" href="https://claude.ai" target="_blank" rel="noopener">打開 Claude 試一次</a>` : `<button type="button" class="go" data-act="task">先做 60 秒任務</button>`)}
-        <button type="button" class="go alt" data-act="map">看學習地圖</button>
+        ${href ? `<a class="go" href="${esc(href)}">開始 ${esc(l.id)}</a>` : (state.done.t1 ? `<a class="go" href="https://claude.ai" target="_blank" rel="noopener">前往 Claude 實測</a>` : `<button type="button" class="go" data-act="task">先進行 60 秒體驗</button>`)}
+        <button type="button" class="go alt" data-act="map">查看學習地圖</button>
       </div>`);
     announce(line);
     refresh(); emit('pick:done', { first, known: r.known, start: r.start });
@@ -217,19 +217,19 @@
     const s1 = MAP7 && MAP7.stages[0], later = MAP7 ? MAP7.stages.slice(1) : [];
     show('map', 'map', `
       <p class="kicker">學習地圖</p>
-      <h2>${k ? `你會了 ${k} / ${TOTAL} 課。` : `第一版先開 ${TOTAL} 課，全部 ${all} 課。`}</h2>
-      <p class="small">${w ? `這週做了 ${w} 件。` : ''}會的可以跳過，順序只是建議。</p>
+      <h2>${k ? `已完成 ${k} / ${TOTAL} 課。` : `首波開放 ${TOTAL} 課／共 ${all} 課`}</h2>
+      <p class="small">${w ? `本週完成 ${w} 項。` : ''}可依程度跳過；順序為建議路徑。</p>
       ${s1 ? `<p class="small map-stage">階段 1　${esc(s1.name)}：${esc(s1.desc)}</p>` : ''}
       <ol class="stages">${STAGES.map((s, i) => {
         const d = s.lessons.filter((l) => state.known.includes(l.id)).length;
         const soon = (s.count || s.lessons.length) - s.lessons.length;
         const nextId = n.kind === 'lesson' ? n.lesson.id : null;
-        const ls = s.lessons.map((l) => `${state.known.includes(l.id) ? '✓ ' : ''}${esc(l.id)} ${esc(l.title)}${l.id === nextId ? `<b class="map-next">下一步，約 ${l.min} 分鐘</b>` : ''}`).join('<br>');
-        return `<li class="${i === here ? 'is-here' : ''}">${esc(s.name)}<span>${d} / ${s.lessons.length}</span><small>${ls}${soon ? `<br>還有 ${soon} 課即將推出` : ''}</small></li>`;
+        const ls = s.lessons.map((l) => `${state.known.includes(l.id) ? '✓ ' : ''}${esc(l.id)} ${esc(l.title)}${l.id === nextId ? `<b class="map-next">下一步・約 ${l.min} 分鐘</b>` : ''}`).join('<br>');
+        return `<li class="${i === here ? 'is-here' : ''}">${esc(s.name)}<span>${d} / ${s.lessons.length}</span><small>${ls}${soon ? `<br>其餘 ${soon} 課即將推出` : ''}</small></li>`;
       }).join('')}</ol>
       ${later.length ? `<p class="small map-later">${later.map((g) => `階段 ${esc(g.no)}　${esc(g.name)}（${g.modules.map((m) => esc(m.id)).join('、')}）即將推出`).join('<br>')}</p>` : ''}
-      <div class="row">${nextButton()}${n.kind === 'lesson' && !lessonHref(n.lesson) ? '<span class="small" style="font-size:13px;color:var(--grape-2)">課程頁還在做，先用這個練。</span>' : ''}</div>`);
-    announce(k ? `學習地圖：你會了 ${k} / ${TOTAL} 課。` : `學習地圖：第一版先開 ${TOTAL} 課，全部 ${all} 課。`);
+      <div class="row">${nextButton()}${n.kind === 'lesson' && !lessonHref(n.lesson) ? '<span class="small" style="font-size:13px;color:var(--grape-2)">課程頁製作中。</span>' : ''}</div>`);
+    announce(k ? `學習地圖：已完成 ${k} / ${TOTAL} 課。` : `學習地圖：首波開放 ${TOTAL} 課，共 ${all} 課。`);
   }
 
   /* ---- a thing that is not built yet: say so, and give the next step instead of a dead end */
@@ -237,11 +237,11 @@
     const e = ENTRY[id]; if (!e) return;
     show('soon', id, `
       <p class="kicker">${esc(e.name)}</p>
-      <h2>這一頁還在做。</h2>
+      <h2>此頁面建置中。</h2>
       <p>${esc(e.line)}</p>
-      <p class="small">做好之前，先做這個：</p>
-      <div class="row">${nextButton()}<button type="button" class="go alt" data-act="map">看學習地圖</button></div>`);
-    announce(`${e.name}還在做。${e.line}`);
+      <p class="small">建議先進行：</p>
+      <div class="row">${nextButton()}<button type="button" class="go alt" data-act="map">查看學習地圖</button></div>`);
+    announce(`${e.name}建置中。${e.line}`);
   }
 
   const showMap = () => (window.F4 && window.F4.onMap ? window.F4.onMap() : openMap());
