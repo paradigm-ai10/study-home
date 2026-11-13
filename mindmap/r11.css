@@ -1,0 +1,33 @@
+/* 第十一輪（diagram-design 規則）：疊在 r8.css 之上。 */
+/* the accent is kept for 1–2 things on the map, so the first-release diamonds in the card and panel are graphite too */
+.card .fr::before, #panel li .f::before { background: #4A4640; }
+#panel li .f { color: var(--muted); }
+/* replay and other controls are not part of the diagram: quiet graphite, not the accent */
+#map .replay-svg text { fill: var(--muted); font-family: var(--font); font-size: 15px; }
+#map .r11-ctl { cursor: pointer; }
+#map .r11-ctl text { fill: var(--muted); }
+#map .r11-ctl:hover text, #map .r11-ctl:focus-visible text { fill: var(--ink); text-decoration: underline; }
+#map .r11-ctl:focus { outline: none; }
+
+/* A 總覽：第一眼只有編號，主題名稱滑過或展開才出現 */
+body.collapsed #map .leaf .nm { opacity: 0; transition: opacity .16s cubic-bezier(0.23, 1, 0.32, 1); }
+body.collapsed #map .leaf.on .nm { opacity: 1; }
+#map .leaf .nm { transition: opacity .16s cubic-bezier(0.23, 1, 0.32, 1); }
+
+/* B 環形：圈上的格子不是熱區，滑過主題時才亮 */
+#map .ringseg .hi { opacity: 0; transition: opacity .16s cubic-bezier(0.23, 1, 0.32, 1); }
+#map .ringseg.on .hi { opacity: 1; }
+
+/* C 未探索：越後面學的越淡；滑過就撥開 */
+/* the fade goes on the children, not the group, so a node's paper backing stays solid and the branch behind it doesn't show through */
+#map .fog, #map .fog > * { transition: opacity .2s ease-out, filter .2s ease-out; }
+#map .fog1:not(.on) { filter: grayscale(.6); }
+#map .fog2:not(.on) { filter: grayscale(1); }
+#map .fog1:not(.on) > :not(.paper):not(.hi) { opacity: .55; }
+#map .fog2:not(.on) > :not(.paper):not(.hi) { opacity: .4; }
+@media (prefers-reduced-motion: reduce) { #map .fog, #map .fog > *, body.collapsed #map .leaf .nm { transition: none; } }
+
+/* 第十三輪 地面：滑過角色時它那一塊地亮起來 */
+#map .region .glow { opacity: 0; transition: opacity .2s cubic-bezier(0.23, 1, 0.32, 1); }
+#map .region.on .glow { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { #map .region .glow { transition: none; } }

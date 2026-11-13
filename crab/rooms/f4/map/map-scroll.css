@@ -1,0 +1,58 @@
+/* The learning map as a scroll picked up off the desk (map-scroll.js). Only active when <html data-mapmode="s">.
+   The paper is the map's own paper colour (#FBF8F1). The rods and paper rolls are drawn by a WebGL canvas (.ms-gl)
+   laid over the paper; the lamp tint and the shadow behind the paper belong to the desk. */
+html[data-mapmode="s"] .mv { display: none !important; }
+
+.ms { position: fixed; inset: 0; z-index: 40; display: none; }
+.ms.is-on { display: block; }
+
+/* the desk stays where it is, dimmed: the lamp side keeps a little of its warmth, the rain keeps falling at the edges */
+.ms-shade { position: absolute; inset: 0; opacity: 0; transition: opacity 620ms cubic-bezier(.3, 0, .2, 1);
+  background: radial-gradient(90% 70% at 16% 8%, rgba(60, 34, 30, .22), rgba(14, 9, 28, .52) 62%), rgba(14, 9, 28, .14); }
+.ms.is-go .ms-shade { opacity: 1; }
+
+.ms-scroll { position: absolute; left: 50%; top: 50%; margin: 0; translate: -50% -50%; opacity: 0; will-change: transform; }
+.ms.is-held .ms-scroll { opacity: 1; }
+
+/* the shadow the open paper throws on the desk behind it */
+.ms-cast { position: absolute; inset: 0; border-radius: 2px; will-change: transform;
+  box-shadow: 0 34px 70px -18px rgba(6, 3, 14, .85), 0 6px 18px rgba(6, 3, 14, .4); }
+
+.ms-paper { position: absolute; inset: 0; background: #FBF8F1; overflow: hidden; will-change: clip-path; }
+/* the map keeps clear of the rolls at the ends of the paper */
+.ms-paper iframe { position: absolute; top: 0; bottom: 0; left: 36px; width: calc(100% - 72px); height: 100%; border: 0; display: block; background: #FBF8F1;
+  opacity: 0; }
+.ms[data-scroll="s2"] .ms-paper iframe { left: 0; width: 100%; top: 36px; bottom: 36px; height: calc(100% - 72px); }
+.ms.is-lit .ms-paper iframe { opacity: 1; }
+/* (the silk bands at the two ends of the paper are drawn by the canvas, in the same silk as the rolls) */
+/* lamp light across the paper (it sits to the upper left of the desk), a cooler far corner, and the sheet's own edges;
+   never over the controls */
+.ms-tint { position: absolute; inset: 0; z-index: 2; pointer-events: none; mix-blend-mode: multiply;
+  /* the last layer is the lamp's warm wash over the whole sheet (LAMP in map-scroll.js: the mesh hands over in this colour) */
+  background: radial-gradient(85% 75% at 6% 0%, rgba(255, 214, 160, .2), rgba(255, 214, 160, 0) 62%),
+    radial-gradient(70% 60% at 100% 100%, rgba(92, 78, 128, .16), rgba(92, 78, 128, 0) 70%),
+    radial-gradient(120% 120% at 50% 50%, rgba(70, 52, 40, 0) 62%, rgba(70, 52, 40, .1)), #F4E3CB;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7), inset 0 -1px 0 rgba(120, 92, 60, .28), inset 0 0 0 1px rgba(96, 72, 40, .12); }
+
+/* rods and rolls: a transparent canvas the size of the window, over the paper; it never takes the pointer */
+.ms-gl { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; display: none; }
+.ms.is-gl .ms-gl { display: block; }
+
+/* the two controls (map-chrome.js) come once the paper is open; they sit clear of the roll beside them */
+.ms .mc { left: 48px; opacity: 0; transition: opacity 200ms ease-out; }
+.ms[data-scroll="s2"] .mc { left: 18px; bottom: 44px; }
+.ms.is-open .mc { opacity: 1; transition-delay: 160ms; }
+
+/* the page's own words step back while the paper is in your hands (3D desk) */
+html[data-mapmode="s"].is-3d :is(header, .hero, .index, .ctl) { transition: opacity 320ms ease-out; }
+html[data-mapmode="s"].is-3d.has-map :is(header, .hero, .index, .ctl, .tag, .bubble, .zzz) { opacity: 0 !important; pointer-events: none; }
+
+/* the home page darkens its left and top edges behind its own words; with the words gone that veil would grey the scroll */
+html[data-mapmode="s"].is-3d .view::after { transition: opacity 320ms ease-out; }
+html[data-mapmode="s"].is-3d.has-map .view::after { opacity: 0; }
+
+@keyframes ms-fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .ms-shade { transition: none !important; }
+  .ms.is-held .ms-scroll, .ms.is-gl .ms-gl { animation: ms-fade 200ms ease-out; }   /* no travel, but not a hard cut either */
+}

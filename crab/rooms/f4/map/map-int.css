@@ -1,0 +1,43 @@
+/* Learning-map integration options (map-int.js). Only active when <html data-mapmode="a|b|c">. */
+
+/* ---- the two floating controls over the framed map (also used by ../map.html) ---- */
+.mc { position: absolute; left: 18px; bottom: 12px; z-index: 3; display: flex; gap: 8px; align-items: center; max-width: calc(100% - 36px);
+  font-family: "Noto Sans TC", "PingFang TC", system-ui, sans-serif; }
+.mc button { appearance: none; font: inherit; font-size: 14.5px; line-height: 1; color: #2E2D2B; cursor: pointer; height: 34px; padding: 0 14px;
+  background: #FDFBF6; border: 1.5px solid #4A4640; border-radius: 8px; white-space: nowrap; transition: background-color 140ms ease-out; }
+.mc button:hover { background: #F1DFA8; }
+.mc button:focus-visible { outline: 2px solid #B4502D; outline-offset: 2px; }
+.mc .mc-prog { display: flex; gap: 10px; align-items: center; min-width: 0; overflow: hidden; }
+.mc .mc-prog span { color: #67635C; }
+.mc .mc-prog b { font-weight: 500; overflow: hidden; text-overflow: ellipsis; }
+.mc .mc-prog i { font-style: normal; color: #9A3F1E; }
+@media (max-width: 700px) { .mc .mc-prog span, .mc .mc-prog i { display: none; } }
+
+/* ---- options A and C: the paper on the desk unfolds over the page ---- */
+.mi { position: fixed; inset: 0; z-index: 40; display: none; }
+.mi.is-on { display: block; }
+.mi-shade { position: absolute; inset: 0; background: rgba(14, 9, 28, .58); opacity: 0; transition: opacity 320ms ease-out; }
+.mi.is-go .mi-shade { opacity: 1; }
+.mi-sheet { position: absolute; inset: 0; background: #FBF8F1; transform-origin: 0 0; will-change: transform; overflow: hidden;
+  box-shadow: 0 30px 60px -20px rgba(8, 5, 18, .8); }
+.mi-sheet iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: #FBF8F1; }
+/* option A: the drawing waits for the paper to be flat, then grows; the controls come with it */
+.mi[data-mode="a"] .mi-sheet iframe, .mi .mc { opacity: 0; transition: opacity 200ms ease-out; }
+.mi.is-open[data-mode="a"] .mi-sheet iframe, .mi.is-open .mc { opacity: 1; }
+.mi.is-open .mc { transition-delay: 120ms; }
+/* two fold creases on the blank paper while it unfolds (gone once the map is on it) */
+.mi-sheet::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 1; transition: opacity 240ms ease-out;
+  background: linear-gradient(90deg, transparent calc(33.3% - 1px), rgba(120, 86, 44, .12) 33.3%, transparent calc(33.3% + 2px)),
+    linear-gradient(90deg, transparent calc(66.6% - 1px), rgba(120, 86, 44, .12) 66.6%, transparent calc(66.6% + 2px)); z-index: 2; }
+.mi.is-open .mi-sheet::before { opacity: 0; }
+
+/* ---- option B: the paper covers the screen, then the page changes to map.html ---- */
+.mi-cover { position: fixed; inset: 0; z-index: 41; background: #FBF8F1; transform-origin: 0 0; will-change: transform; }
+
+/* ---- option C, plain page: the map sits in the page, as wide as the window ---- */
+.mi-inline { position: relative; width: 100%; max-width: 1560px; margin: 4px auto 30px; height: max(716px, min(100vw, 1560px) * 790 / 1420);
+  background: #FBF8F1; box-shadow: 0 0 0 1px rgba(58, 46, 92, .14); }
+.mi-inline iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+html[data-mapmode="c"] #mv-open, html[data-mapmode] .mv { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) { .mi-sheet, .mi-cover { transition: none !important; } }

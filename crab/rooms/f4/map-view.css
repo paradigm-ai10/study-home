@@ -44,8 +44,8 @@
 .mv-stop.is-sel .ring { stroke: #C0351F; stroke-width: 3.2; }
 .mv-stop .id { font-family: "Outfit", system-ui, sans-serif; font-weight: 600; font-size: 17px; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
 .mv-stop .name { font-size: 15.5px; text-anchor: middle; fill: #3A2E5C; pointer-events: none; }
-.mv-stop .meta { font-size: 12.5px; text-anchor: middle; fill: rgba(58, 46, 92, .62); pointer-events: none; }
-.mv-stop.is-later .name { fill: rgba(58, 46, 92, .55); }
+.mv-stop .meta { font-size: 14px; text-anchor: middle; fill: rgba(58, 46, 92, .62); pointer-events: none; }
+.mv-stop.is-later .name { fill: rgba(58, 46, 92, .72); }   /* readable on the paper (about 4.5:1) */
 .mv-here { animation: mv-pulse 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
 @keyframes mv-pulse { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 .mv-legend { font-size: 13px; fill: rgba(58, 46, 92, .7); }

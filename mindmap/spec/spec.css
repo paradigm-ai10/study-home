@@ -1,0 +1,50 @@
+/* 網站學習地圖・設計規格（2026-11-12 起）。跟課程結構無關的規則：畫風、字級、縮放、互動層次。
+   字級一律用「螢幕上的實際大小」來定：地圖畫布 1280×680，在 1280×680 的視窗裡是 1：1，大螢幕等比放大。 */
+:root {
+  /* type scale, screen px at 1:1 */
+  --t-title: 28px;   /* 地圖標題 */
+  --t-stage: 21px;   /* 階段名 */
+  --t-role: 19px;    /* 角色名 */
+  --t-module: 17px;  /* 模組名 */
+  --t-note: 18px;    /* 手寫註記（Iansui 字面較小，所以大 1px） */
+  --t-meta: 15px;    /* 編號、狀態、時數：地圖上的最小字 */
+  --t-card: 15px;    /* 滑過卡片、右側面板內文（一般網頁文字，不跟地圖縮放） */
+  --t-card-min: 14px;/* 卡片裡的最小字 */
+  --font: "Noto Sans TC", "PingFang TC", sans-serif;
+  --hand: "Iansui", "LXGW WenKai TC", cursive;
+  /* pencil paper */
+  --paper: #FBF8F1; --ink: #2E2D2B; --muted: #67635C; --meta: #8A857B; --terra: #B4502D;
+  --radius-hand: 255px 15px 225px 15px / 15px 225px 15px 255px;
+}
+html, body { margin: 0; height: 100%; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font); overflow: hidden; }
+#stage { position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; overflow: hidden; }
+#stage > #map { margin: auto; flex: none; }
+/* graphite grain over everything */
+body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 5; opacity: .5; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .5 0 0 0 0 .42 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+#map { display: block; }
+#map text { font-family: var(--font); fill: var(--ink); }
+#map .t-title { font-size: 28px; font-weight: 700; }
+#map .t-stage { font-size: 21px; font-weight: 700; }
+#map .t-role { font-size: 19px; font-weight: 700; }
+#map .t-module, #map .bname { font-size: 17px; font-weight: 500; }
+#map .t-note { font-family: var(--hand); font-size: 18px; fill: var(--terra); }
+#map .t-meta, #map .bid { font-size: 15px; fill: var(--muted); }
+#map .t-spec { font-size: 15px; fill: var(--meta); }
+#map .t-rule { font-size: 15px; fill: var(--ink); }
+#map .t-kicker { font-size: 15px; font-weight: 700; fill: var(--muted); letter-spacing: .04em; }
+.mod { cursor: pointer; }
+.mod .blk { transition: filter .16s ease-out; }
+.mod.on .blk { filter: drop-shadow(0 4px 8px rgba(46, 45, 43, .16)); }
+
+/* hover card: ordinary page text, fixed size, never scaled with the map */
+.card { position: fixed; z-index: 6; width: 300px; box-sizing: border-box; padding: 14px 16px 10px; background: #FDFBF6;
+  border: 1.5px solid #4A4640; border-radius: var(--radius-hand); box-shadow: 0 12px 30px rgba(46, 45, 43, .12);
+  font-size: var(--t-card); line-height: 1.5; color: var(--ink); }
+.card .o { font-size: 16px; font-weight: 700; color: #7A5206; }
+.card .m { font-size: var(--t-card-min); color: var(--muted); margin-top: 2px; }
+.card .k { font-size: var(--t-card-min); color: #4A4640; margin: 4px 0 6px; line-height: 1.55; }
+.card .les { display: flex; gap: 8px; align-items: baseline; padding: 6px 0; border-top: 1px dashed #D9D3C6; }
+.card .les em { font-style: normal; margin-left: auto; font-size: var(--t-card-min); color: var(--muted); white-space: nowrap; }
+.tag { position: fixed; top: 10px; right: 14px; z-index: 7; font-size: 13px; color: var(--muted); background: #F1EADB; padding: 4px 10px; border-radius: 10px; }

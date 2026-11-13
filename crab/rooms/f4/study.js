@@ -51,7 +51,7 @@ const hintOf = (id) => F4.ENTRY[id].line;
 // what the map on the desk shows: which islands you have started, where you are, how many lessons you know
 const mapState = () => {
   const st = F4.state; const n = F4.nextStep();
-  const counts = F4.STAGES.map((g) => g.lessons.filter((l) => st.known.includes(l.id)).length);
+  const counts = F4.STAGES.slice(0, 5).map((g) => g.lessons.filter((l) => st.known.includes(l.id)).length);   // the paper map has five islands (map v8: topics 1–5, the ones with lessons open)
   const lit = counts.map((c, i) => c > 0 || (i === 0 && !!st.done.t1));
   return { lit, counts, here: n.kind === 'lesson' ? n.lesson.stage : 0, known: st.known.length, total: F4.TOTAL, done: Object.keys(st.done).length };
 };
@@ -1169,11 +1169,12 @@ async function boot() {
     c.fillStyle = '#ffd98a'; c.fillRect(0, 0, w, h);
     if (!n) return;
     c.textAlign = 'left'; c.textBaseline = 'middle';
-    c.fillStyle = 'rgba(58,46,92,0.7)'; c.font = `31px ${FONT_ZH}`; c.fillText('下一步', 24, 50);
-    const big = n.short || n.label;
+    const done = n.kind === 'done';
+    c.fillStyle = 'rgba(58,46,92,0.7)'; c.font = `31px ${FONT_ZH}`; c.fillText(done ? '首版課程' : '下一步', 24, 50);
+    const big = done ? `${F4.TOTAL} 課完成` : n.short || n.label;
     c.fillStyle = '#3a2e5c'; c.font = `${big.length > 5 ? 40 : 54}px ${FONT_ZH}`; c.fillText(big, 22, 122);
     c.strokeStyle = '#ff6b57'; c.lineWidth = 6; c.lineCap = 'round'; c.beginPath(); c.moveTo(24, 166); c.lineTo(160, 162); c.stroke();
-    c.fillStyle = 'rgba(58,46,92,0.78)'; c.font = `30px ${FONT_ZH}`; c.fillText(`約 ${n.min} 分鐘`, 24, 210);
+    c.fillStyle = 'rgba(58,46,92,0.78)'; c.font = `30px ${FONT_ZH}`; if (done) c.fillText('其他課陸續推出', 24, 210); else if (n.min) c.fillText(`約 ${n.min} 分鐘`, 24, 210);
   }, { args: [F4.nextStep()] });
   tNote.flipY = true;
   const note = part(scene, new THREE.PlaneGeometry(0.74, 0.74), std(0xffffff, 0.85, { map: tNote, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }), [0.45, 0.008, 1.05], [-Math.PI / 2, 0, -0.1]);

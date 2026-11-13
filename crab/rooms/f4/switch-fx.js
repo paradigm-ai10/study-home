@@ -19,9 +19,17 @@
     }
     if (n0 && !('onpagereveal' in window)) sessionStorage.removeItem(NOTE);   // no view transitions here (nothing below will read the note): it must not replay on a reload
   } catch (x) { /* then it is an ordinary arrival */ }
+  window.addEventListener('pageswap', function (e) {
+    var vt = e.viewTransition; if (!vt) return;
+    var to = ''; try { to = e.activation && e.activation.entry ? e.activation.entry.url : ''; } catch (x) { to = ''; }
+    var here = location.pathname.replace(/[^/]*$/, ''), there = ''; try { there = new URL(to, location.href).pathname.replace(/[^/]*$/, ''); } catch (x) { there = ''; }
+    if (there !== here) { [vt.finished, vt.ready, vt.updateCallbackDone].forEach(function (p) { if (p && p.catch) p.catch(function () {}); }); vt.skipTransition(); }   // only the two versions of this page play the move
+  });
   window.addEventListener('pagereveal', function (e) {
     var vt = e.viewTransition; if (!vt) { document.documentElement.dataset.fx = 'none'; try { sessionStorage.removeItem(NOTE); } catch (x) {} return; }
     if (vt.ready && vt.ready.catch) vt.ready.catch(function () {});   // skipping below rejects this; nobody is waiting on it
+    if (vt.finished && vt.finished.catch) vt.finished.catch(function () {});
+    if (vt.updateCallbackDone && vt.updateCallbackDone.catch) vt.updateCallbackDone.catch(function () {});   // a transition skipped on arrival from another page (a lesson page) must not leave an uncaught 'aborted'
     var note = null;
     try { note = JSON.parse(sessionStorage.getItem(NOTE) || 'null'); sessionStorage.removeItem(NOTE); } catch (x) { note = null; }
     var simple = document.documentElement.dataset.view === 'simple';

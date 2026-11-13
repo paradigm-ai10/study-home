@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#FFF4E0">
-<title>Paradigm｜不會寫程式，也能學會用 AI</title>
-<meta name="description" content="給學生和上班族的免費中文課：不會寫程式，也能讓 AI 幫你做事。先完成 60 秒體驗，再透過程度評估決定起始課程。">
+<title>Paradigm｜不會寫程式，也能讓 AI 幫你做事</title>
+<meta name="description" content="學生與職場工作者的免費中文 AI 課程：不會寫程式，也能讓 AI 幫你做事。先完成 60 秒體驗，再透過程度評估決定起始課程。">
 <script>document.documentElement.classList.replace('no-js', 'js');</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 13 7%27%3E%3Cpath fill=%27%23D97757%27 d=%27M2 0h9v2h2v2h-2v1H2V4H0V2h2z%27/%3E%3Cpath fill=%27%23D97757%27 d=%27M3 5h1v2H3zM5 5h1v2H5zM7 5h1v2H7zM9 5h1v2H9z%27/%3E%3Cpath fill=%27%231a1a1a%27 d=%27M4 1h1v2H4zM8 1h1v2H8z%27/%3E%3C/svg%3E">
 <link rel="preload" as="font" href="fonts/huninn-f4.woff2" type="font/woff2" crossorigin>
@@ -16,6 +16,12 @@
 <link rel="stylesheet" href="pack-fx.css">
 <link rel="expect" href="#desk-photo" blocking="render">
 <script src="switch-fx.js"></script>
+<!-- learning-map integration options (?mapmode=a|b|c); does nothing without a mode. See 地圖整合_選項.md -->
+<link rel="stylesheet" href="map/map-int.css">
+<script src="map/map-int.js"></script>
+<link rel="stylesheet" href="map/map-scroll.css">
+<script src="map/map-scroll.js"></script>
+<script src="map/map-chrome.js" defer></script>
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -34,7 +40,7 @@
     --sheet: #FFFAF0;
     --grape: #3A2E5C;
     --grape-2: rgba(58, 46, 92, .78);
-    --grape-3: rgba(58, 46, 92, .6);
+    --grape-3: rgba(58, 46, 92, .74);
     --line: rgba(58, 46, 92, .18);
     --coral: #FF6B57;
     --coral-ink: #C0351F;
@@ -191,6 +197,8 @@
     .lead, .body { grid-template-columns: minmax(0, 1fr); }
     .note { rotate: none; max-width: 420px; }
     .top nav { gap: 12px; }
+    .top nav a { white-space: nowrap; }
+    .top nav a.ig { font-size: 12.5px; }
     .lessons li { grid-template-columns: 42px minmax(0, 1fr) auto; }
     .lessons .m { display: none; }
   }
@@ -199,9 +207,9 @@
 </head>
 <body>
 <header class="top wrap">
-  <a class="wordmark" href="../../../index.html">PARADIGM</a>
+  <a class="wordmark" href="./">PARADIGM</a>
   <nav aria-label="版本和 IG">
-    <a class="switch" href="index.html" data-view-to="3d" title="同樣的內容，有會動的螃蟹和書桌">切換至 3D 版</a>
+    <a class="switch" href="index.html" data-view-to="3d" title="相同內容的 3D 互動版">切換至 3D 版</a>
     <a class="ig" href="https://www.instagram.com/paradigmai_tw/" rel="noopener">IG @paradigmai_tw</a>
   </nav>
 </header>
@@ -234,7 +242,7 @@
     <section id="map" aria-labelledby="map-h">
       <div class="sec-h">
         <h2 id="map-h" tabindex="-1">學習地圖</h2>
-        <p id="map-sub">3 階段・12 模組・208 課；首波開放 8 課，可依程度跳過。</p>
+        <p id="map-sub">3 階段・17 主題・必修 83 課、選修 54 課；首版 20 課（已開放 8 課），可依程度跳過。</p>
       </div>
       <ol class="stages" id="stages"></ol>
     </section>
@@ -261,7 +269,7 @@
 <p class="sr" id="live" role="status" aria-live="polite"></p>
 
 <script src="../../routes.js" defer></script>
-<script src="../../../roadmap7.js" defer></script>
+<script src="../../../roadmap8.js" defer></script>
 <script src="app.js" defer></script>
 <script src="simple.js" defer></script>
 <script src="pack-boot.js" defer></script>

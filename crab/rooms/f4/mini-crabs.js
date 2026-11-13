@@ -61,7 +61,7 @@ async function main() {
     // its own small warm light from the front, so it is not lost in the dark at the edge of the desk
     const glow = new THREE.PointLight(0xffd9a8, 1.6, size.y * 5, 2); glow.position.set(0, size.y * 1.4, size.z * 1.6); turn.add(glow);
     // what the pointer hits: a box round the crab and its flag (drawn nowhere)
-    const hit = new THREE.Mesh(new THREE.BoxGeometry(size.x * 1.1, size.y * 1.3, size.z * 1.3), new THREE.MeshBasicMaterial({ visible: false }));
+    const hit = new THREE.Mesh(new THREE.BoxGeometry(size.x * 0.82, size.y * 1.05, size.z * 0.9), new THREE.MeshBasicMaterial({ visible: false }));
     hit.position.set(0, size.y * 0.6, 0); hit.userData.mini = i; root.add(hit);
     scene.add(root);
     const mixer = new THREE.AnimationMixer(model); const a = {};

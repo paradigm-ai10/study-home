@@ -1,32 +1,36 @@
 /* The big learning map (2026-11-12, Thomas: 「地圖要真的像在那張地圖上，點開展開像一個 AI 學習 map，點進去才是 content」).
    Clicking 學習地圖 (the paper map on the desk, the index, or any 看學習地圖 button) unfolds the paper to fill the screen:
-   3 stages, 12 module stops on one road (map version 7, ../../../roadmap7.js). A stop shows its lessons; an open lesson
+   map v8.5 (2026-11-13): 3 stages, 4 roles, 17 topic stops on one road (../../../roadmap8.js, made by make_roadmap8.py). A stop shows its lessons; an open lesson
    shows its short intro (課程頁 not written yet: LESSON_PAGES in ../../routes.js). Same file on the 3D page and the plain page.
    Styles: map-view.css. It takes over F4.onMap, so app.js / simple.js call it without knowing it is here. */
 (() => {
-  const F4 = window.F4, M7 = window.ROADMAP7;
-  if (!F4 || !M7) return;
+  const F4 = window.F4, R8 = window.ROADMAP8;
+  if (!F4 || !R8) return;
   const html = document.documentElement;
   const SIMPLE = F4.simple;
   const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const MODS = []; M7.stages.forEach((s, si) => s.modules.forEach((m) => MODS.push(Object.assign({ stage: si }, m))));
-  const modOf = {}; MODS.forEach((m) => m.lessons.forEach((l) => { modOf[l.id] = m; }));
+  const TOPICS = R8.topics;
+  const topicOf = {}; TOPICS.forEach((t) => t.lessons.forEach((l) => { topicOf[l.id] = t; }));
+  const roleOf = {}; R8.roles.forEach((r) => { roleOf[r.id] = r; });
+  const stageNo = ['', '第一階段', '第二階段', '第三階段'];
   const pageOf = (id) => (window.LESSON_PAGES && window.LESSON_PAGES[id]) || null;
 
-  /* ---------- the drawing: where each stop sits on a 1200 × 720 sheet ---------- */
+  /* ---------- the drawing: where each topic sits on a 1200 × 720 sheet (stretched down by SY) ---------- */
   const AT = {
-    L0: [130, 560], L1: [255, 385], L2: [415, 525], L3: [520, 300], L4: [650, 480],
-    L5: [790, 175], L6: [935, 240], L7: [800, 335], L8: [950, 405], L9: [820, 505],
-    L10: [1105, 245], L11: [1105, 420],
+    T1: [100, 565], T2: [180, 385], T3: [250, 555], T4: [340, 330], T5: [440, 555], T6: [470, 300], T7: [540, 430],
+    T8: [665, 210], T9: [725, 340], T10: [665, 480], T11: [725, 610],
+    T12: [885, 300], T13: [885, 490],
+    T14: [1060, 200], T15: [1090, 340], T16: [1050, 470], T17: [1085, 600],   // map v8.5: 17 topics (builder 8–11, orchestrator 12–13, product engineer 14–17)
   };
   const SY = 1.28;   // the side column leaves a squarer space: stretch the drawing downward (shapes only, never the words)
   Object.keys(AT).forEach((k) => { AT[k][1] = Math.round(AT[k][1] * SY); });
-  const REGION = [   // a soft blob per stage, label in its top-left corner
-    { d: 'M60 205 C 70 120, 250 95, 400 130 C 560 165, 700 150, 712 260 C 726 380, 735 610, 640 660 C 520 712, 210 705, 95 650 C 20 610, 45 300, 60 205 Z', fill: 'rgba(255, 200, 87, .18)', stroke: 'rgba(192, 53, 31, .38)', lx: 92, ly: 168 },
-    { d: 'M738 92 C 820 60, 1010 70, 1018 150 C 1030 260, 1030 460, 1000 560 C 975 625, 790 630, 748 560 C 712 490, 708 140, 738 92 Z', fill: 'rgba(58, 46, 92, .06)', stroke: 'rgba(58, 46, 92, .28)', lx: 760, ly: 120 },
-    { d: 'M1045 140 C 1090 120, 1172 130, 1176 190 C 1182 300, 1182 450, 1160 505 C 1140 545, 1060 545, 1046 495 C 1030 420, 1028 170, 1045 140 Z', fill: 'rgba(58, 46, 92, .06)', stroke: 'rgba(58, 46, 92, .28)', lx: 1050, ly: 112 },
-  ];
+  const REGION = {   // a soft blob per role, its name in the top-left corner
+    'power-user': { d: 'M60 200 C 80 130, 300 110, 450 140 C 560 160, 590 230, 585 330 C 590 460, 600 640, 520 670 C 400 705, 160 700, 80 650 C 30 600, 40 300, 60 200 Z', fill: 'rgba(255, 200, 87, .18)', stroke: 'rgba(192, 53, 31, .38)', lx: 82, ly: 168 },
+    builder: { d: 'M615 140 C 650 105, 770 110, 785 160 C 800 280, 805 560, 785 640 C 760 690, 640 690, 615 640 C 590 540, 590 200, 615 140 Z', fill: 'rgba(58, 46, 92, .06)', stroke: 'rgba(58, 46, 92, .28)', lx: 616, ly: 118 },
+    orchestrator: { d: 'M825 170 C 850 140, 945 140, 955 185 C 968 300, 968 480, 950 540 C 930 580, 845 580, 828 540 C 810 470, 808 230, 825 170 Z', fill: 'rgba(58, 46, 92, .06)', stroke: 'rgba(58, 46, 92, .28)', lx: 820, ly: 150 },
+    'product-engineer': { d: 'M990 120 C 1030 95, 1170 100, 1180 150 C 1190 300, 1192 560, 1170 640 C 1150 690, 1010 690, 992 640 C 972 560, 970 200, 990 120 Z', fill: 'rgba(58, 46, 92, .06)', stroke: 'rgba(58, 46, 92, .28)', lx: 984, ly: 98, small: true },
+  };
   // one smooth road through the stops in order (Catmull-Rom turned into curves)
   function road(ids) {
     const p = ids.map((id) => AT[id]); let d = `M${p[0][0]} ${p[0][1]}`;
@@ -36,66 +40,68 @@
     }
     return d;
   }
-  const S1 = M7.stages[0].modules.map((m) => m.id), REST = MODS.filter((m) => m.stage > 0).map((m) => m.id);
+  const FIRST_ROLE = R8.roles[0].topics, LATER = TOPICS.filter((t) => !FIRST_ROLE.includes(t.id)).map((t) => t.id);
 
   function svg() {
     const st = F4.state, n = F4.nextStep(), known = new Set(st.known);
-    const hereMod = n.kind === 'lesson' ? (modOf[n.lesson.id] || {}).id : 'L0';
-    let out = `<svg viewBox="0 0 1200 ${Math.round(720 * SY)}" role="group" aria-label="學習地圖：12 個模組">`;
-    REGION.forEach((r, i) => {
-      const s = M7.stages[i];
-      const ly = Math.round(r.ly * SY), narrow = i === 2;
+    const hereTopic = n.kind === 'lesson' ? (topicOf[n.lesson.id] || {}).id : 'T1';
+    let out = `<svg viewBox="0 0 1200 ${Math.round(720 * SY)}" role="group" aria-label="學習地圖：${TOPICS.length} 個主題">`;
+    R8.roles.forEach((role, i) => {
+      const r = REGION[role.id]; if (!r) return;
+      const ly = Math.round(r.ly * SY);
       out += `<g transform="scale(1 ${SY})"><path class="mv-region" d="${r.d}" fill="${r.fill}" stroke="${r.stroke}" vector-effect="non-scaling-stroke"/></g>`
-        + (narrow ? `<text class="mv-region-label" x="${r.lx}" y="${ly}">階段 ${esc(s.no)}</text><text class="mv-region-sub" x="${r.lx}" y="${ly + 24}">${esc(s.name)}</text>`
-          : `<text class="mv-region-label" x="${r.lx}" y="${ly}">階段 ${esc(s.no)}　${esc(s.name)}</text>`)
-        + `<text class="mv-region-sub" x="${r.lx}" y="${ly + (narrow ? 46 : 24)}">${i === 0 ? esc(s.desc) : '即將推出'}</text>`;
+        + `<text class="mv-region-label" x="${r.lx}" y="${ly}"${r.small ? ' style="font-size:17px"' : ''}>${esc(role.name)}</text>`
+        + `<text class="mv-region-sub" x="${r.lx}" y="${ly + 24}">${esc(stageNo[role.stage] || '')}${i === 0 ? '・' + esc((R8.stages[0] || {}).tagline || '') : '・即將推出'}</text>`;
     });
-    out += `<path class="mv-road" d="${road(S1.concat(REST.slice(0, 1)))}" stroke="#E2503C"/>`;
-    out += `<path class="mv-road" d="${road(REST)}" stroke="rgba(58,46,92,.35)"/>`;
-    MODS.forEach((m) => {
-      const [x, y] = AT[m.id]; const open = m.lessons.length > 0; const k = m.lessons.filter((l) => known.has(l.id)).length;
-      const meta = open ? `開 ${m.lessons.length} 課・共 ${m.count} 課` : `共 ${m.count} 課`;
-      out += `<g class="mv-stop${open ? '' : ' is-later'}" data-mod="${m.id}" tabindex="0" role="button" aria-label="${esc(m.id + ' ' + m.name + '，' + meta)}">`
-        + `<g class="disc"><circle class="ring" cx="${x}" cy="${y}" r="30" fill="${open ? '#FF6B57' : '#E9DCC2'}" stroke="rgba(58,46,92,.35)" stroke-width="1.5"/>`
-        + `<text class="id" x="${x}" y="${y}" fill="${open ? '#FFF4E0' : 'rgba(58,46,92,.55)'}">${m.id}</text></g>`
-        + `<text class="name" x="${x}" y="${y + 52}">${esc(m.name)}</text>`
-        + `<text class="meta" x="${x}" y="${y + 71}">${meta}</text>`
-        + (k ? `<g transform="translate(${x + 20} ${y - 46})"><path d="M0 0 V28" stroke="#3A2E5C" stroke-width="2"/><path d="M1 1 L19 6 L1 12 Z" fill="#C0351F"/><text x="24" y="10" class="meta" style="text-anchor:start">${k}/${m.lessons.length}</text></g>` : '')
+    out += `<path class="mv-road" d="${road(FIRST_ROLE.concat(LATER.slice(0, 1)))}" stroke="#E2503C"/>`;
+    out += `<path class="mv-road" d="${road(LATER)}" stroke="rgba(58,46,92,.35)"/>`;
+    TOPICS.forEach((t) => {
+      const [x, y] = AT[t.id] || [600, 400]; const open = t.lessons.length > 0; const k = t.lessons.filter((l) => known.has(l.id)).length;
+      const pages = t.lessons.filter((l) => pageOf(l.id)).length;   // first-release lessons with a lesson page now; the rest say 即將上線
+      const meta = pages ? `開放 ${pages} 課・共 ${t.count} 課` : open ? `首版 ${t.lessons.length} 課即將上線` : `共 ${t.count} 課`;
+      out += `<g class="mv-stop${open ? '' : ' is-later'}" data-mod="${t.id}" tabindex="0" role="button" aria-label="${esc('主題 ' + t.no + ' ' + t.name + '，' + meta)}">`
+        + `<g class="disc"><circle class="ring" cx="${x}" cy="${y}" r="28" fill="${open ? '#FF6B57' : '#E9DCC2'}" stroke="rgba(58,46,92,.35)" stroke-width="1.5"/>`
+        + `<text class="id" x="${x}" y="${y}" fill="${open ? '#FFF4E0' : 'rgba(58,46,92,.55)'}">${t.no}</text></g>`
+        + `<text class="name" x="${x}" y="${y + 50}">${esc(t.name)}</text>`
+        + `<text class="meta" x="${x}" y="${y + 69}">${meta}</text>`
+        + (k ? `<g transform="translate(${x + 20} ${y - 44})"><path d="M0 0 V28" stroke="#3A2E5C" stroke-width="2"/><path d="M1 1 L19 6 L1 12 Z" fill="#C0351F"/><text x="24" y="10" class="meta" style="text-anchor:start">${k}/${t.lessons.length}</text></g>` : '')
         + `</g>`;
     });
     // the pin: where you are now
-    const [hx, hy] = AT[hereMod] || AT.L0;
+    const [hx, hy] = AT[hereTopic] || AT.T1;
     out += `<g class="mv-here" aria-hidden="true"><path d="M${hx - 34} ${hy - 78} c -13 0 -22 10 -22 22 c 0 16 22 34 22 34 s 22 -18 22 -34 c 0 -12 -9 -22 -22 -22 z" fill="#3A2E5C"/><circle cx="${hx - 34}" cy="${hy - 56}" r="7.5" fill="#FFC857"/></g>`;
-    out += `<text class="mv-legend" x="40" y="${Math.round(720 * SY) - 18}">紅色：已開放　灰色：即將推出　點選模組查看課程</text></svg>`;
+    out += `<text class="mv-legend" x="40" y="${Math.round(720 * SY) - 18}">紅色：首版課程　灰色：即將推出　點選主題查看課程</text></svg>`;
     return out;
   }
 
   /* ---------- the side column ---------- */
-  const lesBtn = (l, known, nextId) => `<li><button type="button" class="mv-les" data-les="${l.id}"><span class="i">${l.id}</span><span class="t">${esc(l.title)}</span><span class="m">${l.min} 分鐘</span>${known.has(l.id) ? '<span class="s">✓ 會了</span>' : l.id === nextId ? '<span class="s"><b>下一步</b></span>' : ''}</button></li>`;
+  const lesBtn = (l, known, nextId) => `<li><button type="button" class="mv-les" data-les="${l.id}"><span class="i">${l.id}</span><span class="t">${esc(l.title)}</span><span class="m">${esc(l.type || '')}</span>${known.has(l.id) ? '<span class="s">✓ 已完成</span>' : l.id === nextId ? '<span class="s"><b>下一步</b></span>' : pageOf(l.id) ? '' : '<span class="s">即將上線</span>'}</button></li>`;
+  const openLessons = () => R8.first.map((id) => (topicOf[id] || { lessons: [] }).lessons.find((l) => l.id === id)).filter(Boolean);
   function sideOverview() {
     const st = F4.state, n = F4.nextStep(), known = new Set(st.known); const nextId = n.kind === 'lesson' ? n.lesson.id : null;
-    const open = MODS.flatMap((m) => m.lessons);
-    return `<p class="kick">學習路徑</p><h3>建議順序：L0 → L4</h3>
-      <p class="dim">${known.size ? `已完成 ${known.size} / ${open.length} 課。` : ''}${nextId ? `下一步：${esc(nextId)}。` : n.kind === 'task' ? '尚未開始：建議先完成 60 秒體驗。' : '起點未定：建議進行程度評估。'}可依程度跳過；順序為建議路徑。</p>
-      <p class="kick">首波開放課程（${open.length}）</p><ol>${open.map((l) => lesBtn(l, known, nextId)).join('')}</ol>`;
+    const open = openLessons(), opened = open.filter((l) => pageOf(l.id));
+    return `<p class="kick">學習路徑</p><h3>${esc(R8.roles[0].name)}：主題 ${FIRST_ROLE[0].replace('T', '')} → ${FIRST_ROLE[FIRST_ROLE.length - 1].replace('T', '')}</h3>
+      <p class="dim">${known.size ? `已完成 ${known.size} / ${opened.length} 課。` : ''}${nextId ? `下一步：${esc(nextId)}。` : n.kind === 'done' ? `已開放 ${opened.length} 課全部完成。` : n.kind === 'task' ? '尚未開始：建議先完成 60 秒體驗。' : '起點未定：建議進行程度評估。'}可依程度跳過；順序為建議路徑。</p>
+      <p class="kick">首版課程（${open.length} 課，已開放 ${opened.length} 課）</p><ol>${open.map((l) => lesBtn(l, known, nextId)).join('')}</ol>`;
   }
   function sideModule(id) {
-    const m = MODS.find((x) => x.id === id); if (!m) return sideOverview();
+    const t = TOPICS.find((x) => x.id === id); if (!t) return sideOverview();
     const st = F4.state, n = F4.nextStep(), known = new Set(st.known); const nextId = n.kind === 'lesson' ? n.lesson.id : null;
-    const s = M7.stages[m.stage]; const openIds = new Set(m.lessons.map((l) => l.id));
-    const rest = m.all.filter(([lid]) => !openIds.has(lid));
+    const role = roleOf[t.role] || {}; const openIds = new Set(t.lessons.map((l) => l.id));
+    const rest = t.all.filter(([lid]) => !openIds.has(lid));
     return `<button type="button" class="mv-back" data-act="overview">← 返回總覽</button>
-      <p class="kick">階段 ${esc(s.no)}・${esc(m.id)}</p><h3>${esc(m.name)}</h3><p>${esc(m.tagline)}</p>
-      <p class="dim">共 ${m.count} 課${m.hours ? `，必修約 ${m.hours} 小時` : ''}。${m.lessons.length ? `首波開放 ${m.lessons.length} 課。` : '本模組即將推出。'}</p>
-      ${m.lessons.length ? `<ol>${m.lessons.map((l) => lesBtn(l, known, nextId)).join('')}</ol>` : ''}
-      ${rest.length ? `<details class="mv-soon"${m.lessons.length ? '' : ' open'}><summary>其餘 ${rest.length} 課即將推出</summary><ul>${rest.map(([lid, t]) => `<li><span>${esc(lid)}</span>${esc(t)}</li>`).join('')}</ul></details>` : ''}`;
+      <p class="kick">${esc(stageNo[t.stage] || '')}・${esc(role.name || '')}・主題 ${t.no}</p><h3>${esc(t.name)}</h3>
+      <div class="mv-box"><p>實作成果：${esc(t.outcome)}</p></div>
+      <p class="dim">必修 ${t.required} 課、選修 ${t.electives} 課。${t.lessons.length ? `首版 ${t.lessons.length} 課（已開放 ${t.lessons.filter((l) => pageOf(l.id)).length} 課）。` : '本主題即將推出。'}</p>
+      ${t.lessons.length ? `<ol>${t.lessons.map((l) => lesBtn(l, known, nextId)).join('')}</ol>` : ''}
+      ${rest.length ? `<details class="mv-soon"${t.lessons.length ? '' : ' open'}><summary>其餘 ${rest.length} 課即將推出</summary><ul>${rest.map(([lid, title, type]) => `<li><span>${esc(lid)}</span>${esc(title)}${type ? `（${esc(type)}）` : ''}</li>`).join('')}</ul></details>` : ''}`;
   }
   function sideLesson(id) {
-    const m = modOf[id]; const l = m && m.lessons.find((x) => x.id === id); if (!l) return sideOverview();
+    const t = topicOf[id]; const l = t && t.lessons.find((x) => x.id === id); if (!l) return sideOverview();
     const href = pageOf(id); const known = F4.state.known.includes(id);
-    return `<button type="button" class="mv-back" data-act="mod" data-mod="${m.id}">← ${esc(m.id)} ${esc(m.name)}</button>
-      <p class="kick">${esc(l.id)}・約 ${l.min} 分鐘${known ? '・✓ 已完成' : ''}</p><h3>${esc(l.title)}</h3>
-      <div class="mv-box"><p>學習成果：${esc(l.can)}</p></div>
+    return `<button type="button" class="mv-back" data-act="mod" data-mod="${t.id}">← 主題 ${t.no} ${esc(t.name)}</button>
+      <p class="kick">${esc(l.id)}・${esc(l.type || '')}${known ? '・✓ 已完成' : ''}</p><h3>${esc(l.title)}</h3>
+      <div class="mv-box"><p>所屬主題的實作成果：${esc(t.outcome)}</p></div>
       ${href ? `<a class="mv-go" href="${esc(href)}">開始上課</a>` : `<p class="dim">課程頁即將上線。</p><span class="mv-go is-off" aria-disabled="true">課程頁即將上線</span>`}`;
   }
 
@@ -103,12 +109,13 @@
   const root = document.createElement('div');
   root.className = 'mv'; root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-label', 'AI 學習地圖');
   root.innerHTML = `<div class="mv-shade" data-act="close"></div>
-    <div class="mv-sheet"><header class="mv-head"><h2>AI 學習地圖</h2><p>${M7.stages.length} 個階段・${MODS.length} 個模組・${M7.total} 課｜第一版開放 ${MODS.reduce((a, m) => a + m.lessons.length, 0)} 課</p>
+    <div class="mv-sheet"><header class="mv-head"><h2>AI 學習地圖</h2><p>${R8.counts.stages} 個階段・${R8.counts.topics} 個主題・必修 ${R8.counts.required} 課、選修 ${R8.counts.electives} 課｜首版 ${R8.first.length} 課（已開放 ${R8.first.filter((id) => pageOf(id)).length} 課）</p>
       <button type="button" class="mv-x" data-act="close" aria-label="收起地圖">×</button></header>
       <div class="mv-art"></div><aside class="mv-side" aria-live="polite"></aside></div>`;
   document.body.appendChild(root);
   const sheet = root.querySelector('.mv-sheet'), art = root.querySelector('.mv-art'), side = root.querySelector('.mv-side');
-  let isOpen = false, busy = false, sel = null, back = null, from = null;
+  let isOpen = false, busy = false, sel = null, back = null, from = null, pending = 0;
+  F4.on('card:open', (c) => { if (pending && !(c && c.kind === 'map')) { clearTimeout(pending); pending = 0; } });
 
   function paint() { art.innerHTML = svg(); select(sel, true); }
   function select(id, quiet) {
@@ -147,7 +154,7 @@
   }
 
   function open(fromEl) {
-    if (isOpen || busy) return;
+    if (isOpen || busy || pending) return;
     back = document.activeElement; from = fromEl || back;
     const go = () => {
       busy = true; isOpen = true; sel = null;
@@ -165,7 +172,7 @@
     if (html.classList.contains('is-3d') && !SIMPLE) {
       if (F4.card) F4.close();
       F4.emit('card:open', { kind: 'map', id: 'map' });
-      setTimeout(go, REDUCED ? 0 : 720);
+      pending = setTimeout(() => { pending = 0; go(); }, REDUCED ? 0 : 720);
     } else go();
   }
   function shut() {
@@ -190,10 +197,15 @@
     else if (a.dataset.act === 'overview') select(null);
     else if (a.dataset.act === 'mod') select(a.dataset.mod);
   });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (pending) { clearTimeout(pending); pending = 0; e.stopPropagation(); F4.emit('card:close', { kind: 'map', id: 'map' }); return; }   // still flying to the paper: stay on the desk
+    if (isOpen && !root.contains(e.target)) { e.stopPropagation(); shut(); }
+  }, true);   // focus can drop to <body> after a panel swap
   root.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { e.stopPropagation(); shut(); return; }
     const stop = e.target.closest && e.target.closest('.mv-stop');
-    if (stop && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); select(stop.dataset.mod); }
+    if (stop && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); select(stop.dataset.mod); const f = side.querySelector('.mv-les, .mv-back'); if (f) f.focus({ preventScroll: true }); }
     if (e.key === 'Tab') {               // keep the keyboard inside the open map
       const f = [...root.querySelectorAll('button, a[href], [tabindex="0"], summary')].filter((x) => x.offsetParent !== null);
       if (!f.length) return; const first = f[0], last = f[f.length - 1];
@@ -211,4 +223,12 @@
     b.addEventListener('click', () => open(b)); sub.after(b);
   }
   window.F4map = { open, shut, select, get open_() { return isOpen; } };
+  // index.html#map (the lesson pages link 學習地圖 here): open the big map once the page is up; on the 3D page, once the desk is live
+  if (location.hash === '#map') {
+    const t0 = performance.now();
+    (function wait() {
+      const ready = SIMPLE || html.classList.contains('is-3d') || html.classList.contains('is-poster');
+      if (ready || performance.now() - t0 > 5000) setTimeout(() => open(null), SIMPLE ? 200 : 900); else setTimeout(wait, 200);
+    })();
+  }
 })();

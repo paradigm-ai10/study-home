@@ -14,32 +14,31 @@
     const nextId = n.kind === 'lesson' ? n.lesson.id : null;
 
     /* the note */
-    $('#note-next').textContent = n.kind === 'task' ? '起點：60 秒體驗' : n.kind === 'pick' ? '下一步：程度評估' : `下一步：${n.short}`;
+    $('#note-next').textContent = n.kind === 'done' ? `已開放 ${F4.TOTAL} 課全部完成` : n.kind === 'task' ? '起點：60 秒體驗' : n.kind === 'pick' ? '下一步：程度評估' : `下一步：${n.short}`;
     const what = $('#note-what'); what.hidden = n.kind !== 'lesson'; what.textContent = n.kind === 'lesson' ? n.lesson.title : '';
-    $('#note-min').textContent = n.kind === 'pick' ? '3 題・約 1 分鐘' : `約 ${n.min} 分鐘`;
+    $('#note-min').textContent = n.kind === 'done' ? '其他課陸續推出' : n.kind === 'pick' ? '3 題・約 1 分鐘' : (n.min ? `約 ${n.min} 分鐘` : n.lesson && F4.STAGES[n.lesson.stage] ? `主題 ${F4.STAGES[n.lesson.stage].name}` : '');
     $('#note-count').textContent = `已完成 ${k} / ${F4.TOTAL} 課` + (st.done.t1 ? '・60 秒體驗已完成' : '') + (w >= 2 ? `・本週 ${w} 項` : '');
     strip.innerHTML = F4.STAGES.map((s, i) => '<span>' + F4.LESSONS.filter((l) => l.stage === i).map((l) => `<i class="${known.has(l.id) ? 'is-known' : l.id === nextId ? 'is-next' : ''}"></i>`).join('') + '</span>').join('');
 
     /* the map (version 7): stage 1's five modules with the lessons open now, then what comes later */
-    const M7 = window.ROADMAP7, s1 = M7 && M7.stages[0];
+    const R8 = window.ROADMAP8, s1 = R8 && R8.roles[0];   // map v8: the first role's topics, then the later roles
     if (!chosen) { open.clear(); if (n.kind === 'lesson') open.add(n.lesson.stage); }
-    stagesEl.innerHTML = (s1 ? `<li class="stage-group">階段 1　${esc(s1.name)}<span>${esc(s1.desc)}</span></li>` : '') + F4.STAGES.map((s, i) => {
-      const ls = F4.LESSONS.filter((l) => l.stage === i); const d = ls.filter((l) => known.has(l.id)).length; const on = open.has(i);
+    stagesEl.innerHTML = (s1 ? `<li class="stage-group">第一階段　${esc(s1.name)}<span>${esc(s1.line)}</span></li>` : '') + F4.STAGES.map((s, i) => {
+      const ls = F4.FIRST.filter((l) => l.stage === i); const op = ls.filter((l) => F4.lessonHref(l)); const d = op.filter((l) => known.has(l.id)).length; const on = open.has(i);   // first-release lessons; the ones without a page yet say 即將上線
       return `<li class="stage${on ? ' is-open' : ''}">
         <button type="button" class="stage-h" data-i="${i}" aria-expanded="${on}" aria-controls="stage-${i}">
           <span class="name">${esc(s.name)}</span><span class="for">${esc(s.for)}</span>
-          <span class="num${d ? ' has' : ''}">${d} / ${ls.length}${s.count > ls.length ? `<small>共 ${s.count} 課</small>` : ''}</span><span class="tog">${on ? '收起' : '展開'}</span>
+          <span class="num${d ? ' has' : ''}">${op.length ? `${d} / ${op.length}` : ls.length ? '即將上線' : '即將推出'}${s.count > ls.length ? `<small>共 ${s.count} 課</small>` : ''}</span><span class="tog">${on ? '收起' : '展開'}</span>
         </button>
         <ol class="lessons" id="stage-${i}"${on ? '' : ' hidden'}>${ls.map((l) => {
           const href = F4.lessonHref(l); const isK = known.has(l.id), isN = l.id === nextId;
           const title = href ? `<a href="${esc(href)}">${esc(l.title)}</a>` : esc(l.title);
-          return `<li class="${isK ? 'is-known' : isN ? 'is-next' : ''}"><span class="n">${esc(l.id)}</span><span class="t">${title}<span class="can">學習成果：${esc(l.can)}</span></span><span class="m">${l.min} 分鐘</span><span class="s">${isK ? '✓ 已完成' : isN ? '<b>下一步</b>' : ''}</span></li>`;
+          return `<li class="${isK ? 'is-known' : isN ? 'is-next' : ''}"><span class="n">${esc(l.id)}</span><span class="t">${title}</span><span class="m">${l.min ? `${l.min} 分鐘` : esc(l.type || '')}</span><span class="s">${isK ? '✓ 已完成' : isN ? '<b>下一步</b>' : href ? '' : '即將上線'}</span></li>`;
         }).join('')}${s.count > ls.length ? `<li class="soon"><span class="n"></span><span class="t">其餘 ${s.count - ls.length} 課即將推出</span></li>` : ''}</ol>
       </li>`;
-    }).join('') + (M7 ? M7.stages.slice(1).map((g) => `<li class="stage-group is-later">階段 ${esc(g.no)}　${esc(g.name)}<span>${esc(g.desc)}｜${g.modules.map((m) => esc(m.id + ' ' + m.name)).join('、')}｜即將推出</span></li>`).join('') : '');
+    }).join('') + (R8 ? R8.roles.slice(1).map((g) => `<li class="stage-group is-later">${['', '第一階段', '第二階段', '第三階段'][g.stage] || ''}　${esc(g.name)}<span>${esc(g.line)}｜${g.topics.map((tid) => { const t = R8.topics.find((x) => x.id === tid); return t ? esc(t.no + ' ' + t.name) + (t.lessons.length ? `（首版 ${t.lessons.length} 課即將上線）` : '') : ''; }).join('、')}｜即將推出</span></li>`).join('') : '');
 
-    const ready = F4.LESSONS.filter((l) => F4.lessonHref(l));
-    $('#map-sub').textContent = `3 階段・12 模組・${M7 ? M7.total : 208} 課；首波開放 ${F4.TOTAL} 課，可依程度跳過。` + (ready.length === F4.TOTAL ? '' : ready.length ? `已開放課程頁：${ready.map((l) => l.id).join('、')}；其餘製作中。` : '課程頁製作中。');
+    $('#map-sub').textContent = R8 ? `${R8.counts.stages} 階段・${R8.counts.topics} 主題・必修 ${R8.counts.required} 課、選修 ${R8.counts.electives} 課；首版 ${F4.FIRST_N} 課（已開放 ${F4.TOTAL} 課），可依程度跳過。` : '';
 
     /* the other things: say up front which ones are not built yet */
     document.querySelectorAll('#ways a[data-id]').forEach((a) => {

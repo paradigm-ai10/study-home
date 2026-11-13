@@ -1,0 +1,19 @@
+/* 第十五輪：審查後的修正版（r15-side）。疊在 r8.css、r11.css 之上，只在 <body class="r15"> 生效。 */
+/* 這張畫布 1420 寬，1280 的筆電會縮到 0.9，所以最小字是 17px（螢幕上 15.3px） */
+body.r15 #map .t-title { font-size: 30px; }
+body.r15 #map .t-stage { font-size: 22px; }
+body.r15 #map .t-role { font-size: 20px; }
+body.r15 #map .t-module { font-size: 18px; }
+body.r15 #map .t-note { font-size: 19px; }
+body.r15 #map text.t-num, body.r15 #map text.t-row, body.r15 #map text.t-tag, body.r15 #map text.t-legend, body.r15 #map text.t-band { font-size: 17px; }
+body.r15 #map text.t-band { font-weight: 700; }
+body.r15 #map text.t-link { font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+body.r15 #map .replay-svg text { font-size: 17px; }
+
+/* 滑過卡片與面板：內文 16、輔助 14；圓角只留 8 */
+body.r15 .card { width: 324px; font-size: 16px; border-radius: 8px; }
+body.r15 .card .nm { font-size: 18px; }
+body.r15 .card .txt, body.r15 .card li, body.r15 .card .fr, body.r15 .card ol.oc li { font-size: 16px; }
+body.r15 #panel { font-size: 16px; border-radius: 8px; }
+body.r15 #panel .box { font-size: 16px; border-radius: 8px; }
+body.r15 #panel .nav button { border-radius: 8px; }

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 學習地圖｜Paradigm</title>
+<meta name="description" content="AI 學習地圖：3 個階段、17 個主題，從以 AI 提升個人產出到把工具上線。">
+<!-- Learning-map integration, option B (and option C's stand-alone page): the approved map as its own page.
+     The map itself is map/embed.html (a wrapper around mindmap/r15-side); this page adds the way back and the progress chip. -->
+<link rel="stylesheet" href="map/map-int.css">
+<style>
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root) { animation: 200ms ease-out both mp-out; }
+  ::view-transition-new(root) { animation: 240ms ease-out both mp-in; }
+  @keyframes mp-out { to { opacity: 0; } }
+  @keyframes mp-in { from { opacity: 0; } }
+  html, body { margin: 0; height: 100%; background: #FBF8F1; overflow: hidden; }
+  #host { position: fixed; inset: 0; }
+  #host iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+  noscript p { font: 16px/1.7 "Noto Sans TC", "PingFang TC", sans-serif; padding: 24px; color: #2E2D2B; }
+</style>
+</head>
+<body>
+<div id="host"></div>
+<noscript><p>學習地圖需要啟用 JavaScript。<a href="simple.html">返回首頁</a></p></noscript>
+<script src="../../routes.js"></script>
+<script src="../../../roadmap8.js"></script>
+<script src="map/map-chrome.js"></script>
+<script>
+(() => {
+  const Q = new URLSearchParams(location.search), SEEN = 'paradigm.f4.mapSeen';
+  const mode = Q.get('mapmode'), from = Q.get('from');
+  const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let seen = false; try { seen = !!sessionStorage.getItem(SEEN) && !Q.has('mapgrow'); } catch (e) { seen = false; }
+  // the map draws itself the first time this session; after that (and in option C) it is simply there
+  const grow = mode !== 'c' && !seen && !REDUCED;
+  const host = document.getElementById('host');
+  const frame = document.createElement('iframe'); frame.title = 'AI 學習地圖'; frame.src = 'map/embed.html' + (grow ? '' : '?still');
+  host.appendChild(frame);
+  try { sessionStorage.setItem(SEEN, '1'); } catch (e) { /* fine */ }
+  // the way back: to the page you came from if it was the home page (keeps its state), else to the home page
+  const home = (from === 'simple' ? 'simple.html' : from === '3d' ? 'index.html?view=3d' : 'index.html') + (mode ? (from === '3d' ? '&' : '?') + 'mapmode=' + mode : '');
+  let ref = ''; try { ref = new URL(document.referrer).pathname.replace(/[^/]*$/, ''); } catch (e) { ref = ''; }
+  const sameFolder = ref === location.pathname.replace(/[^/]*$/, '') && history.length > 1;
+  const leave = () => { if (sameFolder) history.back(); else location.href = home; };
+  const chrome = MapChrome.mount(host, frame, { closeLabel: '← 返回首頁', onClose: leave });
+  addEventListener('message', (e) => {
+    if (e.origin !== location.origin || e.source !== frame.contentWindow || !e.data) return;
+    if (e.data.t === 'map:ready') chrome.sync(); else if (e.data.t === 'map:close') leave();
+  });
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') leave(); });
+  addEventListener('storage', (e) => { if (e.key === 'pd-done' || e.key === 'paradigm.f4') chrome.sync(); });
+  addEventListener('pageshow', (e) => { if (e.persisted) chrome.sync(); });
+})();
+</script>
+</body>
+</html>
