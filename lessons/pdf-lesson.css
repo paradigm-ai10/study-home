@@ -1,0 +1,368 @@
+/* 網頁課（由定稿 PDF 產生）的外框與互動樣式。PDF 原本的樣式在 media/<課號>/pdf.css（只作用在 .pdfdoc 裡）。
+   這份做兩件事：1. 把 A4 頁改成一路往下捲（拿掉固定頁高、絕對定位、窄螢幕改直排）；2. 網頁外框（pl- 開頭）與互動。
+   2026-11-14 建立。 */
+:root {
+  --cream: #FFF4E0; --cream-2: #FBE9C9; --paper: #FFFDF8; --grape: #3A2E5C; --grape-2: #5b5078; --line: #E8D7B6;
+  --coral: #FF6B57; --coral-ink: #c23d2a; --sun: #FFC857; --sun-soft: #FFE7AE; --ok: #2c7d5c;
+  --ui: 'Outfit', 'Huninn', 'PingFang TC', system-ui, sans-serif; --pixel: 'Silkscreen', 'Outfit', monospace;
+  --r: 10px; --z: 1.16; --col: 860px;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--cream); color: var(--grape); font: 16px/1.65 var(--ui); }
+::selection { background: var(--sun); color: var(--grape); }
+:focus-visible { outline: 2px solid var(--coral); outline-offset: 3px; border-radius: 4px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.pl-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ── 頁首、課程地圖（同 lesson.css 的做法，改用 pl- 開頭，避免跟 PDF 的 class 撞名） ── */
+.pl-top { display: flex; align-items: center; gap: 10px; max-width: 1180px; margin: 0 auto; padding: 14px 28px; }
+.pl-logo { display: flex; gap: 8px; align-items: center; font: 700 14px/1 var(--pixel); letter-spacing: .06em; text-decoration: none; color: var(--grape); }
+.pl-logo svg { width: 30px; height: 18px; display: block; }
+.pl-top nav { margin-left: auto; display: flex; gap: 18px; font-size: 15px; white-space: nowrap; }
+.pl-top nav a { text-decoration: none; color: var(--grape-2); }
+.pl-top nav a:hover { color: var(--coral-ink); }
+.pl-top nav a.home { padding: 6px 12px; border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); color: var(--grape); }
+.pl-draft { font: 700 12px/1 var(--ui); background: var(--sun); color: var(--grape); padding: 5px 8px; border-radius: 6px; }
+
+.pl-map { max-width: 1180px; margin: 0 auto; padding: 4px 28px 0; }
+.pl-mods { list-style: none; margin: 0; padding: 0; display: flex; gap: 18px; flex-wrap: wrap; }
+.pl-mods > li { display: grid; gap: 6px; }
+.pl-mods .sn { font-size: 13px; color: var(--grape-2); white-space: nowrap; }
+.pl-mods > li.here .sn { color: var(--grape); font-weight: 700; }
+.pl-mods ol { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px; }
+.pl-mods ol li { font: 700 13px/1 var(--ui); padding: 6px 7px; border-radius: 6px; background: #efe4cd; color: var(--grape-2); }
+.pl-mods ol li.has { box-shadow: inset 0 0 0 1.5px var(--grape-2); color: var(--grape); }
+.pl-mods ol li.now { background: var(--grape); color: var(--cream); box-shadow: none; }
+.pl-modline { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 26px; margin: 16px 0 0; padding: 0 0 18px; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--grape-2); }
+.pl-modline b { color: var(--grape); }
+.pl-roles { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 0; font-size: 13px; }
+.pl-roles li + li::before { content: '→'; margin: 0 8px; color: #b9aed0; }
+.pl-roles li.now b { box-shadow: inset 0 -0.4em 0 var(--sun); }
+.pl-dots { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; align-items: center; position: relative; height: 10px; }
+.pl-dots::before { content: ''; position: absolute; left: 4px; right: 4px; top: 50%; height: 1px; background: #cfc4e4; }
+.pl-dots > li { position: relative; width: 10px; height: 10px; border-radius: 50%; background: #d9cfee; flex: none; }
+.pl-dots > li.el { background: transparent; box-shadow: inset 0 0 0 1.5px #cfc4e4; width: 8px; height: 8px; }
+.pl-dots > li.now { background: var(--coral); box-shadow: 0 0 0 3px var(--cream), 0 0 0 4px var(--coral); }
+.pl-dots .who { position: absolute; left: 50%; bottom: calc(100% + 5px); width: 24px; transform: translateX(-50%); }
+.pl-dots .who svg { display: block; width: 100%; }
+
+/* ── 版面：左邊章節、右邊內文 ── */
+.pl-wrap { max-width: 1180px; margin: 0 auto; padding: 28px 28px 140px; display: grid; grid-template-columns: 236px minmax(0, var(--col)); gap: 56px; justify-content: center; }
+.pl-side { position: sticky; top: 20px; align-self: start; max-height: calc(100vh - 40px); overflow: auto; font-size: 14px; padding: 4px 4px 12px 0; scrollbar-width: thin; }
+.pl-prog { display: grid; gap: 6px; margin: 0 0 18px; }
+.pl-prog .bar { height: 6px; border-radius: 6px; background: #efe4cd; overflow: hidden; }
+.pl-prog .bar i { display: block; height: 100%; width: 0; background: var(--coral); border-radius: 6px; transition: width .4s ease; }
+.pl-prog p { margin: 0; font-size: 13px; color: var(--grape-2); display: flex; justify-content: space-between; }
+.pl-prog b { color: var(--grape); font-variant-numeric: tabular-nums; }
+.pl-chs { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.pl-chs > li > a { display: flex; gap: 8px; align-items: baseline; text-decoration: none; color: var(--grape); font-weight: 700; font-size: 15px; }
+.pl-chs > li > a .no { font-size: 12px; color: var(--coral); width: 14px; flex: none; }
+.pl-chs > li.done > a::after { content: '✓'; color: var(--ok); margin-left: auto; font-size: 13px; }
+.pl-side .pl-chs > li:not(.cur) > ol { display: none; }
+.pl-chs > li > a { padding: 6px 10px; margin-left: -10px; border-radius: 8px; transition: background .2s, color .2s; }
+.pl-chs > li > a:hover { background: #f5e6c8; }
+.pl-chs > li > a[aria-current="true"] { background: var(--grape); color: var(--cream); }
+.pl-chs > li > a[aria-current="true"] .no { color: var(--sun); }
+.pl-chs > li.done > a[aria-current="true"]::after { color: #9fe0bd; }
+.pl-chs ol { list-style: none; margin: 6px 0 0 22px; padding: 0; display: grid; gap: 1px; border-left: 1.5px solid var(--line); }
+.pl-chs ol a { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0 4px 12px; margin-left: -1.5px; border-left: 1.5px solid transparent; text-decoration: none; color: var(--grape-2); }
+.pl-chs ol a small { font-size: 11.5px; color: #a89cbf; font-variant-numeric: tabular-nums; }
+.pl-chs ol a:hover { color: var(--grape); }
+.pl-chs ol a.seen { color: var(--grape); }
+.pl-chs ol a[aria-current="true"] { border-left-color: var(--coral); color: var(--grape); font-weight: 700; }
+.pl-chs ol a[aria-current="true"] small { color: var(--coral); }
+.pl-sidebtns { display: grid; gap: 8px; margin: 22px 0 0; padding: 16px 0 0; border-top: 1px solid var(--line); }
+.pl-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 14px; border-radius: var(--r); border: 0; background: var(--grape); color: var(--cream); font: 700 14px/1.2 var(--ui); text-decoration: none; }
+.pl-btn:hover { background: #2c2347; }
+.pl-btn.line { background: transparent; color: var(--grape); box-shadow: inset 0 0 0 1.5px var(--grape); }
+.pl-btn.line:hover { background: var(--paper); }
+.pl-btn.sm { padding: 6px 10px; font-size: 13px; }
+.pl-btn[aria-pressed="true"] { background: var(--ok); color: #fff; box-shadow: none; }
+.pl-meta { margin: 14px 0 0; font-size: 12px; color: #8f84a8; line-height: 1.5; }
+
+/* 窄螢幕：章節變成上方一條 */
+.pl-strip { display: none; }
+
+/* 側邊目錄收起來 */
+.pl-sidehead { display: flex; justify-content: space-between; align-items: center; margin: 0 0 12px; }
+.pl-sidehead b { font: 700 12px/1 var(--ui); letter-spacing: .08em; color: var(--grape-2); }
+.pl-fold { border: 0; background: none; color: var(--grape-2); font-size: 13px; padding: 4px 6px; border-radius: 6px; display: inline-flex; gap: 4px; align-items: center; }
+.pl-fold:hover { background: #e6dac2; color: var(--grape); }
+.pl-opener { position: fixed; left: 16px; top: 16px; z-index: 25; border: 0; border-radius: var(--r); background: var(--grape); color: var(--cream); font: 700 13px/1 var(--ui); padding: 10px 12px; box-shadow: 0 4px 14px rgba(58,46,92,.25); }
+.pl-opener::before { content: '☰  '; }
+.pl-opener:hover { background: #2c2347; }
+body.pl-side-off .pl-wrap { grid-template-columns: minmax(0, var(--col)); }
+body.pl-side-off .pl-side { display: none; }
+
+/* ── 小螃蟹跑進度條（黏在內文上方） ── */
+.pl-main { min-width: 0; }
+.pl-run { position: sticky; top: 0; z-index: 15; margin: 0 0 16px; padding: 14px 4px 8px; background: linear-gradient(var(--cream) 78%, rgba(255,244,224,0)); }
+.pl-track { position: relative; height: 30px; margin: 0 56px 0 4px; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
+.pl-track:focus-visible { outline-offset: 6px; }
+.pl-track::before { content: ''; position: absolute; left: 0; right: 0; bottom: 6px; height: 6px; border-radius: 6px; background: #e2d5bb; }
+.pl-track:hover::before { background: #dacba9; }
+.pl-track .fill { position: absolute; left: 0; bottom: 6px; height: 6px; border-radius: 6px; background: var(--coral); width: 0; }
+.pl-track .tick { position: absolute; bottom: 6px; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; pointer-events: none; transform: translateY(0); }
+.pl-track .tick.sub { width: 4px; height: 4px; margin-left: -2px; bottom: 7px; background: #fff8ea; opacity: .9; }
+.pl-track .tick.ch { width: 12px; height: 12px; margin-left: -6px; bottom: 3px; background: var(--grape-2); box-shadow: 0 0 0 2px var(--cream); }
+.pl-track .tick.ch.seen { background: var(--coral); }
+.pl-crab { position: absolute; bottom: 10px; width: 34px; height: 21px; margin-left: -17px; left: 0; pointer-events: none; transition: transform .15s; }
+.pl-run.dragging .pl-crab { transform: translateY(-3px) scale(1.12); }
+.pl-run.dragging .pl-track { cursor: grabbing; }
+/* 拉到哪一節的泡泡：出現在條的下面（蓋住索引那一行），往上會被畫面頂端切掉 */
+.pl-bubble { position: absolute; top: 31px; transform: translateX(-50%); white-space: nowrap; font: 700 12.5px/1 var(--ui); color: var(--cream); background: var(--grape); padding: 6px 10px; border-radius: 7px; pointer-events: none; box-shadow: 0 4px 12px rgba(58,46,92,.25); z-index: 2; }
+.pl-bubble::after { content: ''; position: absolute; left: 50%; top: -4px; margin-left: -4px; border: 4px solid transparent; border-top: 0; border-bottom-color: var(--grape); }
+.pl-run:has(.pl-bubble:not([hidden])) .pl-index { opacity: .15; }
+.pl-index { transition: opacity .15s; }
+/* 索引：章名寫在章的點底下，可以點 */
+.pl-index { position: relative; height: 20px; margin: 4px 56px 0 4px; }
+.pl-index a { position: absolute; top: 0; display: flex; gap: 4px; align-items: baseline; font-size: 12.5px; line-height: 1.3; color: var(--grape-2); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transform: translateX(-6px); padding: 1px 4px; border-radius: 5px; }
+.pl-index a span { font-weight: 700; color: var(--coral); font-size: 11.5px; }
+.pl-index a:hover { color: var(--grape); background: #f5e6c8; }
+.pl-index a.now { color: var(--grape); font-weight: 700; }
+.pl-index a.seen:not(.now) { color: #8a7fa4; }
+.pl-goal b { font-size: 11.5px; color: var(--grape); margin-left: 4px; font-variant-numeric: tabular-nums; }
+.pl-crab svg { display: block; width: 100%; height: 100%; }
+.pl-crab .run { display: none; }
+.pl-crab.running .run { display: block; } .pl-crab.running .idle { display: none; }
+.pl-crab.back svg { transform: scaleX(-1); }
+.pl-goal { position: absolute; right: -50px; bottom: 0; font: 700 12px/1 var(--ui); color: var(--grape-2); display: flex; gap: 4px; align-items: flex-end; }
+.pl-goal i { width: 2px; height: 22px; background: var(--grape); position: relative; display: block; }
+.pl-goal i::after { content: ''; position: absolute; left: 2px; top: 0; width: 12px; height: 8px; background: repeating-conic-gradient(var(--grape) 0 25%, var(--cream) 0 50%) 0 0 / 6px 4px; }
+.pl-goal.won i::after { background: repeating-conic-gradient(var(--ok) 0 25%, var(--cream) 0 50%) 0 0 / 6px 4px; }
+.pl-runlabel { display: flex; justify-content: space-between; gap: 12px; margin: 4px 56px 0 4px; font-size: 12.5px; color: var(--grape-2); }
+.pl-runlabel b { color: var(--grape); font-variant-numeric: tabular-nums; }
+
+/* 接著讀 */
+.pl-resume { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 22px; padding: 12px 16px; border-radius: var(--r); background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); font-size: 15px; }
+.pl-resume .x { margin-left: auto; border: 0; background: none; color: var(--grape-2); font-size: 18px; line-height: 1; padding: 4px 6px; }
+
+/* ── PDF 內容：一路往下捲，不分頁、不顯示頁數（Thomas 11/14） ── */
+:root { --desk: var(--cream); }
+.pdfdoc { background: none; zoom: var(--z); min-width: 0; }
+.pdfdoc .pdfpage { width: auto; height: auto; margin: 0 0 30mm; padding: 0; background: none; overflow: visible; display: block; break-after: auto; position: relative; }
+.pdfdoc .pdfpage:last-child { margin-bottom: 0; }
+.pdfdoc .pdfpage .spacer { display: none; }
+.pl-key { display: flex; gap: 3mm; align-items: baseline; margin: 6mm 0 0 !important; padding: 2.5mm 0 0; border-top: 1px dashed var(--line); font-size: 9pt; color: var(--grape-2); }
+.pl-key span { font-weight: 700; color: var(--coral); font-size: 8pt; letter-spacing: .04em; white-space: nowrap; }
+
+/* 章節開頭 */
+.pl-chhead { margin: 0 0 10mm; padding: 0 0 4mm; border-bottom: 2px solid var(--grape); display: flex; align-items: baseline; gap: 4mm; flex-wrap: wrap; }
+.pl-chhead .no { font: 800 9pt/1 var(--ui); color: var(--cream); background: var(--coral); border-radius: 2mm; padding: 1.2mm 2.2mm; }
+.pl-chhead b { font-size: 16pt; font-weight: 800; }
+.pl-chhead span { font-size: 10pt; color: var(--grape-2); }
+.pl-chhead em { margin-left: auto; font-style: normal; font-size: 8.5pt; color: #a89878; }
+
+/* 封面：絕對定位改成兩欄 */
+.pdfdoc .pdfpage.cover { background: var(--grape); color: var(--cream); border-radius: 5mm; padding: 14mm 14mm 12mm; margin-bottom: 24mm;
+  display: grid; grid-template-columns: minmax(0, 1fr) 60mm; column-gap: 10mm; align-items: start; }
+.pdfdoc .cover > * { grid-column: 1 / -1; }
+.pdfdoc .cover .toc { position: static; width: auto; grid-column: 1; margin-top: 4mm; }
+.pdfdoc .cover .recipe { position: static; width: auto; grid-column: 2; margin-top: 10mm; transform: rotate(3deg); }
+.pdfdoc .cover h1 { margin-top: 3mm; }
+.toc-row { text-decoration: none; }
+a.toc-row:hover .tx b, a.toc-row:focus-visible .tx b { color: var(--sun); }
+a.toc-row:hover { background: rgba(255,255,255,.04); }
+
+/* 頁碼引用（第 5 頁）變成連結 */
+.pl-ref { color: inherit; text-decoration: underline; text-decoration-color: var(--coral); text-decoration-thickness: 1.5px; text-underline-offset: .2em; }
+.pl-ref:hover { color: var(--coral-ink); }
+.cover .pl-ref { color: var(--sun); }
+
+/* ── 互動：複製、開 Claude ── */
+.pdfdoc .prompt { padding-bottom: 12mm; }
+.pl-pbtns { position: absolute; right: 3.5mm; bottom: 2.8mm; display: flex; gap: 2mm; }
+.pl-pbtns button, .pl-pbtns a { font: 700 8.5pt/1 var(--ui); border: 0; border-radius: 1.6mm; padding: 1.7mm 3mm; background: var(--grape); color: var(--cream); text-decoration: none; display: inline-flex; align-items: center; gap: 1.2mm; }
+.pl-pbtns a { background: transparent; color: var(--grape); box-shadow: inset 0 0 0 1.2px var(--grape); }
+.pl-pbtns button:hover { background: #2c2347; }
+.pl-pbtns a:hover { background: var(--paper); }
+.pl-pbtns .ok { background: var(--ok); }
+.pdfdoc .say.pl-copyable, .pdfdoc .way .say { cursor: copy; }
+.pl-toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); background: var(--grape); color: var(--cream); padding: 10px 16px; border-radius: var(--r); font-size: 14px; opacity: 0; pointer-events: none; transition: .25s ease; z-index: 30; }
+.pl-toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+/* 填空 */
+.pl-blank { font: inherit; color: var(--grape); background: var(--paper); border: 0; border-bottom: 1.5px solid var(--coral); border-radius: 1mm 1mm 0 0; padding: 0 1.5mm; margin: 0 1mm; width: 30mm; }
+.pl-blank::placeholder { color: #b9a98a; }
+.pl-blank:focus { outline: none; background: #fff; box-shadow: 0 0 0 2px var(--sun); }
+.pl-area { display: block; width: 100%; font: inherit; color: var(--grape); background: var(--paper); border: 1.5px dashed #d8c08a; border-radius: 2mm; padding: 2mm 3mm; margin: 1mm 0 2mm; min-height: 18mm; resize: vertical; }
+.pl-area::placeholder { color: #9d8d6c; }
+.pl-area:focus { outline: none; border-style: solid; border-color: var(--grape); background: #fff; }
+
+/* 步驟打勾：點數字 */
+.pdfdoc ol.steps > li { transition: color .2s; }
+.pl-chk { position: absolute; left: -1mm; top: -.8mm; width: 8mm; height: 8mm; border: 0; background: none; border-radius: 50%; padding: 0; z-index: 1; }
+.pl-chk:hover + * , .pdfdoc ol.steps > li:hover::before { box-shadow: 0 0 0 1mm var(--sun-soft); }
+.pdfdoc ol.steps > li.pl-done::before { content: '✓'; background: var(--ok); }
+.pdfdoc ol.steps > li.pl-done { color: #6f6688; }
+.pl-hint { display: inline-block; font: 700 8pt/1.3 var(--ui); color: var(--grape-2); background: var(--paper); border: 1px dashed #cdbb93; border-radius: 1.5mm; padding: .8mm 2mm; margin: 0 0 2.5mm; }
+
+/* 截圖放大 */
+.pdfdoc figure img { cursor: zoom-in; transition: transform .2s ease, box-shadow .2s ease; }
+.pdfdoc figure img:hover { transform: translateY(-.5mm); box-shadow: 0 2mm 5mm rgba(58,46,92,.25); }
+.pl-lb { position: fixed; inset: 0; z-index: 40; background: rgba(30,24,48,.88); display: grid; place-items: center; padding: 28px; }
+.pl-lb[hidden] { display: none; }
+.pl-lb figure { margin: 0; max-width: min(1200px, 100%); max-height: 100%; display: grid; gap: 10px; justify-items: center; }
+.pl-lb img { max-width: 100%; max-height: calc(100vh - 120px); border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,.4); background: #fff; }
+.pl-lb figcaption { color: #f2ecdf; font-size: 15px; max-width: 760px; text-align: center; }
+.pl-lb button { position: absolute; border: 0; background: rgba(255,255,255,.12); color: #fff; width: 44px; height: 44px; border-radius: 50%; font-size: 22px; line-height: 1; }
+.pl-lb button:hover { background: rgba(255,255,255,.24); }
+.pl-lb .x { top: 18px; right: 18px; }
+.pl-lb .pv { left: 18px; top: 50%; } .pl-lb .nx { right: 18px; top: 50%; }
+
+/* 第 2 頁：食材換、菜照做 */
+.pdfdoc .flow3 .paper { cursor: pointer; transition: transform .25s ease, box-shadow .25s ease, background .25s; border: 0; font: inherit; font-size: 7.5pt; color: inherit; }
+.pdfdoc .flow3 .paper.dish { color: var(--sun); }
+.pdfdoc .flow3 .paper.pl-on { transform: translateY(-2.5mm) rotate(0deg) scale(1.08); box-shadow: 0 0 0 .8mm var(--coral), 0 2mm 4mm rgba(58,46,92,.2); z-index: 2; position: relative; }
+.pdfdoc .flow3 .mini-card.pl-on { box-shadow: 0 0 0 .8mm var(--sun), 0 .8mm 2mm rgba(58,46,92,.12); }
+.pdfdoc .flow3 .papers.pl-dim .paper:not(.pl-on) { opacity: .45; }
+.pdfdoc .revise .add { transition: transform .5s cubic-bezier(.2,.9,.3,1.3), opacity .4s ease, background .8s ease; }
+.pdfdoc .revise.pl-pre .add { opacity: 0; transform: translateX(-6mm); }
+.pdfdoc .revise.pl-flash .add { background: var(--sun); }
+
+/* 第 3 頁：解剖圖對照、食譜架播放 */
+.pdfdoc .labels > div { cursor: default; transition: background .2s, border-color .2s; border-radius: 0 1.5mm 1.5mm 0; padding-top: .8mm; padding-bottom: .8mm; }
+.pdfdoc .part { transition: box-shadow .2s, transform .2s; }
+.pdfdoc .anatomy.pl-hl .part:not(.pl-on) { opacity: .5; }
+.pdfdoc .part.pl-on { box-shadow: 0 0 0 .7mm var(--coral); transform: translateX(1mm); }
+.pdfdoc .labels > div.pl-on { background: var(--paper); border-left-color: var(--coral); }
+.pdfdoc .flow4 > div { transition: background .25s, box-shadow .25s, color .25s; }
+.pdfdoc .flow4 > div.pl-on { background: var(--grape) !important; color: var(--cream); box-shadow: 0 1mm 3mm rgba(58,46,92,.25); }
+.pdfdoc .flow4 > div.pl-on .n { color: var(--sun); }
+.pdfdoc .shelf-row .mini-card { transition: opacity .25s, box-shadow .25s, transform .25s; }
+.pdfdoc .shelf.pl-play .mini-card { opacity: .55; box-shadow: none; }
+.pdfdoc .shelf.pl-play .mini-card.pl-scan { opacity: 1; transform: translateY(-1mm); box-shadow: 0 0 0 .6mm #CFC6E6; }
+.pdfdoc .shelf.pl-play .mini-card.pl-pick { opacity: 1; box-shadow: 0 0 0 1.5mm var(--sun); transform: translateY(-1mm) scale(1.04); }
+.pl-play-btn { display: inline-flex; align-items: center; gap: 1.5mm; margin: 0 0 2.5mm; border: 0; border-radius: 1.6mm; padding: 1.5mm 3mm; background: var(--grape); color: var(--cream); font: 700 8.5pt/1 var(--ui); }
+.pl-play-btn:hover { background: #2c2347; }
+.pl-play-btn.on-dark { background: var(--sun); color: var(--grape); }
+
+/* 打字效果 */
+.pl-typing .cur { animation: pl-blink 1s steps(1) infinite; }
+@keyframes pl-blink { 50% { opacity: 0; } }
+.pdfdoc .cf-quiz { transition: opacity .4s ease, transform .4s ease; }
+.pdfdoc .callflow.pl-pre .cf-quiz { opacity: .25; transform: translateX(2mm); }
+.pdfdoc .callflow.pl-pre .cf-arrow { opacity: .3; }
+.pdfdoc .cf-arrow { transition: opacity .3s; }
+.pdfdoc .cf-prog i { transition: width .8s ease; }
+.pdfdoc .cf-o { cursor: pointer; transition: background .15s, border-color .15s; }
+.pdfdoc .cf-o:hover { border-color: var(--grape-2); }
+.pdfdoc .cf-o.pl-on { background: var(--sun-soft); border-color: var(--sun); }
+.pdfdoc .mock .menu { transition: opacity .3s ease, transform .3s ease; }
+.pdfdoc .mock.pl-pre .menu { opacity: 0; transform: translateY(2mm); }
+
+/* 第 11 頁：鍵盤真的會亮 */
+.pdfdoc kbd { transition: background .12s, color .12s, transform .12s; }
+.pdfdoc kbd.pl-on { background: var(--grape); color: var(--cream); transform: translateY(.4mm); border-bottom-width: 1px; }
+
+/* 常見問題：可以收合 */
+.pdfdoc .faq details { border-bottom: 1px solid var(--line); }
+.pdfdoc .faq details > summary { list-style: none; cursor: pointer; display: flex; gap: 3mm; align-items: baseline; padding: 2.4mm 0; font-weight: 700; font-size: 10.6pt; }
+.pdfdoc .faq details > summary::-webkit-details-marker { display: none; }
+.pdfdoc .faq details > summary::before { content: '+'; color: var(--coral); font-weight: 800; width: 3mm; flex: none; transition: transform .2s; }
+.pdfdoc .faq details[open] > summary::before { content: '−'; }
+.pdfdoc .faq details > summary:hover { color: var(--coral-ink); }
+.pdfdoc .faq details > .pl-ans { padding: 0 0 3mm 6mm; font-size: 9.8pt; }
+.pdfdoc .faq details > .pl-ans p { margin: 0; }
+.pl-faqtools { display: flex; gap: 2mm; margin: 0 0 1.5mm; }
+.pl-faqtools button { border: 0; background: none; color: var(--grape-2); font: 700 8.5pt/1 var(--ui); padding: 1mm 0; text-decoration: underline; text-underline-offset: .2em; }
+
+/* 第 13 頁：勾勾看 */
+.pdfdoc .fit.pl-check li { list-style: none; position: relative; margin-left: -4.5mm; padding-left: 6mm; cursor: pointer; border-radius: 1.5mm; transition: background .15s; }
+.pdfdoc .fit.pl-check li::before { content: ''; position: absolute; left: 0; top: 1.2mm; width: 3.6mm; height: 3.6mm; border-radius: 1mm; box-shadow: inset 0 0 0 1.3px currentColor; opacity: .7; }
+.pdfdoc .fit.pl-check li[aria-checked="true"]::before { content: '✓'; color: #fff; opacity: 1; font: 800 2.8mm/3.6mm var(--ui); text-align: center; }
+.pdfdoc .fit.pl-check .yes li[aria-checked="true"]::before { background: var(--grape); }
+.pdfdoc .fit.pl-check .no li[aria-checked="true"]::before { background: var(--coral); box-shadow: none; }
+.pdfdoc .fit.pl-check li:hover { background: rgba(255,255,255,.6); }
+.pdfdoc .fit.pl-check > div { transition: box-shadow .3s, transform .3s; }
+.pdfdoc .fit.pl-check > div.pl-win { box-shadow: 0 0 0 1.2mm var(--sun); transform: translateY(-1mm); }
+.pdfdoc .lead .em.pl-win { background: var(--sun-soft); border-radius: 1mm; box-shadow: 0 0 0 1mm var(--sun-soft); transition: background .3s; }
+
+/* 第 15 頁：做到這三件、考考你 */
+.pdfdoc ul.dots.pl-pass { list-style: none; padding-left: 0; }
+.pdfdoc ul.dots.pl-pass li { display: flex; gap: 2.5mm; align-items: baseline; cursor: pointer; padding: 1mm 0; }
+.pdfdoc ul.dots.pl-pass li::before { content: ''; flex: none; width: 4mm; height: 4mm; border-radius: 1mm; box-shadow: inset 0 0 0 1.4px var(--grape); transform: translateY(.6mm); }
+.pdfdoc ul.dots.pl-pass li[aria-checked="true"]::before { content: '✓'; background: var(--ok); box-shadow: none; color: #fff; font: 800 3mm/4mm var(--ui); text-align: center; }
+.pdfdoc ul.dots.pl-pass li[aria-checked="true"] { color: #6f6688; }
+.pl-donebox { display: flex; gap: 3mm; align-items: center; flex-wrap: wrap; margin: 1mm 0 5mm; font-size: 9.4pt; color: var(--grape-2); }
+.pl-donebox.all { color: var(--ok); font-weight: 700; }
+.pdfdoc .quiz ol li { cursor: pointer; border-radius: 1.5mm; padding: .6mm 2mm; margin-left: -2mm; transition: background .15s; }
+.pdfdoc .quiz ol li:hover { background: var(--cream); }
+.pdfdoc .quiz.pl-answered ol li { cursor: default; }
+.pdfdoc .quiz ol li.pl-right { background: #e3f1e8; color: var(--ok); font-weight: 700; }
+.pdfdoc .quiz ol li.pl-wrong { background: #ffe6e0; color: var(--coral-ink); text-decoration: line-through; }
+.pdfdoc .quiz .ans { display: none; }
+.pdfdoc .quiz.pl-answered .ans { display: block; transform: none; font-size: 10pt; color: var(--grape); margin-top: 1mm; }
+.pl-quizbtn { border: 0; background: none; color: var(--grape-2); font: 700 8.5pt/1 var(--ui); padding: 1mm 0; text-decoration: underline; text-underline-offset: .2em; }
+
+/* 結尾 */
+.pdfdoc .refs a { color: var(--grape); }
+.pdfdoc .end-cta a { color: var(--sun); }
+.pl-fin { display: flex; gap: 3mm; flex-wrap: wrap; align-items: center; margin: 0 0 6mm; }
+.pl-fin .pl-btn { font-size: 10pt; padding: 2.4mm 4.5mm; border-radius: 2.4mm; }
+body.pl-finished .pl-fin .note-done { display: inline; }
+.pl-fin .note-done { display: none; color: var(--ok); font-weight: 700; font-size: 9.4pt; }
+
+/* 進場：捲到才出現（只在沒有減少動態時） */
+@media (prefers-reduced-motion: no-preference) {
+  .pl-reveal { opacity: 0; transform: translateY(4mm); transition: opacity .55s ease, transform .55s cubic-bezier(.2,.8,.3,1); }
+  .pl-reveal.pl-in { opacity: 1; transform: none; }
+}
+
+/* 名詞小卡（同 lesson.css） */
+.gl { border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: help; text-decoration: underline dotted; text-decoration-color: var(--grape-2); text-underline-offset: .25em; }
+.gl:hover { color: var(--coral-ink); }
+.glpop { position: absolute; z-index: 35; background: var(--paper); color: var(--grape); border-radius: var(--r); padding: 14px 16px 12px; box-shadow: 0 0 0 1px var(--line), 0 10px 28px rgba(58,46,92,.18); font-size: 15px; }
+.glpop p { margin: 0 0 8px; }
+.glpop .t { display: flex; gap: 8px; align-items: baseline; padding-right: 22px; }
+.glpop .en { font-size: 13px; color: var(--grape-2); }
+.glpop .go { font-size: 13px; color: var(--grape-2); margin: 0; }
+.glpop .x { position: absolute; top: 6px; right: 8px; border: 0; background: none; font-size: 20px; line-height: 1; color: var(--grape-2); }
+
+/* ── 窄螢幕 ── */
+@media (max-width: 1100px) { :root { --z: 1.08; } .pl-wrap { grid-template-columns: 200px minmax(0, var(--col)); gap: 36px; } }
+@media (max-width: 900px) {
+  :root { --z: 1.12; }
+  .pl-top, .pl-map { padding-left: 16px; padding-right: 16px; }
+  .pl-top nav { gap: 12px; font-size: 14px; }
+  .pl-top nav a:not(.home) { display: none; }
+  .pl-mods { display: none; }
+  .pl-modline { margin-top: 4px; }
+  .pl-wrap { display: block; padding: 20px 16px 120px; }
+  .pl-side { display: none; }
+  .pl-strip { display: block; position: sticky; top: 0; z-index: 20; background: rgba(255,244,224,.96); backdrop-filter: blur(6px); box-shadow: 0 1px 0 var(--line); }
+  .pl-strip button { width: 100%; border: 0; background: none; text-align: left; padding: 10px 16px 9px; display: flex; gap: 10px; align-items: baseline; font-size: 14px; }
+  .pl-strip button b { color: var(--grape); }
+  .pl-strip button span { color: var(--grape-2); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pl-strip button small { color: var(--coral); font-weight: 700; }
+  .pl-strip .bar { display: none; }
+  .pl-run { top: 41px; padding-top: 10px; }
+  .pl-opener { display: none; }
+  .pl-track, .pl-index { margin-right: 46px; }
+  .pl-index a { font-size: 0; gap: 0; } .pl-index a span { font-size: 12px; }
+  .pl-strip .sheet { padding: 4px 16px 14px; max-height: 70vh; overflow: auto; }
+  .pl-strip .sheet[hidden] { display: none; }
+  /* PDF 的並排全部改直排 */
+  .pdfdoc .row, .pdfdoc .three, .pdfdoc .flow3, .pdfdoc .flow4, .pdfdoc .anatomy, .pdfdoc .compare, .pdfdoc .fit, .pdfdoc .ab, .pdfdoc .grid3,
+  .pdfdoc .ex, .pdfdoc .okno, .pdfdoc .row3, .pdfdoc .callflow, .pdfdoc .cards, .pdfdoc .revise, .pdfdoc .shelf-row, .pdfdoc .cover .learn, .pdfdoc .files { flex-direction: column; }
+  .pdfdoc .row > *, .pdfdoc .ab > div, .pdfdoc .flow3 .st { width: 100% !important; flex: none !important; }
+  .pdfdoc .ar, .pdfdoc .arrow, .pdfdoc .cf-arrow { transform: rotate(90deg); width: auto !important; height: 8mm; }
+  .pdfdoc .mini-card.big { width: auto; }
+  .pdfdoc figure[style] { width: 100% !important; }
+  .pdfdoc .mock[style] { width: 100% !important; }
+  .pdfdoc .steps3 > div { grid-template-columns: 1fr; }
+  .pdfdoc .steps3 figure { grid-column: 1; grid-row: auto; margin-top: 2mm; }
+  .pdfdoc .pdfpage.cover { display: block; padding: 10mm 8mm; }
+  .pdfdoc .cover .recipe { margin: 8mm 4mm 2mm; }
+  .pdfdoc .cover h1 { font-size: 26pt; }
+  .pdfdoc .way { flex-direction: column; gap: 1mm; }
+  .pdfdoc .way .say { white-space: normal; }
+  .pdfdoc .path { white-space: normal; }
+  .pl-pbtns { position: static; margin-top: 2.5mm; justify-content: flex-end; }
+  .pdfdoc .prompt { padding-bottom: 3.5mm; }
+  .pl-blank { width: 26mm; }
+}
+@media print { .pl-top, .pl-map, .pl-side, .pl-strip, .pl-pbtns, .pl-resume { display: none !important; } .pl-wrap { display: block; } }

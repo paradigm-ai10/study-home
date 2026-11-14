@@ -8,20 +8,13 @@ window.CRAB_ROUTES = [
   { id: 'solve', part: 'claw-right', zh: '解決一件事',    en: 'Solve one thing',   hint: '帶一件麻煩事來，一步步用 AI 做掉',     href: null },
   { id: 'words', part: 'legs',       zh: 'AI 名詞小字典', en: 'AI words',          hint: 'Skill、MCP、Agent，一句話講清楚',      href: null },
   { id: 'news',  part: 'bubbles',    zh: 'AI 新聞',       en: 'AI news',           hint: '每週整理好，學生也看得懂',             href: null },
-  { id: 'free',  part: 'parcel',     zh: '領取資源',      en: 'Free stuff',        hint: 'skill 檔、PDF、提示詞，直接帶走',      href: null },
+  { id: 'free',  part: 'parcel',     zh: '資源下載',      en: 'Downloads',         hint: 'Skill 檔案、PDF 講義與提示詞範本',     href: '../../../resources/index.html' },   // 2026-11-14 資源頁做好；網址相對於首頁資料夾（環境/f4-雨夜書桌/）
 ];
 
-/* 學習站已開放課程頁的課（2026-11-13 課程地圖 v8.5：首版 20 課〔roadmap.json 的 first_release〕，目前有課程頁的 8 課：1-1、1-4、2-1、3-1、4-1、4-4、4-5、6-3；課號 v8.1→v8.5 沒變）。
-   只放已經有頁面的課：放進來的課才會出現在首頁的路徑、下一步、程度評估；其餘首版課在地圖和清單上顯示「即將上線」。
-   每課的網址放這裡（2026-11-12 課程頁寫好，全部接上；檔案在 網站/學習站/lessons/），首頁的「開始」按鈕、學習地圖、幫我挑都從這裡讀；還沒寫好的放 null，首頁會先給替代的下一步。
+/* 學習站已開放課程頁的課（2026-11-14：舊 8 課已撤下，課程頁重新一課一課定版；目前定版 1 課：4-4「Skills 入門：呼叫、更新、自己做一個」）。
+   只放已經有頁面的課：放進來的課才會出現在首頁的路徑、下一步、程度評估；其餘首版課（roadmap.json 的 first_release，共 20 課）在地圖和清單上顯示「即將上線」。
+   之後每定版一課，在這裡加一行就會照首版順序排進路徑；檔案在 網站/學習站/課程/。
    網址相對於首頁資料夾（環境/f4-雨夜書桌/），或寫完整網址。 */
 window.LESSON_PAGES = {
-  '1-1': '../../../lessons/1-1.html',
-  '1-4': '../../../lessons/1-4.html',
-  '2-1': '../../../lessons/2-1.html',
-  '3-1': '../../../lessons/3-1.html',
-  '4-1': '../../../lessons/4-1.html',
   '4-4': '../../../lessons/4-4.html',
-  '4-5': '../../../lessons/4-5.html',
-  '6-3': '../../../lessons/6-3.html',
 };

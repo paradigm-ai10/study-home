@@ -5,7 +5,7 @@
    Needs ../../routes.js (LESSON_PAGES) and ../../../roadmap8.js (ROADMAP8) on the page. */
 window.MapChrome = (() => {
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const LINKS = /[?&]maplinks=1/.test(location.search);   // lesson names in the panel become links (off until the lesson pages exist)
+  const LINKS = !/[?&]maplinks=0/.test(location.search);   // lesson names in the panel become links when the lesson has a page (LESSON_PAGES); ?maplinks=0 turns it off
 
   function progress() {
     const R8 = window.ROADMAP8 || { topics: [], first: [], idmap: {} }, PAGES = window.LESSON_PAGES || {};

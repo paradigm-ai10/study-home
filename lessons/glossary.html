@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 名詞小字典｜Paradigm 學 AI</title>
+<meta name="description" content="學習站用到的 AI 名詞，每個一句話說明，並連到講它的那一課。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Outfit:wght@400;700&family=Silkscreen:wght@400;700&display=swap">
+<link rel="stylesheet" href="lesson.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 8 5%22 shape-rendering=%22crispEdges%22%3E%3Cpath fill=%22%23FF6B57%22 d=%22M1 0h6v1h1v3H7v1H6V4H5v1H4V4H3v1H2V4H1v1H0V1h1z%22/%3E%3Cpath fill=%22%233A2E5C%22 d=%22M2 1h1v1H2zM5 1h1v1H5z%22/%3E%3C/svg%3E">
+<style>
+  /* AI 名詞小字典：依主題分組，可搜尋；每個名詞一句說明，連到講它的那一課（只連已開放的課） */
+  .gwrap { max-width: 760px; margin: 0 auto; padding: 8px 24px 100px; }
+  .gwrap h1 { font-size: clamp(28px, 4vw, 36px); line-height: 1.25; margin: 18px 0 10px; }
+  .gwrap .lede { color: var(--grape-2); font-size: 17px; margin: 0 0 22px; }
+  .gsearch { display: grid; gap: 6px; margin: 0 0 8px; font-size: 14px; color: var(--grape-2); }
+  .gsearch input { font: 17px/1.5 var(--body); color: var(--grape); padding: 10px 14px; min-height: 44px; border: 1px solid var(--grape-2); border-radius: var(--r); background: var(--paper); }
+  .gcount { font-size: 14px; color: var(--grape-2); margin: 0 0 26px; }
+  .gtopic { margin: 0 0 34px; }
+  .gtopic h2 { font-size: 20px; margin: 0 0 6px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .gtopic h2 small { font-family: var(--latin); font-weight: 400; color: var(--grape-2); margin-right: 8px; }
+  .glist { list-style: none; margin: 0; padding: 0; }
+  .glist li { padding: 12px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 20px; }
+  .glist li:last-child { border-bottom: 0; }
+  .glist li:target { background: var(--paper); box-shadow: -12px 0 0 var(--paper), 12px 0 0 var(--paper); }
+  .glist .t { font-weight: 700; font-size: 17px; }
+  .glist .en { font-family: var(--latin); color: var(--grape-2); font-size: 14px; margin-left: 8px; }
+  .glist p { margin: 4px 0 0; font-size: 16px; line-height: 1.65; }
+  .glist .go { font-size: 14px; color: var(--grape-2); }
+  .gempty { color: var(--grape-2); }
+  @media (max-width: 820px) { .gwrap { padding: 4px 16px 80px; } }
+</style>
+</head>
+<body>
+<header class="top" id="top"></header>
+<main class="gwrap">
+  <h1>AI 名詞小字典</h1>
+  <p class="lede">學習站用到的 AI 名詞，每個一句話說明。課號可以點的，是已經開放的課。</p>
+  <label class="gsearch">搜尋名詞或英文<input id="q" type="search" placeholder="例：Skill、幻覺、Connector" autocomplete="off"></label>
+  <p class="gcount" id="count" aria-live="polite"></p>
+  <div id="list"></div>
+</main>
+<script src="../pixel.js"></script>
+<script src="roadmap8.js"></script>
+<script src="glossary.js"></script>
+<script>
+(() => {
+  const R = ROADMAP, esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+  const HOME_URL = '../crab/rooms/f4/index.html'
+  document.getElementById('top').innerHTML = `<a class="logo" href="${HOME_URL}"><span>${PIXEL.critterIcon()}</span>PARADIGM</a>
+    <nav><a href="${HOME_URL}#map">學習地圖</a><a href="glossary.html" aria-current="page">AI 名詞小字典</a><a class="home" href="${HOME_URL}">回終端機</a></nav>`
+  const titleOf = id => { for (const t of R.topics) { const l = t.lessons.find(x => x.id === id); if (l) return l.title } return '' }
+  const topicOf = g => g.topic || (g.lesson ? 'T' + g.lesson.split('-')[0] : 'other')
+  const groups = [...R.topics.map(t => ({ id: t.id, no: t.no, name: t.name })), { id: 'other', no: '', name: '其他名詞' }]
+  const where = g => g.lesson ? ((R.written || R.open).includes(g.lesson) ? `<a href="${g.lesson}.html">${esc(g.lesson)} ${esc(titleOf(g.lesson))}</a>` : `${esc(g.lesson)} ${esc(titleOf(g.lesson))}（即將推出）`) : ''
+  const item = g => `<li id="${esc(g.term)}"><span class="t">${esc(g.term)}</span>${g.en ? `<span class="en">${esc(g.en)}</span>` : ''}<p>${esc(g.plain)}</p>${where(g) ? `<p class="go">相關課程　${where(g)}</p>` : ''}</li>`
+  const draw = q => {
+    const k = q.trim().toLowerCase()
+    const hit = GLOSSARY.filter(g => !k || [g.term, g.en, g.plain, ...(g.alias || [])].join(' ').toLowerCase().includes(k))
+    document.getElementById('count').textContent = k ? `找到 ${hit.length} 個名詞` : `共 ${GLOSSARY.length} 個名詞，依主題排列`
+    document.getElementById('list').innerHTML = groups.map(gr => { const its = hit.filter(g => topicOf(g) === gr.id); return its.length ? `<section class="gtopic"><h2>${gr.no ? `<small>主題 ${gr.no}</small>` : ''}${esc(gr.name)}</h2><ul class="glist">${its.map(item).join('')}</ul></section>` : '' }).join('') || '<p class="gempty">找不到這個名詞。</p>'
+  }
+  const q = document.getElementById('q')
+  q.oninput = () => draw(q.value)
+  draw('')
+  if (location.hash) { const el = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (el) el.scrollIntoView() }
+})()
+</script>
+</body>
+</html>

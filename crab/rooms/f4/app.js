@@ -201,7 +201,7 @@
   // What they tick in question 3 counts as learned; if the start is one of those, move on to the next lesson not learned.
   function recommend(level, goal, checks) {
     const known = SKILLS.map(([id]) => id).filter((id) => checks[id] && byId[id]);
-    if (level >= 1 && !known.includes('1-1')) known.push('1-1');
+    if (level >= 1 && byId['1-1'] && !known.includes('1-1')) known.push('1-1');   // only once 1-1 has a page: a lesson that is not open is never counted as learned
     const done = state.known.filter((id) => !state.self.includes(id));   // finished on the lesson pages
     const all = [...new Set(known.concat(done))];
     let start = level === 0 ? '1-1' : level === 1 ? '1-4' : GOAL_START[goal] || '2-1';
@@ -286,9 +286,11 @@
   const showMap = () => (window.F4 && window.F4.onMap ? window.F4.onMap() : openMap());
 
   /* ---- going into one of the seven (from the index, or from the thing on the desk) */
+  let left = false;   // gone to one of the pages: Back may bring this page out of the browser's back cache still faded out and busy
+  addEventListener('pageshow', (e) => { if (e.persisted && left) location.reload(); });
   function enter(id) {
     const r = ROUTES[id];
-    if (r && r.href) { emit('leave', { id, href: r.href }); setTimeout(() => { location.href = r.href; }, html.classList.contains('is-3d') ? 750 : 0); return; }
+    if (r && r.href) { left = true; emit('leave', { id, href: r.href }); setTimeout(() => { location.href = r.href; }, html.classList.contains('is-3d') ? 750 : 0); return; }
     if (id === 'pick') openPick(); else if (id === 'map') showMap(); else openSoon(id);
   }
   const act = (name) => { if (name === 'map') showMap(); else if (name === 'task') openTask(); else if (name === 'pick') openPick(); else if (name === 'lesson') { const n = nextStep(); const href = n.lesson && lessonHref(n.lesson); if (href) location.href = href; else showMap(); } };
@@ -322,6 +324,7 @@
   addEventListener('hashchange', () => fromHash(0));
   btnPick.addEventListener('click', () => act(btnPick.dataset.next || 'pick'));
   ways.addEventListener('click', (e) => { const a = e.target.closest('a[data-id]'); if (!a) return; e.preventDefault(); enter(a.dataset.id); });
+  { const mi = ways.querySelector('a[data-id="map"] i'); if (mi && MAP8) mi.textContent = ENTRY.map.line.replace(/。$/, ''); }   // the count of open lessons follows LESSON_PAGES, not the words typed in the page
 
   window.F4 = { state, on, emit, enter, openTask, openPick, openMap, openSoon, close, nextStep, greeting, weekCount, ENTRY, ROUTES, LESSONS, FIRST, FIRST_N, STAGES, byId, TOTAL, lessonHref, onMap: null, simple: SIMPLE, t0: performance.now(), get card() { return cur; } };
   refresh();
