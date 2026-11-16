@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cowork 入門：交辦一件多步驟的工作｜Paradigm 學 AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap">
+<link rel="stylesheet" href="media/5-1/pdf.css">
+<link rel="stylesheet" href="pdf-lesson.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 8 5%22 shape-rendering=%22crispEdges%22%3E%3Cpath fill=%22%23FF6B57%22 d=%22M1 0h6v1h1v3H7v1H6V4H5v1H4V4H3v1H2V4H1v1H0V1h1z%22/%3E%3Cpath fill=%22%233A2E5C%22 d=%22M2 1h1v1H2zM5 1h1v1H5z%22/%3E%3C/svg%3E">
+</head>
+<body>
+<!-- 網頁課（5-1）：內容是定稿 PDF 的原文（課程/05_Cowork入門/PDF/index.html），由 tools/from_pdf.py 產生，不要手改；
+     要改字請改 PDF 那邊，再重跑這支工具。外框與互動在 pdf-lesson.js、pdf-lesson.css。 -->
+<header class="pl-top" id="top"></header>
+<div class="pl-map" id="map"></div>
+<div class="pl-strip" id="strip" aria-hidden="true"></div>
+<button type="button" class="pl-opener" id="opener" aria-controls="side" aria-expanded="false" hidden>目錄</button>
+<div class="pl-wrap">
+  <nav class="pl-side" id="side" aria-label="這課的章節"></nav>
+  <div class="pl-main">
+  <div class="pl-run" id="run"></div>
+  <main class="pdfdoc" id="doc">
+<section class="pdfpage cover" id="p1" data-n="1">
+  <div class="brand">PARADIGM AI · Cowork 完整教學 PDF</div>
+  <h1>Cowork 入門：<br>交辦一件多步驟的工作</h1>
+  <div class="tagline">交代一次，成品直接存成檔案</div>
+  <p class="who">給有付費方案、會用 Claude 對話，但還沒交辦過長任務的學生和上班族。不需要寫程式。</p>
+  <div class="learn">
+    <div><i>01</i><b>連接資料夾</b>只授權這次要用的那一個</div>
+    <div><i>02</i><b>交辦</b>講清楚成品、位置、完成標準</div>
+    <div><i>03</i><b>看計畫</b>確認做法，再放手讓它執行</div>
+    <div><i>04</i><b>驗收</b>核對來源、遺漏、數字，要它補改</div>
+  </div>
+  <div class="meta"><span>閱讀約 10 分鐘</span><span>動手操作約 5–10 分鐘（不含等它執行）</span><span>付費方案才有，詳見 1-3</span></div>
+  <div class="skip">
+    <p><b>想跳過原理、直接動手？</b>翻到第 5 頁。</p>
+    <p><b>只想拿交辦句和驗收清單？</b>翻到第 9–10 頁。</p>
+  </div>
+  <div class="toc" id="toc"><div class="toc-t">目錄</div></div>
+  <div class="recipe">
+    <div class="t">交辦三要素</div>
+    <ol>
+      <li>要什麼成品（幾份、什麼檔）</li>
+      <li>存在哪個資料夾</li>
+      <li>做到怎樣算完成</li>
+    </ol>
+    <div class="call">再加一句：「不確定的地方標出來」</div>
+  </div>
+</section>
+<section class="pdfpage" id="p2" data-n="2" data-ch="learn" data-tl="Cowork 是什麼">
+  <p class="kicker">核心概念</p>
+  <h1>Cowork 是什麼？</h1>
+  <p class="lead">連接一個資料夾後，Claude 會<span class="em">自己做完一件多步驟的工作</span>：讀檔、整理、產出 Word、Excel 或簡報，成品直接存回資料夾。它只讀寫你授權的資料夾。</p>
+
+  <h2>把它想成：請一位助理到你的書桌</h2>
+  <p>交代清楚要什麼、放哪裡、做到怎樣算完成，你就可以去忙。助理做到一半可能回來問你；做完之後，仍然要你驗收才算收下。</p>
+  <div class="roles">
+    <div class="role"><div class="ic">你</div><b>交辦的人</b><p>講清楚成品與完成標準，中途回答問題，最後驗收。</p></div>
+    <div class="ar">→</div>
+    <div class="role hot"><div class="ic">助</div><b>助理＝Cowork</b><p>先提做法，再一步一步執行；不確定時回來問你。</p></div>
+    <div class="ar">→</div>
+    <div class="role"><div class="ic desk">桌</div><b>書桌＝授權的資料夾</b><p>只在這個資料夾裡讀寫，其他資料夾碰不到。</p></div>
+    <div class="ar">→</div>
+    <div class="role"><div class="ic file">檔</div><b>桌上的成品＝檔案</b><p>Word、Excel、簡報，存回資料夾，驗收後再使用。</p></div>
+  </div>
+
+  <h2>差別在檔案由誰來搬</h2>
+  <p class="small muted">例子：把組員交來的 5 份檔案合併成一份報告，再做一份簡報。兩種做法 Claude 都做得出成品，差在中間的搬運。</p>
+  <div class="compare">
+    <div class="box before">
+      <div class="label">沒有連接資料夾</div>
+      <ul class="dots" style="margin:0">
+        <li>你把 5 份檔案一份份上傳</li>
+        <li>成品要一份份下載</li>
+        <li>再自己存回正確的資料夾</li>
+      </ul>
+    </div>
+    <div class="arrow">→</div>
+    <div class="box after">
+      <div class="label">連接資料夾後交辦給 Cowork</div>
+      <ul class="dots" style="margin:0">
+        <li>它直接讀資料夾裡的 5 份檔案</li>
+        <li>自己合併、自己做簡報</li>
+        <li>成品直接存回你指定的位置</li>
+      </ul>
+    </div>
+  </div>
+  <p class="compare-cap">比的不是成品好壞，是<b>檔案由誰來搬、成品放在哪</b>。檔案越多、步驟越多，差距越大。</p>
+  <p class="pl-key"><span>這段重點</span>檔案誰搬，成品放哪</p>
+</section>
+<section class="pdfpage" id="p3" data-n="3" data-ch="learn" data-tl="怎麼運作">
+  <p class="kicker">核心概念</p>
+  <h1>Cowork 怎麼運作：四個步驟</h1>
+  <p class="lead">本課建議每次交辦都走這四步。<span class="em">你負責交辦、確認、回答問題、驗收</span>，中間的執行由它完成。</p>
+  <div class="flow4">
+    <div><span class="n">1</span><b>你交辦</b>成品、位置、完成標準，加上「不確定的地方標出來」</div>
+    <div class="ar">→</div>
+    <div><span class="n">2</span><b>它提計畫</b>請它先說打算怎麼做，你確認後再開始</div>
+    <div class="ar">→</div>
+    <div><span class="n">3</span><b>它執行</b>讀檔、整理、產出檔案；遇到不確定的事可能回來問你</div>
+    <div class="ar">→</div>
+    <div><span class="n">4</span><b>你驗收</b>核對來源、遺漏、數字，不對就要它改</div>
+  </div>
+
+  <h2>開始前要知道的三件事</h2>
+  <div class="facts">
+    <div><b>只讀寫你授權的資料夾</b>在桌面 app 裡連接哪個資料夾，它就只在裡面讀檔、存檔。要永久刪除檔案之前，它一定會先問你。</div>
+    <div><b>用到本機檔案時，桌面 app 要開著</b>任務要讀寫你電腦裡的檔案，Claude 桌面 app 不能關，電腦也不要進入睡眠，否則任務可能中斷。</div>
+    <div><b>中途它可能回來問你</b>例如兩份檔案的數字對不上。交辦完可以去忙，但記得回來看有沒有等你回覆的問題。內容上的疑問要靠交辦時請它「標出來」；下圖的權限模式（Permission mode）管的是另一件事：使用新工具、開新網站之前要不要先問你。</div>
+  </div>
+
+  <h2>你的畫面長這樣</h2>
+  <div class="shot-row">
+    <div class="shot"><img src="media/5-1/img/s1_permission.png" alt="訊息框與權限模式選單"></div>
+    <div class="cap">
+      <p style="margin-top:0"><b>新介面：</b>訊息框上方沒有 Chat／Cowork 兩個選項，任何對話都能直接交辦。</p>
+      <p><b>權限模式：</b>訊息框下方右側的 <code>Auto</code>，點開可選 <code>Manual</code>（使用新工具或開新網站前先問你）或 <code>Auto</code>（自己執行，看起來不安全時停下來問）。我們參考的帳號預設是 Auto，以你的帳號設定為準。</p>
+      <p class="cap-en">英文介面畫面。訊息框上還看得到 Chat／Cowork 兩個選項的是舊介面：先選 Cowork 再交辦，其他步驟相同。</p>
+    </div>
+  </div>
+  <p class="pl-key"><span>這段重點</span>交辦 → 計畫 → 執行 → 驗收</p>
+</section>
+<section class="pdfpage" id="p4" data-n="4" data-ch="learn" data-tl="適合交辦的事">
+  <p class="kicker">核心概念</p>
+  <h1>什麼事適合交辦給 Cowork？</h1>
+  <p class="lead">判斷標準：<span class="em">多檔案、多步驟、要做很久</span>，最後要交出檔案的工作。只要一個快速答案，直接問就好。</p>
+  <div class="fit">
+    <div class="yes">
+      <h3>適合交辦</h3>
+      <ul>
+        <li><b>檔案很多</b>：5 份組員的稿、一整學期的講義、10 篇論文</li>
+        <li><b>步驟很多</b>：先讀、再比對、再合併、再做成簡報</li>
+        <li><b>成品是檔案</b>：Word、Excel、簡報</li>
+        <li><b>說得出完成標準</b>：例如「簡報 10 頁」「每份稿都放進去」</li>
+      </ul>
+    </div>
+    <div class="no">
+      <h3>直接在對話裡問就好</h3>
+      <ul>
+        <li><b>只要快速答案</b>：解釋一個名詞、改一句話</li>
+        <li><b>還沒想清楚要什麼</b>：先在對話裡討論，想清楚再交辦</li>
+        <li><b>只有你能判斷的事</b>：報告的立場、要不要交出去</li>
+        <li><b>只想聽一句建議</b>：例如「這個題目好不好」</li>
+      </ul>
+    </div>
+  </div>
+  <h2>例子</h2>
+  <div class="ex">
+    <div>
+      <h3>學習</h3>
+      <ul>
+        <li>組員的 5 份稿 → 一份合併好的報告＋10 頁簡報</li>
+        <li>一學期的講義 → 期末複習包（重點整理＋比較表＋自我測驗）</li>
+        <li>各科課程大綱 → 一張所有截止日的總表</li>
+      </ul>
+    </div>
+    <div>
+      <h3>工作</h3>
+      <ul>
+        <li>一個月的會議紀錄 → 待辦總表，依負責人分頁</li>
+        <li>各組交來的月報 → 部門月報＋摘要簡報</li>
+        <li>幾份市場資料 → 一份比較報告和摘要簡報</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note"><b>長任務比較吃用量。</b>一次交辦會讀很多檔、做很多步，比一般問答用掉更多額度。相關的事併成一次交辦，不相關的開新對話。</div>
+  <div class="note"><b>放進資料夾之前：</b>密碼、帳號、身分證字號這類資料不要放進授權的資料夾。公司檔案，先確認公司是否允許交給 AI 處理。</div>
+  <p class="pl-key"><span>這段重點</span>多檔案、多步驟、要做很久</p>
+</section>
+<section class="pdfpage" id="p5" data-n="5" data-ch="do" data-tl="開啟" data-step="1">
+  <p class="kicker">實作流程 ① 連接資料夾</p>
+  <h1>準備資料夾，連接到 Cowork</h1>
+  <p class="lead">接下來四頁照同一個例子走：<span class="em">分組報告收尾</span>。組員交來 5 份檔案，格式不一致、內容有重複，還有一處數字對不上，要合併成一份報告和一份簡報。</p>
+  <h2>開始前，先確認三件事</h2>
+  <ol class="steps">
+    <li><b>有付費方案。</b>Cowork 只有付費方案才有，方案差異詳見 1-3。</li>
+    <li><b>用 Claude 桌面 app。</b>要讓它直接讀寫電腦裡的檔案，要用桌面 app（Mac、Windows 都有）。網頁版可以上傳檔案，但不能連接本機資料夾。</li>
+    <li><b>第一次用複本或小資料夾。</b>把這次要用的 3–5 份檔案複製到一個新資料夾，原檔留在別處。不要直接連接整個「文件」或「桌面」。組員的稿在雲端文件或 LINE 上，先下載成檔案放進來。</li>
+  </ol>
+  <div class="files5">
+    <div class="ftitle">期末報告_第三組 <span class="tag-demo">示範用檔案</span></div>
+    <div class="fi"><span class="ext w">DOCX</span>01_前言與研究動機_林雅婷.docx<span class="flag dup">第一段跟 02 重複</span></div>
+    <div class="fi"><span class="ext w">DOCX</span>02_文獻回顧_陳冠宇.docx</div>
+    <div class="fi"><span class="ext w">DOCX</span>03_問卷結果_王思涵.docx<span class="flag">整理講義重點 60%</span></div>
+    <div class="fi"><span class="ext w">DOCX</span>04_訪談整理_張家豪.docx<span class="flag dup">一段跟 03 重複</span></div>
+    <div class="fi"><span class="ext p">PPTX</span>05_報告簡報草稿_李柏翰.pptx<span class="flag">同一項寫 62%</span></div>
+  </div>
+  <p class="small muted">示範用檔案：內容虛構、人名為假名、問卷是示範數據。標籤是為了讓你看懂例子，實際檔案上沒有。</p>
+  <h2>連接資料夾</h2>
+  <div class="shot-row">
+    <div class="cap">
+      <ol class="steps" style="margin:0">
+        <li>在桌面 app 開一個新對話（舊介面先在訊息框選「Cowork」）。</li>
+        <li>在訊息框附近找連接資料夾的選項（位置與名稱以你的畫面為準），選剛才的「期末報告_第三組」。</li>
+        <li>若出現存取授權的提示，看清楚路徑是對的資料夾，再允許。</li>
+        <li>連好後先問一句「請列出你讀得到的檔名」，確認 5 份都在。</li>
+      </ol>
+    </div>
+    <div class="shot" style="flex:0 0 46%"><img src="media/5-1/img/s2b_allow.png" alt="資料夾授權視窗"><span class="lbl" style="top:2mm;bottom:auto">示意畫面</span></div>
+  </div>
+  <p class="small muted">右圖是授權提示的示意畫面：問你要不要讓 Claude 在「期末報告_第三組」裡讀取、建立、修改檔案，並列出資料夾路徑。實際字樣與位置以你的畫面為準。</p>
+  <p class="pl-key"><span>這段重點</span>第一次用複本，原檔留在別處</p>
+</section>
+<section class="pdfpage" id="p6" data-n="6" data-ch="do" data-tl="交辦" data-step="2">
+  <p class="kicker">實作流程 ② 交辦</p>
+  <h1>講清楚三要素，再加一句「標出不確定」</h1>
+  <p class="lead">交辦寫得清不清楚，決定交回來的成品對不對。每次都講這三件，<span class="em">再請它把不確定的地方標出來</span>。</p>
+  <div class="three">
+    <div><b>要什麼成品</b>幾份、什麼檔：一份 Word、一份 10 頁簡報。</div>
+    <div><b>存在哪裡</b>存進哪個資料夾、檔名叫什麼。</div>
+    <div><b>做到怎樣算完成</b>說得出來的標準：每份稿都放進去、沒有重複、簡報 10 頁。</div>
+  </div>
+  <div class="prompt"><span class="tag">可以直接複製（分組報告收尾）</span>
+    <p>這個資料夾裡是我們這組期末報告的 5 份檔案，組員各自寫的，格式不一樣，有些內容重複。</p>
+    <p>請做兩份成品，存到這個資料夾裡新開的「成品」資料夾：</p>
+    <p>1. 一份合併好的報告 Word：統一標題與內文格式，重複的內容只留一次，章節照「研究動機 → 文獻回顧 → 研究方法 → 結果 → 結論」排。</p>
+    <p>2. 一份 10 頁的報告簡報：每頁一個重點，問卷數字做成圖表。</p>
+    <p>做完的標準：5 份檔案的內容都放進去、沒有重複段落、簡報 10 頁。</p>
+    <p>不確定的地方標出來：數字前後對不上的，先以原始資料為準，並列出兩邊的出處給我確認；檔案裡沒有的寫「待補」，不要自己編。</p>
+    <p>不要改動原本的 5 份檔案。動手前先告訴我你打算怎麼做，我確認後再開始。</p>
+  </div>
+  <div class="anno">
+    <div><span class="k">成品</span>「一份 Word」「10 頁簡報」：講出檔案種類和份量。</div>
+    <div><span class="k">位置</span>「存到成品資料夾」：成品和原檔分開，好找，也降低覆蓋原檔的風險。</div>
+    <div><span class="k">標準</span>「內容都放進去、沒有重複、10 頁」：驗收時就照這三條核對。</div>
+    <div><span class="k">不確定</span>「數字對不上列出處給我確認、沒有的寫待補」：要它把問題攤開，而不是悄悄自己決定。</div>
+  </div>
+  <div class="note"><b>寫不出完成標準？</b>代表你還沒想清楚要什麼。先在對話裡跟 Claude 討論「這份報告怎樣才算完成」，想清楚再交辦。</div>
+  <p class="pl-key"><span>這段重點</span>成品、位置、標準＋標出不確定</p>
+</section>
+<section class="pdfpage p-plan" id="p7" data-n="7" data-ch="do" data-tl="看計畫" data-step="3">
+  <p class="kicker">實作流程 ③ 看計畫</p>
+  <h1>先看它的計畫，再放手</h1>
+  <p class="lead">交辦最後那句「動手前先告訴我」，是請 Claude 先列出做法、等你回覆。<span class="em">花 30 秒看一遍</span>，比做完才發現方向錯了省時間。</p>
+  <div class="shot"><img src="media/5-1/img/s3b_plan.png" alt="Claude 的計畫"></div>
+  <p class="cap-en">示意畫面：Claude 讀完 5 份檔後列出 5 步計畫，等你確認。圖中的 <code>Approve plan</code>（確認）、<code>Edit plan</code>（修改）按鈕是示意，你的畫面可能沒有；最穩的做法是直接在對話回覆「計畫可以，請開始」。</p>
+  <h2>看這三點</h2>
+  <div class="check3">
+    <div><span class="n">1</span><b>成品對不對</b>是你要的那幾份檔、那個份量嗎？</div>
+    <div><span class="n">2</span><b>位置對不對</b>是存到你指定的資料夾嗎？</div>
+    <div><span class="n">3</span><b>會不會動到原檔</b>計畫裡有沒有改寫、移動、刪除原始檔案？</div>
+  </div>
+  <h2>要改就直接說</h2>
+  <div class="prompt filled"><span class="tag">例子</span>
+    <p>第 4 步改一下：簡報最後一頁改成分工頁，寫誰負責哪一章，總共還是 10 頁。其他照你的計畫，開始吧。</p>
+  </div>
+  <h2>執行中：它可能回來問你</h2>
+  <p>確認後它就會自己做，畫面上看得到進行到哪一步。你可以去忙；用到本機檔案時，<b>桌面 app 不要關</b>。遇到判斷不了的事，它可能停下來問你，例如兩份檔案的數字不一樣要用哪一個；回來時先看有沒有等你回覆的問題。</p>
+  <p class="small muted">第一次交辦、檔案很重要時，可以把權限模式切成 Manual，讓它使用新工具前都先問你。中途想改方向，直接在同一個對話輸入。</p>
+  <p class="pl-key"><span>這段重點</span>花 30 秒看計畫</p>
+</section>
+<section class="pdfpage" id="p8" data-n="8" data-ch="do" data-tl="驗收" data-step="4">
+  <p class="kicker">實作流程 ④ 驗收</p>
+  <h1>打開檔案核對，不對就要它改</h1>
+  <p class="lead">它說做完了，不代表做對了。<span class="em">它不一定發現所有問題</span>，所以要打開檔案，照你寫的標準核對來源、遺漏、數字。</p>
+  <div class="shot"><img src="media/5-1/img/x2b_report.png" alt="完成回報：3 件請你確認的事"></div>
+  <div class="shot-row" style="align-items:flex-start">
+    <div class="cap">
+      <p style="margin-top:0"><b>教學用的完成回報範例</b>（擬真示意畫面）：報告和簡報存進「成品」資料夾。因為交辦時要求「不確定的地方標出來」，它列了 3 件請你確認的事：簡報草稿寫 62%、問卷原檔寫 60%；重複段落怎麼處理；參考文獻缺少、留了「待補」。</p>
+      <p><b>但它不一定發現所有問題。</b>沒列出來的地方，仍然要你自己核對。</p>
+    </div>
+    <div class="cap">
+      <h2 style="margin-top:0">打開成品，核對三件事</h2>
+      <ul class="tick">
+        <li><b>來源</b>：抽兩段回原檔確認出處</li>
+        <li><b>遺漏</b>：5 份都在，刪掉的真的是重複</li>
+        <li><b>數字</b>：抽兩個回原檔對；衝突由你決定</li>
+        <li>簡報頁數、「待補」；原檔沒被改</li>
+        <li>補改後再開檔，確認改到了、其他處沒動</li>
+      </ul>
+    </div>
+  </div>
+  <div class="prompt filled"><span class="tag">也可以請它先自我檢查</span>
+    <p>請對照我一開始寫的「做完的標準」，一條一條說明有沒有做到；另外列出你合併時刪掉的段落和改過的數字，先不要改。（它的自我檢查只是幫你找問題，不能取代你核對。）</p>
+  </div>
+  <h2>補改：講清楚哪裡、改成怎樣、其他不要動</h2>
+  <div class="fixes">
+    <div><b>版面要改</b><p>簡報第 3 頁字太多，改成 3 個重點。其他頁不要動。</p></div>
+    <div><b>刪錯、改錯</b><p>「文獻回顧」最後那段「認知外包」不是重複內容，請放回那章最後。其他地方不要動。</p></div>
+    <div><b>確認後回覆</b><p>60% 跟思涵確認過是對的，維持 60%。請再檢查報告和簡報裡還有沒有其他數字跟原檔不同，列出來給我。</p></div>
+  </div>
+  <div class="note"><b>整個方向都錯了？</b>不要一處處補，開新對話用改過的交辦重交一次。</div>
+  <p class="pl-key"><span>這段重點</span>核對來源、遺漏、數字</p>
+</section>
+<section class="pdfpage" id="p9" data-n="9" data-ch="kit" data-tl="三要素與驗收清單">
+  <p class="kicker">交辦句與驗收清單</p>
+  <h1>交辦三要素小卡＋驗收清單</h1>
+  <p class="lead">交辦前看小卡，收到成品後照清單核對。<span class="em">兩張都可以截圖存在手機裡</span>。</p>
+  <div class="card3">
+    <div class="t">交辦三要素小卡</div>
+    <ol>
+      <li><b>成品</b>：要幾份、什麼檔、多長（例：一份 Word＋一份 10 頁簡報）</li>
+      <li><b>位置</b>：存進哪個資料夾（例：新開「成品」資料夾，跟原檔分開）</li>
+      <li><b>完成標準</b>：驗收時一條條核對的標準（例：每份稿都放進去、沒有重複）</li>
+    </ol>
+    <div class="plus"><b>每次都加的兩句：</b>「不確定的地方標出來，不要自己猜。」「動手前先告訴我你打算怎麼做，我確認後再開始。」</div>
+  </div>
+  <div class="prompt"><span class="tag">可以直接複製，填空後送出</span>
+    <p>這個資料夾裡是＿＿＿＿（資料是什麼）。</p>
+    <p>請做＿＿＿＿（成品：幾份、什麼檔、多長），存到＿＿＿＿（資料夾）。</p>
+    <p>做完的標準：＿＿＿＿、＿＿＿＿、＿＿＿＿。</p>
+    <p>不確定的地方標出來，不要自己猜。不要改動原本的檔案。</p>
+    <p>動手前先告訴我你打算怎麼做，我確認後再開始。</p>
+  </div>
+  <h2>驗收清單</h2>
+  <div class="vgrid">
+    <div><h3>來源</h3><ul class="tick"><li>抽兩段內容回原檔確認出處</li><li>沒有資料裡不存在的內容</li></ul></div>
+    <div><h3>遺漏</h3><ul class="tick"><li>每份檔案的內容都在</li><li>刪掉的段落真的是重複</li></ul></div>
+    <div><h3>數字</h3><ul class="tick"><li>抽兩個數字回原檔對</li><li>它標出的衝突由你決定</li></ul></div>
+    <div><h3>完成標準與原檔</h3><ul class="tick"><li>交辦時寫的標準逐條做到</li><li>原檔仍在、沒有被改</li></ul></div>
+  </div>
+  <p class="small muted">任務太大、一次交辦不清楚時，下一課 5-2 教你拆成幾步分批交辦。</p>
+  <p class="pl-key"><span>這段重點</span>交辦看小卡，驗收看清單</p>
+</section>
+<section class="pdfpage" id="p10" data-n="10" data-ch="kit" data-tl="5 句交辦句">
+  <p class="kicker">交辦句與驗收清單</p>
+  <h1>5 句常用交辦句：學生 3 句、上班族 2 句</h1>
+  <p class="lead">先把資料放進一個資料夾並連接，再貼上對應的句子。<span class="em">底線的地方換成你的</span>。</p>
+  <div class="prompt sm"><span class="tag">1 分組報告</span>
+    <p>這個資料夾是組員各自寫的報告檔。請合併成一份 Word 報告，章節照<u>研究動機、文獻回顧、研究方法、結果、結論</u>排，統一格式、重複只留一次；再做一份 <u>10</u> 頁簡報。存到「成品」資料夾。標準：每份稿的內容都放進去、沒有重複段落。不確定的地方標出來：數字對不上的以原始資料為準並列出兩邊出處給我確認，檔案裡沒有的寫「待補」。不要改原檔。動手前先告訴我計畫，我確認後再開始。</p>
+  </div>
+  <div class="prompt sm"><span class="tag">2 期末複習包</span>
+    <p>這個資料夾是<u>這學期的講義</u>。請做期末複習包，存到「複習包」資料夾：每章一頁重點整理（Word）、一張各章比較表（Excel）、<u>20</u> 題自我測驗附答案（Word）。標準：每章都有、內容只來自講義、每題標出處頁碼。講義看不清楚或互相矛盾的地方標出來。動手前先告訴我計畫，我確認後再開始。</p>
+  </div>
+  <div class="prompt sm"><span class="tag">3 課表與截止日</span>
+    <p>這個資料夾有<u>各科的課程大綱</u>。請整理成一份 Excel，存在這個資料夾：第一個工作表是課表，第二個工作表是所有作業和考試的截止日，依日期排序，標科目和配分。標準：每科都有、日期格式一致。大綱沒寫日期的標「未寫」，日期寫法看不懂的標出來。動手前先告訴我計畫，我確認後再開始。</p>
+  </div>
+  <div class="prompt sm work"><span class="tag">4 會議紀錄整理（上班族）</span>
+    <p>這個資料夾是<u>這個月</u>的會議紀錄。請整理成一份待辦總表 Excel，存在「待辦」資料夾：每個負責人一個工作表，欄位是待辦事項、出自哪次會議、期限、狀態。標準：每份紀錄都看過、同一件事只列一次。沒寫期限的標「未定」，負責人不明確的標出來。不要改原本的紀錄。動手前先告訴我計畫，我確認後再開始。</p>
+  </div>
+  <div class="prompt sm work"><span class="tag">5 月報彙整（上班族）</span>
+    <p>這個資料夾有<u>各組交來的月報</u>和數字表。請彙整成一份<u>部門月報</u> Word，再做一份 <u>5</u> 頁摘要簡報，都存到「月報」資料夾。標準：每組都有、數字跟原表一致、寫出跟上個月比的增減。各組數字互相矛盾的列出出處，表裡沒有的寫「待補」，不要估。動手前先告訴我計畫，我確認後再開始。</p>
+  </div>
+  <p class="pl-key"><span>這段重點</span>放好資料夾，貼上就能交辦</p>
+</section>
+<section class="pdfpage" id="p11" data-n="11" data-ch="end" data-tl="常見問題">
+  <p class="kicker">疑難排解</p>
+  <h1>常見問題</h1>
+  <div class="faq">
+    <div><b>找不到 Cowork 的選項？</b>訊息框沒有 Chat／Cowork 兩個選項，代表已經是新介面，連接資料夾後直接在對話裡交辦（第 3 頁）。Free 方案沒有 Cowork，方案差異詳見 1-3。</div>
+    <div><b>它說讀不到我的檔案？</b>確認三件事：用的是桌面 app、資料夾已連接並允許存取、桌面 app 沒有關掉。</div>
+    <div><b>會不會亂動我的檔案？</b>它只讀寫你授權的資料夾，永久刪除檔案前一定先問你。第一次用，請用複本或小資料夾、在交辦裡寫「不要改動原本的檔案」，也可以把權限模式切成 Manual。</div>
+    <div><b>交辦完可以去做別的事嗎？</b>可以。用到本機檔案時，桌面 app 要開著、電腦不要睡眠；回來先看它有沒有停下來等你回答的問題。</div>
+    <div><b>成品存到哪裡了？</b>應該在你交辦時指定的資料夾。找不到就問它「請列出剛才產生的檔案完整路徑和檔名」。</div>
+    <div><b>它檢查過了，還要我看嗎？</b>要。報告是你要交的，觀點、引用和數字都要自己看過；它的完成回報和自我檢查只是幫你找問題。</div>
+    <div><b>用量用得很快？</b>多步驟的長任務比一般問答吃更多用量。相關的事併成一次交辦，不相關的開新對話。</div>
+  </div>
+  <h2>做到這三件，就學會了</h2>
+  <ul class="dots">
+    <li>連接一個資料夾，交辦一件多步驟的工作</li>
+    <li>看過它的計畫、確認後才讓它執行</li>
+    <li>核對來源、遺漏、數字，至少要它補改一次</li>
+  </ul>
+  <h2>課後測驗</h2>
+  <div class="quiz">
+    <p>下面哪一段交辦，最可能拿回你要的成品？</p>
+    <ol>
+      <li>幫我整理這個資料夾的報告。</li>
+      <li>把這 5 份檔合併成一份 Word，存到「成品」資料夾，每份稿都放進去、不要重複；數字對不上的標出來；動手前先告訴我計畫，我確認後再開始。</li>
+      <li>幫我把報告弄得好一點，越快越好。</li>
+    </ol>
+    <span class="ans">答案：B。只有 B 講了成品、位置、完成標準，請它標出不確定，還要它先給計畫。</span>
+  </div>
+  <p class="pl-key"><span>這段重點</span>卡住就回來翻這頁</p>
+</section>
+<section class="pdfpage" id="p12" data-n="12" data-ch="end" data-tl="下一步">
+  <p class="kicker">延伸</p>
+  <h1>你已經會交辦了</h1>
+  <p class="lead">接下來，挑一件這週真的要做、而且要碰很多檔案的事，用第 9 頁的小卡交辦一次，再照驗收清單核對。</p>
+  <div class="next">
+    <div class="k">下一課 5-2</div>
+    <div class="t">任務太大？拆成幾步分批交辦</div>
+    <p>有些事一次交代不清楚，例如整份畢業專題。下一課教你把大任務拆成幾段，一段一段交辦、驗收。</p>
+  </div>
+  <div class="end-cta">
+    <div class="big">交辦成功了？留言告訴我們<br>你交給 Cowork 做了什麼。</div>
+    <p>追蹤 Paradigm AI（@paradigmai_tw），我們一起把 AI 學起來。</p>
+  </div>
+  <h2>官方說明</h2>
+  <ul class="refs">
+    <li><a href="https://support.claude.com/en/articles/13345190">Get started with Claude Cowork｜support.claude.com/en/articles/13345190</a></li>
+    <li><a href="https://support.claude.com/en/articles/16761823">Claude Cowork and chat are one Claude｜support.claude.com/en/articles/16761823</a></li>
+  </ul>
+  <div class="spacer"></div>
+  <p class="small muted">介面說明依 2026 年 11 月的 Claude 說明中心與網頁版介面觀察；畫面皆為擬真示意，介面可能隨更新改變。課號（1-3、5-2）是 Paradigm AI 課程地圖的編號。示範用檔案的內容、人名、數字都是虛構的。</p>
+  <p class="pl-key"><span>這段重點</span>Paradigm AI</p>
+</section>
+  </main>
+  </div>
+</div>
+<script>window.PDFLESSON = {"id": "5-1", "title": "Cowork 入門：交辦一件多步驟的工作", "pdf": "media/5-1/cowork-intro.pdf", "pdfName": "Cowork入門.pdf", "chapters": [{"k": "learn", "t": "核心概念", "d": "Cowork 是什麼、怎麼運作、適合交辦哪些事"}, {"k": "do", "t": "實作流程", "d": "連接資料夾 → 交辦 → 看計畫 → 驗收"}, {"k": "kit", "t": "交辦句與驗收清單", "d": "交辦三要素小卡、驗收清單、5 句常用交辦句"}, {"k": "end", "t": "疑難排解與延伸", "d": "常見問題、課後測驗、下一課"}], "source": "課程/05_Cowork入門/PDF", "built": "2026-11-15", "draft": false, "result": {"src": "media/5-1/img/x2b_report.png", "alt": "完成回報：3 件請你確認的事", "page": 8, "tl": "驗收"}}</script>
+<script src="../pixel.js"></script>
+<script src="roadmap8.js"></script>
+<script src="glossary.js"></script>
+<script src="pdf-lesson.js"></script>
+</body>
+</html>

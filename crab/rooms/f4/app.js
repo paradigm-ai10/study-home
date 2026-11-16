@@ -15,12 +15,20 @@
   const WEEK = 7 * 864e5;
 
   /* ---------------------------------------------------------------- the map, version 8 (../../../roadmap8.js, made by make_roadmap8.py): v8.5: 3 stages, 4 roles, 17 topics, 137 lessons.
-     The first release is 20 of them; STAGES here are the AI Power User topics, each with its first-release lessons (FIRST).
+     The first release (its order is the course map's first_release, set in 網站/學習站/開課選單/) is 21 of them; STAGES here are the AI Power User topics, each with its first-release lessons (FIRST).
      Only the ones with a lesson page (LESSON_PAGES in ../../routes.js) are open: LESSONS, the path that progress, the next step and 程度評估 follow.
      A new lesson page goes into LESSON_PAGES and joins the path by itself, in first-release order. */
   const STAGES = Array.isArray(window.STAGES) ? window.STAGES : [];
+  // FIRST follows the first-release order saved in the course map (開課選單 can reorder across topics); stage = the lesson's topic in STAGES,
+  // or -1 for a lesson in a later role's topic (it still joins the path once it has a page, it is just not drawn in the first role's list)
   const FIRST = [];
-  STAGES.forEach((s, si) => s.lessons.forEach((l) => FIRST.push(Object.assign({}, l, { stage: si }))));
+  { const inStage = {}; STAGES.forEach((s, si) => s.lessons.forEach((l) => { inStage[l.id] = Object.assign({}, l, { stage: si }); }));
+    const M8 = window.ROADMAP8, ids = M8 && Array.isArray(M8.first) ? M8.first : Object.keys(inStage);
+    ids.forEach((id) => {
+      if (inStage[id]) { FIRST.push(inStage[id]); return; }
+      const t = M8 && M8.topics.find((x) => x.lessons.some((l) => l.id === id)); const l = t && t.lessons.find((x) => x.id === id);
+      if (l) FIRST.push(Object.assign({}, l, { can: t.outcome, stage: -1 }));
+    }); }
   const LESSONS = FIRST.filter((l) => window.LESSON_PAGES && window.LESSON_PAGES[l.id]);
   const byId = {}; LESSONS.forEach((l) => { byId[l.id] = l; });
   const TOTAL = LESSONS.length || 8;

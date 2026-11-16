@@ -365,4 +365,46 @@ body.pl-finished .pl-fin .note-done { display: inline; }
   .pdfdoc .prompt { padding-bottom: 3.5mm; }
   .pl-blank { width: 26mm; }
 }
+/* 02 起的區塊（2026-11-15 加） */
+.pdfdoc .quiz ol.pl-qdone li { cursor: default; }
+.pdfdoc .three.pl-pass > div { cursor: pointer; position: relative; padding-left: 6mm; border-radius: 1.5mm; }
+.pdfdoc .three.pl-pass > div::before { content: ''; position: absolute; left: 0; top: 2.6mm; width: 4mm; height: 4mm; border-radius: 1mm; box-shadow: inset 0 0 0 1.4px var(--grape); }
+.pdfdoc .three.pl-pass > div[aria-checked="true"]::before { content: '✓'; background: var(--ok); box-shadow: none; color: #fff; font: 800 3mm/4mm var(--ui); text-align: center; }
+.pdfdoc .three.pl-pass > div[aria-checked="true"] { color: #6f6688; }
+.pdfdoc .check.pl-checkable .q { cursor: pointer; border-radius: 1.5mm; transition: background .15s; }
+.pdfdoc .check.pl-checkable .q:hover { background: var(--sun-soft); }
+.pdfdoc .check.pl-checkable .q[aria-checked="true"] .box { background: var(--ok); border-color: var(--ok); position: relative; }
+.pdfdoc .check.pl-checkable .q[aria-checked="true"] .box::after { content: '✓'; position: absolute; inset: 0; color: #fff; font: 800 3.4mm/4.6mm var(--ui); text-align: center; }
+.pdfdoc .check.pl-checkable .q:focus-visible, .pdfdoc .three.pl-pass > div:focus-visible { outline: 2px solid var(--coral); outline-offset: 1px; }
+.pdfdoc .ws td.pl-cell { cursor: text; background: #fff; min-width: 20mm; outline: none; }
+.pdfdoc .ws td.pl-cell:focus { box-shadow: inset 0 0 0 2px var(--coral); }
+.pdfdoc .answer.pl-hidden-ans { display: none; }
+.pl-ansbtn { margin: 0 0 3mm; }
+.pdfdoc .sk .src a, .pdfdoc .refs a { color: var(--grape); text-decoration: underline; text-underline-offset: .2em; word-break: break-all; }
 @media print { .pl-top, .pl-map, .pl-side, .pl-strip, .pl-pbtns, .pl-resume { display: none !important; } .pl-wrap { display: block; } }
+/* 05 起的區塊（2026-11-15 加，PDF 沒有這些 class 的課不受影響） */
+.pdfdoc .shot img { cursor: zoom-in; }
+.pdfdoc ul.tick.pl-ticks li { cursor: pointer; border-radius: 1.2mm; transition: background .15s; }
+.pdfdoc ul.tick.pl-ticks li:hover { background: var(--sun-soft); }
+.pdfdoc ul.tick.pl-ticks li[aria-checked="true"]::before { content: '✓'; background: var(--ok); border-color: var(--ok); color: #fff; font: 800 2.6mm/3.2mm var(--ui); text-align: center; }
+.pdfdoc ul.tick.pl-ticks li[aria-checked="true"] { color: #6f6688; }
+.pdfdoc ul.tick.pl-ticks li:focus-visible { outline: 2px solid var(--coral); outline-offset: 1px; }
+@media (max-width: 900px) {
+  .pdfdoc .shot-row, .pdfdoc .roles, .pdfdoc .check3 { flex-direction: column; }
+  .pdfdoc .shot-row > .shot, .pdfdoc .shot-row > .cap { width: 100% !important; flex: none !important; }
+  .pdfdoc .anno, .pdfdoc .vgrid { grid-template-columns: 1fr; }
+  .pdfdoc .fixes div { flex-direction: column; gap: 1mm; }
+  .pdfdoc .fixes b { width: auto; }
+  .pdfdoc .files5 .fi { flex-wrap: wrap; padding-left: 0; word-break: break-all; }
+}
+/* 「接著讀」等放在內文裡的實心按鈕連結：PDF 樣式的 a 顏色會蓋掉按鈕字色，變成紫底紫字（2026-11-15 修，所有課） */
+.pdfdoc a.pl-btn:not(.line) { color: var(--cream); }
+/* 做完的樣子（05 起，2026-11-15 加）：封面下面的成品圖卡，之後換成影片卡 */
+.pl-result { margin: 28px 0 8px; padding: 18px 20px 16px; border-radius: 16px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); }
+.pl-result-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 12px; font-size: 15px; }
+.pl-result-h b { font-size: 17px; color: var(--grape); }
+.pl-result-h a { font-size: 13.5px; color: var(--coral-ink); text-decoration: none; font-weight: 700; }
+.pl-result-h a:hover { text-decoration: underline; }
+.pl-result figure { margin: 0; }
+.pl-result img { display: block; width: 100%; border-radius: 10px; cursor: zoom-in; }
+.pl-result figcaption { margin-top: 8px; font-size: 13.5px; color: var(--grape-2); }

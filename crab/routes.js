@@ -17,4 +17,5 @@ window.CRAB_ROUTES = [
    網址相對於首頁資料夾（環境/f4-雨夜書桌/），或寫完整網址。 */
 window.LESSON_PAGES = {
   '4-4': '../../../lessons/4-4.html',
+  '5-1': '../../../lessons/5-1.html',
 };

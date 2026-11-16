@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>首版開課選單｜Paradigm 學習站</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 13 7%27%3E%3Cpath fill=%27%23FF6B57%27 d=%27M2 0h9v2h2v2h-2v1H2V4H0V2h2z%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Outfit:wght@500;600&display=swap">
+<style>
+  :root { --cream: #FFF4E0; --paper: #FFFBF3; --grape: #3A2E5C; --grape-2: #6B6187; --line: #E6DCC8; --coral: #FF6B57; --coral-ink: #C23A28; --sun: #FFC857; --ok: #2E7D5B; --ok-bg: #E4F2EA; --no-bg: #FBE6E2; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--cream); color: var(--grape); font: 16px/1.55 "Outfit", "Huninn", -apple-system, "PingFang TC", sans-serif; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  header { position: sticky; top: 0; z-index: 5; background: var(--cream); border-bottom: 1px solid var(--line); padding: 14px 24px 12px; display: flex; gap: 24px; align-items: baseline; flex-wrap: wrap; }
+  header h1 { margin: 0; font-size: 22px; }
+  header .meta { color: var(--grape-2); font-size: 14px; }
+  header .tools { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  input[type=search] { font: inherit; font-size: 14px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--grape); width: 200px; }
+  .chip { font-size: 13px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); }
+  .chip[aria-pressed=true] { background: var(--grape); color: var(--paper); border-color: var(--grape); }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 24px; padding: 20px 24px 120px; max-width: 1440px; margin: 0 auto; }
+  /* the whole map */
+  .stage { margin-bottom: 26px; }
+  .stage > h2 { font-size: 15px; margin: 0 0 10px; color: var(--grape-2); font-weight: 600; letter-spacing: .02em; }
+  .stage > h2 b { color: var(--grape); font-size: 17px; margin-right: 8px; }
+  .topic { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; margin-bottom: 10px; }
+  .topic > button.head { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 0; background: none; text-align: left; }
+  .topic .no { font-family: "Outfit"; font-weight: 600; width: 26px; text-align: center; color: var(--grape-2); }
+  .topic .nm { font-weight: 600; flex: 1; }
+  .topic .cnt { font-size: 13px; color: var(--grape-2); }
+  .topic .cnt b { color: var(--coral-ink); }
+  .topic .tw { font-size: 12px; color: var(--grape-2); transition: transform .15s; }
+  .topic.closed .tw { transform: rotate(-90deg); }
+  .topic.closed ul { display: none; }
+  .topic ul { list-style: none; margin: 0; padding: 0 8px 8px; }
+  .topic li { display: grid; grid-template-columns: 28px 52px 1fr auto; align-items: center; gap: 8px; padding: 6px 6px; border-radius: 6px; }
+  .topic li:hover { background: #FFF1D6; }
+  .topic li.on { background: #FFEBC2; }
+  .topic li label { display: contents; cursor: pointer; }
+  .topic li input { width: 18px; height: 18px; accent-color: var(--coral); margin: 0 auto; cursor: pointer; }
+  .topic li .id { font-family: "Outfit"; font-weight: 600; font-size: 14px; color: var(--grape-2); }
+  .topic li .tt { font-size: 15px; }
+  .topic li .grp { display: block; font-size: 12px; color: var(--grape-2); }
+  .tags { display: flex; gap: 6px; }
+  .tag { font-size: 12px; padding: 1px 7px; border-radius: 4px; border: 1px solid var(--line); color: var(--grape-2); white-space: nowrap; }
+  .tag.req { border-color: #CFC4E6; color: var(--grape); }
+  .tag.page { border-color: #B8DCC8; background: var(--ok-bg); color: var(--ok); }
+  .tag.add { background: var(--ok-bg); border-color: #B8DCC8; color: var(--ok); }
+  .tag.del { background: var(--no-bg); border-color: #F2C4BB; color: var(--coral-ink); }
+  .hidden { display: none !important; }
+  /* the chosen list */
+  aside { position: sticky; top: 74px; align-self: start; max-height: calc(100vh - 96px); display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; }
+  aside .ah { padding: 12px 14px 8px; border-bottom: 1px solid var(--line); }
+  aside .ah h2 { margin: 0; font-size: 17px; }
+  aside .ah p { margin: 4px 0 0; font-size: 13px; color: var(--grape-2); }
+  aside .ah .row { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  aside ol { list-style: none; margin: 0; padding: 6px; overflow: auto; flex: 1; counter-reset: n; }
+  aside li { display: grid; grid-template-columns: 26px 46px 1fr auto; gap: 6px; align-items: center; padding: 5px 6px; border-radius: 6px; font-size: 14px; background: var(--paper); border: 1px solid transparent; cursor: grab; }
+  aside li::before { counter-increment: n; content: counter(n); font-family: "Outfit"; font-weight: 600; color: var(--grape-2); text-align: right; }
+  aside li:hover { border-color: var(--line); }
+  aside li.drag { opacity: .4; }
+  aside li.over { border-top: 2px solid var(--coral); }
+  aside li.new { background: var(--ok-bg); }
+  aside li .id { font-family: "Outfit"; font-weight: 600; color: var(--grape-2); }
+  aside li .tt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  aside li .mv { display: flex; gap: 2px; }
+  aside li .mv button { border: 0; background: none; padding: 0 4px; color: var(--grape-2); font-size: 13px; }
+  aside li .mv button:hover { color: var(--coral-ink); }
+  aside .gone { padding: 8px 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--coral-ink); }
+  aside .warn { padding: 8px 14px; border-top: 1px solid var(--line); font-size: 13px; background: var(--no-bg); color: var(--coral-ink); }
+  /* bottom bar */
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--grape); color: var(--paper); padding: 12px 24px; display: flex; gap: 16px; align-items: center; z-index: 10; }
+  .bar .sum { flex: 1; font-size: 15px; }
+  .bar .sum em { font-style: normal; color: var(--sun); }
+  .bar button { border: 1px solid rgba(255,255,255,.4); background: none; color: var(--paper); padding: 8px 16px; border-radius: 6px; }
+  .bar button.save { background: var(--coral); border-color: var(--coral); color: #fff; font-weight: 600; }
+  .bar button:disabled { opacity: .45; cursor: default; }
+  .bar a.link { color: var(--sun); font-size: 15px; }
+  .mode { font-size: 13px; padding: 2px 8px; border-radius: 4px; background: var(--sun); color: var(--grape); font-weight: 600; }
+  .result { position: fixed; right: 24px; bottom: 76px; width: 420px; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 10px 30px rgba(58,46,92,.18); padding: 14px 16px; font-size: 14px; z-index: 11; }
+  .result h3 { margin: 0 0 6px; font-size: 16px; }
+  .result ul { margin: 6px 0 0; padding-left: 18px; }
+  .result .x { position: absolute; top: 8px; right: 10px; border: 0; background: none; font-size: 18px; color: var(--grape-2); }
+  .result.err { border-color: #F2C4BB; background: var(--no-bg); }
+  :focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
+  @media (max-width: 960px) { main { grid-template-columns: 1fr; } aside { position: static; max-height: none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>首版開課選單</h1>
+  <span class="mode hidden" id="mode">線上試看：只存在這台瀏覽器</span>
+  <span class="meta" id="meta">讀取課程地圖正本…</span>
+  <div class="tools">
+    <input type="search" id="q" placeholder="搜尋課號或課名" aria-label="搜尋課號或課名">
+    <button class="chip" id="only" aria-pressed="false">只看已選</button>
+    <button class="chip" id="openall">全部展開</button>
+    <button class="chip" id="closeall">全部收起</button>
+  </div>
+</header>
+<main>
+  <section id="map" aria-label="課程地圖全部課程"></section>
+  <aside aria-label="首版順序">
+    <div class="ah">
+      <h2>首版順序（<span id="n">0</span> 課）</h2>
+      <p>由上往下＝首頁推薦的順序、課程頁的上一課／下一課。拖曳或按 ↑↓ 調整；新勾的課會照地圖順序插進去。</p>
+      <div class="row"><button class="chip" id="bymap">照地圖順序排</button></div>
+    </div>
+    <ol id="list"></ol>
+    <div class="gone hidden" id="gone"></div>
+    <div class="warn hidden" id="warn"></div>
+  </aside>
+</main>
+<div class="bar">
+  <div class="sum" id="sum">尚未變更</div>
+  <a class="link hidden" id="home" href="#">打開首頁看看</a>
+  <button class="hidden" id="copy">複製給 Claude</button>
+  <button class="hidden" id="untrial">取消試看</button>
+  <button id="reset" disabled>放棄變更</button>
+  <button class="save" id="save" disabled>儲存到課程地圖</button>
+</div>
+<div class="result hidden" id="result" role="status" aria-live="polite"></div>
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  let S = null, saved = [], first = [], order = [], byId = {}, closed = new Set(), official = [];
+  const pageSet = () => new Set(S.pages);
+  // two ways this page runs:
+  //   server: opened from server.py (port 8797) → 儲存 writes the course map source
+  //   trial:  any static copy (the online preview, or the 8769 preview) → 套用試看 keeps the choice in this browser only
+  const TRIAL_KEY = 'paradigm.firstTrial';
+  const TRIAL = !/[?&]server/.test(location.search) && (location.port !== '8797' || /[?&]trial/.test(location.search));
+  const readTrial = () => { try { const t = JSON.parse(localStorage.getItem(TRIAL_KEY) || 'null'); return t && Array.isArray(t.ids) ? t : null; } catch (e) { return null; } };
+  const script = (src) => new Promise((ok, no) => { const el = document.createElement('script'); el.src = src; el.onload = ok; el.onerror = () => no(new Error(src)); document.head.appendChild(el); });
+  const ROUTES = '../crab/routes.js', HOME = '../crab/rooms/f4/index.html';   // the online copy (picker/) gets English paths from the copy step
+  async function trialState() {
+    await Promise.all([script('../roadmap8.js'), script(ROUTES)]);
+    const R = window.ROADMAP8;
+    return { version: R.version, first: R.first.slice(), stages: R.stages.map((s) => ({ no: s.no, name: s.name, tagline: s.tagline, topics: s.topics })),
+      topics: R.topics.map((t) => ({ id: t.id, no: t.no, name: t.name, stage: t.stage, lessons: (t.all || []).map(([id, title, type, group]) => ({ id, title, type, group })) })),
+      pages: Object.keys(window.LESSON_PAGES || {}).filter((k) => window.LESSON_PAGES[k]), stamp: null, last: null };
+  }
+
+  async function load() {
+    if (TRIAL) {
+      try { S = await trialState(); } catch (e) { $('#meta').textContent = '讀不到課程地圖：' + e.message; return; }
+      official = S.first.slice();
+      const t = readTrial(); const known = new Set(S.topics.flatMap((x) => x.lessons.map((l) => l.id)));
+      if (t) S.first = t.ids.filter((id) => known.has(id));
+      $('#mode').classList.remove('hidden'); $('#save').textContent = '套用試看'; $('#copy').classList.remove('hidden');
+      $('#home').href = HOME; $('#home').classList.remove('hidden'); $('#untrial').classList.toggle('hidden', !t);
+    } else {
+      const r = await fetch('/api/state', { cache: 'no-store' }); S = await r.json();
+      if (S.error) { $('#meta').textContent = '讀不到正本：' + S.error; return; }
+      official = S.first.slice();
+    }
+    saved = S.first.slice(); first = S.first.slice(); order = []; byId = {};
+    S.topics.forEach((t) => t.lessons.forEach((l) => { byId[l.id] = { ...l, topic: t }; order.push(l.id); }));
+    if (!closed.size) S.topics.forEach((t) => { if (!t.lessons.some((l) => first.includes(l.id))) closed.add(t.id); });
+    drawMap(); refresh();
+  }
+  const mapIndex = (id) => order.indexOf(id);
+
+  function drawMap() {
+    const pg = pageSet();
+    $('#map').innerHTML = S.stages.map((st) => `<div class="stage"><h2><b>${esc(st.name)}</b>${esc(st.tagline)}</h2>` +
+      st.topics.map((tid) => { const t = S.topics.find((x) => x.id === tid); return `<div class="topic${closed.has(t.id) ? ' closed' : ''}" data-t="${t.id}">
+        <button class="head" type="button" aria-expanded="${!closed.has(t.id)}"><span class="no">${t.no}</span><span class="nm">${esc(t.name)}</span><span class="cnt" data-cnt></span><span class="tw">▼</span></button>
+        <ul>${t.lessons.map((l) => `<li data-id="${l.id}"><label><input type="checkbox" value="${l.id}"><span class="id">${l.id}</span><span class="tt">${esc(l.title)}${l.group ? `<span class="grp">${esc(l.group)}</span>` : ''}</span></label>
+          <span class="tags"><span class="tag ${l.type === '必修' ? 'req' : ''}">${esc(l.type)}</span>${pg.has(l.id) ? '<span class="tag page">已有課程頁</span>' : ''}<span class="tag add hidden" data-add>新增</span><span class="tag del hidden" data-del>拿掉</span></span></li>`).join('')}</ul></div>`; }).join('') + '</div>').join('');
+  }
+
+  function refresh() {
+    const on = new Set(first), was = new Set(official), pg = pageSet(), q = $('#q').value.trim().toLowerCase(), only = $('#only').getAttribute('aria-pressed') === 'true';
+    document.querySelectorAll('.topic').forEach((box) => {
+      let n = 0, vis = 0;
+      box.querySelectorAll('li').forEach((li) => {
+        const id = li.dataset.id, l = byId[id], c = on.has(id);
+        li.querySelector('input').checked = c; li.classList.toggle('on', c); if (c) n++;
+        li.querySelector('[data-add]').classList.toggle('hidden', !(c && !was.has(id)));
+        li.querySelector('[data-del]').classList.toggle('hidden', !(!c && was.has(id)));
+        const show = (!only || c) && (!q || (id + ' ' + l.title + ' ' + (l.group || '')).toLowerCase().includes(q));
+        li.classList.toggle('hidden', !show); if (show) vis++;
+      });
+      box.querySelector('[data-cnt]').innerHTML = `已選 <b>${n}</b> / ${box.querySelectorAll('li').length}`;
+      box.classList.toggle('hidden', (q || only) && !vis);
+      if ((q || only) && vis) box.classList.remove('closed');
+    });
+    $('#n').textContent = first.length;
+    $('#list').innerHTML = first.map((id) => { const l = byId[id] || { title: '（正本裡找不到）' }; return `<li draggable="true" data-id="${id}" class="${was.has(id) ? '' : 'new'}"><span class="id">${id}</span><span class="tt" title="${esc(l.title)}">${esc(l.title)}</span><span class="mv"><button type="button" data-up aria-label="往上">↑</button><button type="button" data-dn aria-label="往下">↓</button><button type="button" data-rm aria-label="拿掉">✕</button></span></li>`; }).join('');
+    const removed = official.filter((x) => !on.has(x)), added = first.filter((x) => !was.has(x));
+    const moved = JSON.stringify(official.filter((x) => on.has(x))) !== JSON.stringify(first.filter((x) => was.has(x)));
+    const dirty = JSON.stringify(first) !== JSON.stringify(saved);
+    $('#gone').classList.toggle('hidden', !removed.length);
+    $('#gone').textContent = removed.length ? '拿掉：' + removed.join('、') : '';
+    const lost = removed.filter((x) => pg.has(x));
+    $('#warn').classList.toggle('hidden', !lost.length);
+    $('#warn').textContent = lost.length ? `${lost.join('、')} 已有課程頁：拿出首版後，首頁的路徑、程度評估就不會再推它（課程頁本身還在）。` : '';
+    const changed = added.length || removed.length || moved;   // compared with the official first release
+    const req = first.filter((x) => (byId[x] || {}).type === '必修').length;
+    $('#meta').textContent = `課程地圖 v${S.version}　·　首版 ${first.length} 課（必修 ${req}、選修 ${first.length - req}）　·　已有課程頁 ${first.filter((x) => pg.has(x)).length} 課`;
+    const diff = `${added.length ? `新增 <em>${added.length}</em> 課　` : ''}${removed.length ? `拿掉 <em>${removed.length}</em> 課　` : ''}${moved ? '順序有調整　' : ''}`;
+    if (TRIAL) {
+      const applied = !!readTrial();
+      $('#sum').innerHTML = (changed ? `和正式版比：${diff}→ 首版 ${first.length} 課` : `和正式版相同（首版 ${official.length} 課）`) + (dirty ? '　·　<em>還沒套用</em>' : applied ? '　·　已套用試看' : '');
+      $('#save').disabled = !dirty || !first.length; $('#reset').disabled = !dirty; $('#copy').disabled = !changed;
+    } else {
+      $('#sum').innerHTML = changed ? `已變更：${diff}→ 首版 ${first.length} 課` : `尚未變更　·　目前首版 ${saved.length} 課${S.last ? `　·　上次儲存 ${esc(S.last.time.replace('T', ' '))}` : ''}`;
+      $('#save').disabled = !changed || !first.length; $('#reset').disabled = !changed;
+    }
+  }
+
+  // tick a lesson: insert it before the first chosen lesson that comes later on the map
+  function add(id) { if (first.includes(id)) return; const k = mapIndex(id); const at = first.findIndex((x) => mapIndex(x) > k); if (at < 0) first.push(id); else first.splice(at, 0, id); }
+  $('#map').addEventListener('change', (e) => { const i = e.target.closest('input[type=checkbox]'); if (!i) return; if (i.checked) add(i.value); else first = first.filter((x) => x !== i.value); refresh(); });
+  $('#map').addEventListener('click', (e) => { const h = e.target.closest('button.head'); if (!h) return; const box = h.parentElement; box.classList.toggle('closed'); const c = box.classList.contains('closed'); h.setAttribute('aria-expanded', !c); if (c) closed.add(box.dataset.t); else closed.delete(box.dataset.t); });
+  $('#list').addEventListener('click', (e) => {
+    const li = e.target.closest('li'); if (!li) return; const i = first.indexOf(li.dataset.id);
+    if (e.target.closest('[data-up]') && i > 0) [first[i - 1], first[i]] = [first[i], first[i - 1]];
+    else if (e.target.closest('[data-dn]') && i < first.length - 1) [first[i + 1], first[i]] = [first[i], first[i + 1]];
+    else if (e.target.closest('[data-rm]')) first.splice(i, 1);
+    else return;
+    refresh(); const again = $(`#list li[data-id="${li.dataset.id}"] [data-${e.target.closest('[data-up]') ? 'up' : 'dn'}]`); if (again) again.focus();
+  });
+  let dragId = null;
+  $('#list').addEventListener('dragstart', (e) => { const li = e.target.closest('li'); dragId = li.dataset.id; li.classList.add('drag'); e.dataTransfer.effectAllowed = 'move'; });
+  $('#list').addEventListener('dragover', (e) => { e.preventDefault(); document.querySelectorAll('#list li.over').forEach((x) => x.classList.remove('over')); const li = e.target.closest('li'); if (li && li.dataset.id !== dragId) li.classList.add('over'); });
+  $('#list').addEventListener('dragend', () => { dragId = null; document.querySelectorAll('#list li').forEach((x) => x.classList.remove('drag', 'over')); });
+  $('#list').addEventListener('drop', (e) => { e.preventDefault(); const li = e.target.closest('li'); if (!li || !dragId || li.dataset.id === dragId) return; first = first.filter((x) => x !== dragId); first.splice(first.indexOf(li.dataset.id), 0, dragId); refresh(); });
+  $('#bymap').onclick = () => { first.sort((a, b) => mapIndex(a) - mapIndex(b)); refresh(); };
+  $('#q').oninput = refresh;
+  $('#only').onclick = (e) => { const b = e.currentTarget; b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') !== 'true'); refresh(); };
+  $('#openall').onclick = () => { closed.clear(); document.querySelectorAll('.topic').forEach((b) => { b.classList.remove('closed'); b.querySelector('.head').setAttribute('aria-expanded', true); }); };
+  $('#closeall').onclick = () => { document.querySelectorAll('.topic').forEach((b) => { b.classList.add('closed'); closed.add(b.dataset.t); b.querySelector('.head').setAttribute('aria-expanded', false); }); };
+  $('#reset').onclick = () => { first = saved.slice(); refresh(); };
+
+  const result = (html, err) => { const r = $('#result'); r.innerHTML = '<button class="x" type="button" aria-label="關閉">×</button>' + html; r.classList.toggle('err', !!err); r.classList.remove('hidden'); r.querySelector('.x').onclick = () => r.classList.add('hidden'); };
+  async function applyTrial() {
+    const same = JSON.stringify(first) === JSON.stringify(official);
+    try { if (same) localStorage.removeItem(TRIAL_KEY); else localStorage.setItem(TRIAL_KEY, JSON.stringify({ ids: first, base: official, version: S.version, time: new Date().toISOString() })); }
+    catch (e) { result('<h3>沒有套用</h3><p>這個瀏覽器不能存資料（可能是無痕模式）。</p>', true); return; }
+    saved = first.slice(); $('#untrial').classList.toggle('hidden', same); refresh();
+    result(same ? '<h3>已回到正式版</h3><p>選的和正式版一樣，所以沒有試看。</p>' : `<h3>已套用試看：首版 ${first.length} 課</h3><p>只有這台瀏覽器看得到，別人看到的線上版不變。<a href="${HOME}">打開首頁看看</a>（首頁左下角會有「試看中」小條，可以回來或取消）。</p><p>滿意的話按「複製給 Claude」，貼給 Claude，就會改成正式版。</p>`);
+  }
+  $('#untrial').onclick = () => { try { localStorage.removeItem(TRIAL_KEY); } catch (e) {} first = official.slice(); saved = official.slice(); $('#untrial').classList.add('hidden'); refresh(); result('<h3>已取消試看</h3><p>這台瀏覽器回到正式版。</p>'); };
+  $('#copy').onclick = async () => {
+    const was = new Set(official), on = new Set(first);
+    const txt = `請把首版開課改成下面這份（我在線上開課選單試看過，課程地圖 v${S.version}）：\n` + first.map((id, i) => `${i + 1}. ${id} ${(byId[id] || {}).title || ''}`).join('\n')
+      + `\n\n新增：${first.filter((x) => !was.has(x)).join('、') || '無'}\n拿掉：${official.filter((x) => !on.has(x)).join('、') || '無'}`;
+    try { await navigator.clipboard.writeText(txt); result('<h3>已複製</h3><p>貼到和 Claude 的對話裡，就會照這份改正式版。</p>'); }
+    catch (e) { result(`<h3>請手動複製</h3><textarea style="width:100%;height:160px;font:13px/1.4 monospace">${esc(txt)}</textarea>`); }
+  };
+  $('#save').onclick = async () => {
+    if (TRIAL) return applyTrial();
+    const lost = saved.filter((x) => !first.includes(x) && S.pages.includes(x));
+    if (lost.length && !confirm(`${lost.join('、')} 已有課程頁，拿出首版後首頁不會再推它。確定要儲存嗎？`)) return;
+    $('#save').disabled = true; $('#save').textContent = '儲存中…';
+    try {
+      const r = await fetch('/api/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ first, stamp: S.stamp }) });
+      const o = await r.json();
+      if (!r.ok) { result(`<h3>沒有儲存</h3><p>${esc(o.error || r.status)}</p>`, true); }
+      else if (o.unchanged) { result('<h3>沒有變更</h3>'); }
+      else {
+        const e = o.saved;
+        result(`<h3>已儲存：首版 ${e.after.length} 課</h3><p>${e.added.length ? '新增 ' + esc(e.added.join('、')) + '。' : ''}${e.removed.length ? '拿掉 ' + esc(e.removed.join('、')) + '。' : ''}${e.order_changed ? '順序已更新。' : ''}</p>
+          <ul>${o.steps.map((s) => `<li>${s.ok ? '✓' : '✕'} ${esc(s.cmd)}：${esc(s.out)}</li>`).join('')}</ul>
+          <p>備份在 ${esc(e.backup)}。重新整理首頁就會看到新的首版；線上預覽版要推一次才會更新。</p>`, o.steps.some((s) => !s.ok));
+        S = o.state; official = S.first.slice(); saved = S.first.slice(); first = S.first.slice(); refresh();
+      }
+    } catch (err) { result(`<h3>沒有儲存</h3><p>連不到選單伺服器：${esc(err.message)}</p>`, true); }
+    $('#save').textContent = '儲存到課程地圖'; refresh();
+  };
+  addEventListener('beforeunload', (e) => { if (!$('#save').disabled && !TRIAL) { e.preventDefault(); e.returnValue = ''; } });
+  load();
+})();
+</script>
+</body>
+</html>

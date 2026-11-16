@@ -42,6 +42,14 @@
   })
   const label = p => p.dataset.tl || '封面'
 
+  // ── 做完的樣子（05 起，2026-11-15 加）：還沒有影片的課，封面下面放一張成品圖（圖與圖說都來自 PDF，from_pdf.py --result 指定）；影片上線後這裡換成影片卡 ──
+  if (M.result && pages[0]) {
+    const r = M.result, at = pages[r.page - 1], c = at && CH.find(x => x.k === at.dataset.ch)
+    const card = document.createElement('aside'); card.className = 'pl-result'; card.setAttribute('aria-label', '做完的樣子')
+    card.innerHTML = `<p class="pl-result-h"><b>做完的樣子</b>${c ? `<a href="#p${r.page}">${esc(c.t)}｜${esc(r.tl)} →</a>` : ''}</p><figure><img src="${esc(r.src)}" alt="${esc(r.alt)}"><figcaption>${esc(r.alt)}</figcaption></figure>`
+    pages[0].after(card)
+  }
+
   // 側邊目錄：只列五章（Thomas 11/14：預設的側邊欄太多），現在讀的那章亮起；下載、完成本課放在課的最後
   const side = $('#side')
   side.innerHTML = `<div class="pl-sidehead"><b>目錄</b><button type="button" class="pl-fold" aria-controls="side" aria-expanded="true" title="收起目錄">‹ 收起</button></div>
@@ -182,7 +190,8 @@
     s.replace(new RegExp(re.source, 'g'), (m, ...g) => { const i = g[g.length - 2]; frag.append(s.slice(last, i), make(m, ...g)); last = i + m.length; return m })
     frag.append(s.slice(last)); n.replaceWith(frag)
   })
-  linkify(/第\s*(\d+)\s*頁/, (m, n) => { if (!$('#p' + n)) return m; const a = document.createElement('a'); a.className = 'pl-ref'; a.href = '#p' + n; a.textContent = m; return a })
+  // 「簡報第 3 頁」這種講的是讀者自己的檔案，不是這課的頁，不連（05 起，2026-11-15 加）
+  linkify(/第\s*(\d+)\s*頁/, (m, n, i, str) => { if (!$('#p' + n) || /(簡報|投影片|報告|講義|檔案|PDF)\s*$/.test(str.slice(Math.max(0, i - 6), i))) return m; const a = document.createElement('a'); a.className = 'pl-ref'; a.href = '#p' + n; a.textContent = m; return a })
   linkify(/support\.claude\.com\/[\w\-/]+/, m => { const a = document.createElement('a'); a.href = 'https://' + m; a.target = '_blank'; a.rel = 'noopener'; a.textContent = m; return a })
   linkify(/@paradigmai_tw/, m => { const a = document.createElement('a'); a.href = 'https://www.instagram.com/paradigmai_tw/'; a.target = '_blank'; a.rel = 'noopener'; a.textContent = m; return a })
   doc.addEventListener('click', e => { const a = e.target.closest('a[href^="#p"], a[href^="#ch-"]'); if (!a) return; const t = $(a.getAttribute('href')); if (t) { e.preventDefault(); t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); history.replaceState(null, '', a.getAttribute('href')); flash(t) } })
@@ -244,12 +253,16 @@
   if (firstSteps) firstSteps.insertAdjacentHTML('beforebegin', '<p class="pl-hint">做完一步，點左邊的數字打勾（只存在這台裝置）</p>')
 
   // ── 截圖放大 ──
-  const shots = $$('figure img', doc)
+  const shots = $$('figure img, .shot img', doc)   // .shot（截圖框）05 起（2026-11-15 加）
   const lb = document.createElement('div'); lb.className = 'pl-lb'; lb.hidden = true; lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-label', '截圖放大')
   lb.innerHTML = '<figure><img alt=""><figcaption></figcaption></figure><button type="button" class="x" aria-label="關閉">×</button><button type="button" class="pv" aria-label="上一張">‹</button><button type="button" class="nx" aria-label="下一張">›</button>'
   body.append(lb)
   let li = 0, back = null
-  const show = i => { li = (i + shots.length) % shots.length; const im = shots[li], cap = im.closest('figure').querySelector('figcaption'); $('img', lb).src = im.src; $('img', lb).alt = im.alt; $('figcaption', lb).textContent = cap ? cap.textContent : im.alt }
+  const show = i => {
+    li = (i + shots.length) % shots.length; const im = shots[li], fig = im.closest('figure'), cap = fig && fig.querySelector('figcaption')
+    const tag = im.closest('.shot') && $('.lbl', im.closest('.shot'))   // 截圖框上 CSS 疊的「示意畫面」標籤，放大時寫進圖說，不會不見
+    $('img', lb).src = im.src; $('img', lb).alt = im.alt; $('figcaption', lb).textContent = (cap ? cap.textContent : im.alt) + (tag ? `（${tag.textContent.trim()}）` : '')
+  }
   const openLb = i => { back = document.activeElement; show(i); lb.hidden = false; $('.x', lb).focus() }
   const closeLb = () => { lb.hidden = true; back && back.focus() }
   shots.forEach((im, i) => { im.tabIndex = 0; im.setAttribute('role', 'button'); im.title = '點一下放大'; im.onclick = () => openLb(i); im.onkeydown = e => { if (e.key === 'Enter') openLb(i) } })
@@ -395,7 +408,9 @@
   })
 
   // ── 第 13 頁：想一件你常做的事，勾勾看 ──
-  $$('.fit', doc).filter(f => /適合/.test(($('.yes h3', f) || {}).textContent || '') && ($('.yes h3', f).textContent.trim() === '適合')).forEach(f => {
+  // 01 的標題是「適合」；05 起標題可能是「適合交辦」這種（2026-11-15 加），提示句照標題接
+  $$('.fit', doc).filter(f => /^適合/.test((($('.yes h3', f) || {}).textContent || '').trim())).forEach(f => {
+    const yesT = $('.yes h3', f).textContent.trim()
     f.classList.add('pl-check')
     const yes = $$('.yes li', f), no = $$('.no li', f), lead = f.closest('.pdfpage').querySelector('.lead .em')
     const all = yes.concat(no), saved = store.get(K('fit'), [])
@@ -408,8 +423,54 @@
     all.forEach((l, i) => { l.setAttribute('role', 'checkbox'); l.setAttribute('aria-checked', !!saved[i]); l.tabIndex = 0
       const t = () => { l.setAttribute('aria-checked', l.getAttribute('aria-checked') !== 'true'); paint() }
       l.onclick = t; l.onkeydown = e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); t() } } })
-    const hint = document.createElement('p'); hint.className = 'pl-hint'; hint.textContent = '想一件你常做的事，把符合的勾起來：左邊四項全中、右邊都沒中，就適合做成 Skill'
+    const hint = document.createElement('p'); hint.className = 'pl-hint'
+    hint.textContent = yesT === '適合' ? '想一件你常做的事，把符合的勾起來：左邊四項全中、右邊都沒中，就適合做成 Skill'
+      : `想一件你最近要做的事，把符合的勾起來：左邊 ${yes.length} 項全中、右邊都沒中，就${yesT}`
     f.before(hint); paint()
+  })
+
+  // ── 05 起：驗收清單 ul.tick（方框清單）可以一項一項打勾，記住（2026-11-15 加） ──
+  $$('ul.tick', doc).forEach((ul, ui) => {
+    const items = $$(':scope > li', ul), saved = store.get(K('tick' + ui), [])
+    ul.classList.add('pl-ticks')
+    const paint = () => store.set(K('tick' + ui), items.map(l => l.getAttribute('aria-checked') === 'true'))
+    items.forEach((l, i) => { l.setAttribute('role', 'checkbox'); l.setAttribute('aria-checked', !!saved[i]); l.tabIndex = 0; l.title = '核對完就點一下'
+      const t = () => { l.setAttribute('aria-checked', l.getAttribute('aria-checked') !== 'true'); paint() }
+      l.onclick = t; l.onkeydown = e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); t() } } })
+  })
+  $$('.vgrid', doc).forEach(v => { if (!$('ul.tick', v)) return; const hint = document.createElement('p'); hint.className = 'pl-hint'; hint.textContent = '收到成品後，核對完一項就點一下打勾（只存在這台裝置）'; v.before(hint) })
+
+  // ── 02 起的區塊（2026-11-15 加，PDF 沒有這些 class 的課不受影響） ──
+  // 勾選題 .check .q：點一下打勾，記住
+  $$('.check', doc).forEach((c, ci) => {
+    const qs = $$(':scope > .q', c), saved = store.get(K('check' + ci), [])
+    c.classList.add('pl-checkable')
+    const paint = () => store.set(K('check' + ci), qs.map(q => q.getAttribute('aria-checked') === 'true'))
+    qs.forEach((q, i) => { q.setAttribute('role', 'checkbox'); q.setAttribute('aria-checked', !!saved[i]); q.tabIndex = 0
+      const t = () => { q.setAttribute('aria-checked', q.getAttribute('aria-checked') !== 'true'); paint() }
+      q.onclick = t; q.onkeydown = e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); t() } } })
+  })
+  // 練習作答表 .ws：空白格可以直接打字，記住
+  $$('table.ws', doc).forEach((tb, ti) => {
+    const cells = $$('td', tb).filter(td => !td.textContent.trim()), saved = store.get(K('ws' + ti), [])
+    cells.forEach((td, i) => { td.contentEditable = 'true'; td.classList.add('pl-cell'); td.setAttribute('aria-label', '在這裡寫'); if (saved[i]) td.textContent = saved[i]
+      td.oninput = () => store.set(K('ws' + ti), cells.map(x => x.textContent)) })
+    const hint = document.createElement('p'); hint.className = 'pl-hint'; hint.textContent = '空白格可以直接打字，會記在這台裝置'
+    tb.before(hint)
+  })
+  // 參考答案 .answer：先收起來，作答完再看
+  $$('.answer', doc).forEach(a => {
+    a.classList.add('pl-hidden-ans')
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'pl-btn sm line pl-ansbtn'; b.textContent = '看參考答案'; b.setAttribute('aria-expanded', 'false')
+    b.onclick = () => { const open = !a.classList.toggle('pl-hidden-ans'); b.textContent = open ? '收起參考答案' : '看參考答案'; b.setAttribute('aria-expanded', open) }
+    a.before(b)
+  })
+  // 原始網址、官方說明：網址字變成可以點的連結（字不變）
+  $$('.sk .src, .refs li', doc).forEach(el => {
+    const tn = [...el.childNodes].find(n => n.nodeType === 3 && /(github\.com|support\.claude\.com)\//.test(n.nodeValue)); if (!tn) return
+    const m = tn.nodeValue.match(/((?:github\.com|support\.claude\.com)\/\S+)/); if (!m) return
+    const after = tn.splitText(tn.nodeValue.indexOf(m[1])); after.splitText(m[1].length)
+    const a = document.createElement('a'); a.href = 'https://' + m[1]; a.target = '_blank'; a.rel = 'noopener'; a.textContent = m[1]; after.replaceWith(a)
   })
 
   // ── 完成本課（pd-done，跟首頁共用） ──
@@ -419,11 +480,11 @@
   const paintDone = () => { const on = isDone(); body.classList.toggle('pl-finished', on); $$('[data-done]').forEach(b => { b.setAttribute('aria-pressed', on); b.textContent = on ? '已完成本課（再按取消）' : '完成本課' }) }
 
   // 第 15 頁：做到這三件
-  const passH = $$('h2', doc).find(h => /做到這.*件/.test(h.textContent))
-  const passUl = passH && passH.nextElementSibling && passH.nextElementSibling.matches('ul') ? passH.nextElementSibling : null
+  const passH = $$('h1, h2', doc).find(h => /做到這.*件/.test(h.textContent))   // 01：h2＋ul；02：h1＋.three（2026-11-15 加）
+  const passUl = passH && passH.nextElementSibling && passH.nextElementSibling.matches('ul, .three') ? passH.nextElementSibling : null
   if (passUl) {
     passUl.classList.add('pl-pass')
-    const items = $$('li', passUl), saved = store.get(K('pass'), [])
+    const items = passUl.matches('ul') ? $$('li', passUl) : $$(':scope > div', passUl), saved = store.get(K('pass'), [])
     const box = document.createElement('div'); box.className = 'pl-donebox'
     box.innerHTML = '<span class="msg"></span><button type="button" class="pl-btn sm line" data-done>完成本課</button>'
     passUl.after(box)
@@ -433,11 +494,30 @@
       l.onclick = t; l.onkeydown = e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); t() } } })
     paint()
   }
+  // 考考你（多題，答案寫「答案：1 B　2 B　3 B」，02 起）：每題各自點選項，全部答完或按「直接看答案」才顯示答案那行
+  function multiQuiz(q, ans) {
+    const ols = $$(':scope > ol', q), pairs = ans ? [...ans.textContent.matchAll(/(\d+)\s*([A-Z])/g)] : []
+    if (!ols.length || pairs.length !== ols.length) return
+    const right = pairs.map(x => x[2].charCodeAt(0) - 65), saved = store.get(K('quiz'), [])
+    const picked = Array.isArray(saved) ? saved.slice() : []
+    const pick = (qi, i) => {
+      const ol = ols[qi], opts = $$(':scope > li', ol); ol.classList.add('pl-qdone'); picked[qi] = i
+      opts.forEach((o, k) => { o.classList.toggle('pl-right', k === right[qi]); o.classList.toggle('pl-wrong', k === i && i !== right[qi]); o.removeAttribute('tabindex') })
+      store.set(K('quiz'), picked)
+      if (ols.every(o => o.classList.contains('pl-qdone'))) { q.classList.add('pl-answered'); btn.remove() }
+    }
+    ols.forEach((ol, qi) => $$(':scope > li', ol).forEach((o, i) => { o.tabIndex = 0; o.setAttribute('role', 'button')
+      const go = () => { if (!ol.classList.contains('pl-qdone')) pick(qi, i) }
+      o.onclick = go; o.onkeydown = e => { if (e.key === 'Enter') go() } }))
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'pl-quizbtn'; btn.textContent = '直接看答案'
+    btn.onclick = () => ols.forEach((ol, qi) => { if (!ol.classList.contains('pl-qdone')) pick(qi, -1) }); ans.before(btn)
+    picked.forEach((v, qi) => { if (v !== null && v !== undefined && ols[qi]) pick(qi, v) })
+  }
   // 考考你：點選項才看答案
   $$('.quiz', doc).forEach(q => {
     const opts = $$('ol > li', q), ans = $('.ans', q)
     const m = ans && ans.textContent.match(/答案[：:]\s*([A-Z])/)
-    if (!m) return
+    if (!m) { multiQuiz(q, ans); return }
     const right = m[1].charCodeAt(0) - 65
     const pick = i => {
       q.classList.add('pl-answered')
@@ -455,13 +535,17 @@
     const fin = document.createElement('div'); fin.className = 'pl-fin'
     fin.innerHTML = `<button type="button" class="pl-btn" data-done>完成本課</button><a class="pl-btn line" href="${esc(M.pdf)}" download="${esc(M.pdfName)}">下載這課 PDF</a><span class="note-done">已記在這台裝置，學習地圖會同步顯示。</span>`
     cta.before(fin)
+  } else {   // 02 起：最後一頁沒有 .end-cta，就放在最後一頁的最後（這段重點之前）
+    const fin = document.createElement('div'); fin.className = 'pl-fin'
+    fin.innerHTML = `<button type="button" class="pl-btn" data-done>完成本課</button><a class="pl-btn line" href="${esc(M.pdf)}" download="${esc(M.pdfName)}">下載這課 PDF</a><span class="note-done">已記在這台裝置，學習地圖會同步顯示。</span>`
+    const key = $('.pl-key', lastPg); key ? key.before(fin) : lastPg.append(fin)
   }
   $$('[data-done]').forEach(b => b.onclick = () => setDone(!isDone()))
   paintDone()
 
   // 進場：每頁的大區塊捲到才淡入
   if (!reduce) {
-    const els = $$('.pdfpage:not(.cover) > :is(.flow3, .revise, .anatomy, .flow4, .shelf, .compare, .three, .cards, .callflow, .warnbox, .steps3, .ab, .fit, .ex, .end-cta, .next, figure, .row)', doc)
+    const els = $$('.pdfpage:not(.cover) > :is(.flow3, .revise, .anatomy, .flow4, .shelf, .compare, .three, .cards, .callflow, .warnbox, .steps3, .ab, .fit, .ex, .end-cta, .next, figure, .row, .roles, .shot-row, .card3, .vgrid, .files5)', doc)
     els.forEach(el => { if (el.getBoundingClientRect().top > innerHeight) { el.classList.add('pl-reveal'); onSee(el, () => el.classList.add('pl-in'), 0.08) } })
   }
 
