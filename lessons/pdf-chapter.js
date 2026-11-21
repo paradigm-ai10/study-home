@@ -486,7 +486,18 @@
   // ── 完成本課（pd-done，跟首頁共用） ──
   const DONE = () => store.get('pd-done', [])
   const isDone = () => DONE().includes(ID)
-  const setDone = on => { let d = DONE().filter(x => x !== ID); if (on) d.push(ID); store.set('pd-done', d); paintDone() }
+  const setDone = on => { const was = isDone(); let d = DONE().filter(x => x !== ID); if (on) d.push(ID); store.set('pd-done', d); paintDone(); if (on && !was) coinToast() }
+  // 完成一課得 10 代幣，可以回首頁佈置書桌（代幣是首頁照 pd-done 算的，這裡只是告訴你；數字要跟 crab/rooms/f4/decor/catalog.json 的 perLesson 一樣）
+  const COINS_PER_LESSON = 10
+  let coinTimer = 0
+  function coinToast() {
+    let t = $('#pl-coin'); if (!t) { t = document.createElement('div'); t.id = 'pl-coin'; t.className = 'pl-coin'; t.setAttribute('role', 'status'); body.appendChild(t) }
+    t.innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2"/><circle cx="8" cy="8" r="4.6"/></svg><p><b>完成本課，得到 ${COINS_PER_LESSON} 代幣</b><span>代幣可以在首頁兌換擺飾，佈置你的書桌。</span></p><a href="${HOME_URL}">回首頁佈置</a><button type="button" aria-label="關閉">×</button>`
+    $('button', t).onclick = () => t.classList.remove('on')
+    setTimeout(() => t.classList.add('on'), 30)       // 不用 requestAnimationFrame：分頁在背景時它不會跑
+    clearTimeout(coinTimer); coinTimer = setTimeout(() => t.classList.remove('on'), 9000)
+    t.onmouseenter = () => clearTimeout(coinTimer); t.onmouseleave = () => { coinTimer = setTimeout(() => t.classList.remove('on'), 4000) }
+  }
   const paintDone = () => { const on = isDone(); body.classList.toggle('pl-finished', on); $$('[data-done]').forEach(b => { b.setAttribute('aria-pressed', on); b.textContent = on ? '已完成本課（再按取消）' : '完成本課' }) }
 
   // 第 15 頁：做到這三件

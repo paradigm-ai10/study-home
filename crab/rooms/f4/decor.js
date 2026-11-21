@@ -15,7 +15,12 @@ const Q = new URLSearchParams(location.search);
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const KEY = 'paradigm.decor';
 const DEV = /^(localhost|127\.|\[::1\]|.*\.localhost$)/.test(location.hostname);   // ?coins= and ?decorslow= are for us, on our own machines only
-const KEEP = !Q.has('fresh') || Q.has('keep');          // same rule as app.js: ?fresh never writes into the visitor's saved progress
+const KEEP = !Q.has('fresh') || Q.has('keep');
+/* 開發者模式（Thomas，2026-11-21）：網址加 ?dev=paradigm 打開，之後這個瀏覽器一直是開的（線上也可以）；?dev=off 或擺飾架上的「關閉」關掉。
+   開著時代幣固定 9999，擺飾架多一排「清空擺飾／關閉」。這不是保密機制，知道暗號的人都能開；代幣本來就只存在自己的瀏覽器裡。 */
+const DEV_KEY = 'paradigm.decor.dev';
+try { if (Q.get('dev') === 'paradigm') localStorage.setItem(DEV_KEY, '1'); else if (Q.get('dev') === 'off') localStorage.removeItem(DEV_KEY); } catch (e) { /* private mode */ }
+let DEVMODE = false; try { DEVMODE = localStorage.getItem(DEV_KEY) === '1'; } catch (e) { DEVMODE = false; }          // same rule as app.js: ?fresh never writes into the visitor's saved progress
 const V3 = THREE.Vector3, lerp = THREE.MathUtils.lerp, clamp = THREE.MathUtils.clamp, rad = THREE.MathUtils.degToRad;
 const now = () => performance.now() / 1000;
 const easeIO = (u) => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
@@ -48,7 +53,7 @@ async function main() {
 
   /* tokens: only lessons finished on a lesson page count (pd-done), not the ones ticked as "already know" in 程度評估 */
   const lessonsDone = () => { let d = []; try { d = JSON.parse(localStorage.getItem('pd-done') || '[]'); } catch (e) { d = []; } return new Set(d.filter((id) => !F4 || !F4.byId || F4.byId[id])).size; };
-  const earned = () => (DEV && Q.has('coins') ? +Q.get('coins') || 0 : lessonsDone() * cat.currency.perLesson + (F4 && F4.state.done && F4.state.done.t1 ? cat.currency.firstTask : 0));
+  const earned = () => (DEVMODE ? 9999 : DEV && Q.has('coins') ? +Q.get('coins') || 0 : lessonsDone() * cat.currency.perLesson + (F4 && F4.state.done && F4.state.done.t1 ? cat.currency.firstTask : 0));
   const spent = () => mine.owned.reduce((n, id) => n + byId[id].price, 0);
   const balance = () => Math.max(0, earned() - spent());
 
@@ -459,10 +464,19 @@ async function main() {
   const marks = document.createElement('div'); marks.className = 'decor-marks'; marks.setAttribute('aria-hidden', 'true'); stage.appendChild(marks);
   const markEl = {}; Object.entries(cat.slots).forEach(([id, s]) => { const m = document.createElement('i'); m.innerHTML = `<b>${s.label}</b>`; marks.appendChild(m); markEl[id] = m; });
   const shelf = tray.querySelector('.shelf'), purse = tray.querySelector('.purse');
+  if (DEVMODE) {
+    const bar = document.createElement('p'); bar.className = 'devbar'; bar.innerHTML = '<b>開發者模式</b><span>代幣不會用完</span><button type="button" data-dev="reset">清空擺飾</button><button type="button" data-dev="off">關閉開發者模式</button>';
+    tray.querySelector('header').after(bar);
+    bar.addEventListener('click', async (e) => {
+      const b = e.target.closest('button[data-dev]'); if (!b || showing) return;
+      if (b.dataset.dev === 'reset') { for (const slot of Object.keys(live)) await putAway(slot, true); mine.owned = []; mine.placed = {}; save(); draw(); tell('擺飾已清空。'); }
+      else { try { localStorage.removeItem(DEV_KEY); } catch (err) { /* private mode */ } const u = new URL(location.href); u.searchParams.delete('dev'); location.replace(u.href); }
+    });
+  }
   tray.querySelector('.how').textContent = `每完成一課得 ${cat.currency.perLesson} ${cat.currency.name}，完成 60 秒體驗得 ${cat.currency.firstTask} ${cat.currency.name}。`;
   let studio = null, shown = -1;
   // tokens you have not been told about yet (a lesson finished since you last looked): a dot on the button, and the crab mentions it once
-  const fresh = () => Math.max(0, earned() - mine.seen);
+  const fresh = () => (DEVMODE ? 0 : Math.max(0, earned() - mine.seen));
   let told = false;
   setInterval(() => { if (told || !fresh() || !S.introDone || S.busy || decorating || (F4 && F4.card) || S.layout !== 'wide' || document.hidden) return; told = true; f2.say(`你有 ${balance()} ${cat.currency.name}，可以拿來佈置書桌。按右下角的「佈置」。`, { hold: 5 }); }, 4000);
 
@@ -521,7 +535,7 @@ async function main() {
     if (on) {
       if (f2.skipIntro) f2.skipIntro(); if (F4 && F4.card && F4.close) F4.close();
       if (f2.LIFE && f2.LIFE.mode) f2.endLife(false);
-      mine.seen = earned(); save(); told = true;
+      if (!DEVMODE) { mine.seen = earned(); save(); } told = true;
       S.busy = true; camTo(...DECOR_CAM); draw(); pictures(); tell('書桌佈置已開啟。');
       const first = shelf.querySelector('button:not(:disabled)'); if (first) setTimeout(() => first.focus({ preventScroll: true }), 260);
     } else { setHot(null); S.busy = false; camHome(); btn.focus({ preventScroll: true }); }

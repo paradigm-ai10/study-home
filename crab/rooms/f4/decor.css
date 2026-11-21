@@ -66,6 +66,11 @@ html.is-decor .decor-tray li { opacity: 1; transform: none; transition: opacity 
 .decor-tray li.soon h3 { font-weight: 400; }
 .decor-tray li.soon button { background: none; justify-content: flex-start; padding: 2px 0; }
 
+.decor-tray .devbar { margin: -2px 2px 10px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: rgba(255, 244, 224, .86); }
+.decor-tray .devbar b { font-weight: 600; color: var(--grape); background: var(--sun); padding: 4px 8px; border-radius: 4px; letter-spacing: .06em; }
+.decor-tray .devbar button { appearance: none; cursor: pointer; font: inherit; font-size: 13px; color: var(--cream); background: rgba(23, 20, 41, .62); border: 0; box-shadow: inset 0 0 0 1px rgba(255, 244, 224, .3); padding: 6px 10px; border-radius: 6px; transition: scale 140ms ease-out; }
+.decor-tray .devbar button:active { scale: .97; }
+
 /* 擺飾架後面一層由下往上的暗，讓標題和卡片從書桌上分出來 */
 .decor-scrim { position: absolute; left: 0; right: 0; bottom: 0; height: min(62vh, 520px); z-index: 4; pointer-events: none; opacity: 0; transition: opacity 320ms ease-out;
   background: linear-gradient(to top, rgba(18, 14, 34, .86), rgba(18, 14, 34, .62) 46%, rgba(18, 14, 34, 0)); }
