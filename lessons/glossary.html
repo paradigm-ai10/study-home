@@ -1,15 +1,27 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://paradigm-ai10.github.io/study-home/lessons/glossary.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Paradigm AI 學習站">
+<meta property="og:title" content="AI 名詞辭典｜Paradigm 學 AI">
+<meta property="og:description" content="學習站用到的 AI 名詞，每個一句話說明，並連到講它的那一課。">
+<meta property="og:url" content="https://paradigm-ai10.github.io/study-home/lessons/glossary.html">
+<meta property="og:image" content="https://paradigm-ai10.github.io/study-home/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI 名詞小字典｜Paradigm 學 AI</title>
+<title>AI 名詞辭典｜Paradigm 學 AI</title>
 <meta name="description" content="學習站用到的 AI 名詞，每個一句話說明，並連到講它的那一課。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Outfit:wght@400;700&family=Silkscreen:wght@400;700&display=swap">
 <link rel="stylesheet" href="lesson.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 8 5%22 shape-rendering=%22crispEdges%22%3E%3Cpath fill=%22%23FF6B57%22 d=%22M1 0h6v1h1v3H7v1H6V4H5v1H4V4H3v1H2V4H1v1H0V1h1z%22/%3E%3Cpath fill=%22%233A2E5C%22 d=%22M2 1h1v1H2zM5 1h1v1H5z%22/%3E%3C/svg%3E">
 <style>
-  /* AI 名詞小字典：依主題分組，可搜尋；每個名詞一句說明，連到講它的那一課（只連已開放的課） */
+  /* AI 名詞辭典：依主題分組，可搜尋；每個名詞一句說明，連到講它的那一課（只連已開放的課） */
   .gwrap { max-width: 760px; margin: 0 auto; padding: 8px 24px 100px; }
   .gwrap h1 { font-size: clamp(28px, 4vw, 36px); line-height: 1.25; margin: 18px 0 10px; }
   .gwrap .lede { color: var(--grape-2); font-size: 17px; margin: 0 0 22px; }
@@ -34,7 +46,7 @@
 <body>
 <header class="top" id="top"></header>
 <main class="gwrap">
-  <h1>AI 名詞小字典</h1>
+  <h1>AI 名詞辭典</h1>
   <p class="lede">學習站用到的 AI 名詞，每個一句話說明。課號可以點的，是已經開放的課。</p>
   <label class="gsearch">搜尋名詞或英文<input id="q" type="search" placeholder="例：Skill、幻覺、Connector" autocomplete="off"></label>
   <p class="gcount" id="count" aria-live="polite"></p>
@@ -48,7 +60,7 @@
   const R = ROADMAP, esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
   const HOME_URL = '../crab/rooms/f4/index.html'
   document.getElementById('top').innerHTML = `<a class="logo" href="${HOME_URL}"><span>${PIXEL.critterIcon()}</span>PARADIGM</a>
-    <nav><a href="${HOME_URL}#map">學習地圖</a><a href="glossary.html" aria-current="page">AI 名詞小字典</a><a class="home" href="${HOME_URL}">回終端機</a></nav>`
+    <nav><a href="${HOME_URL}#map">學習地圖</a><a href="glossary.html" aria-current="page">AI 名詞辭典</a><a class="home" href="${HOME_URL}">回首頁</a></nav>`
   const titleOf = id => { for (const t of R.topics) { const l = t.lessons.find(x => x.id === id); if (l) return l.title } return '' }
   const topicOf = g => g.topic || (g.lesson ? 'T' + g.lesson.split('-')[0] : 'other')
   const groups = [...R.topics.map(t => ({ id: t.id, no: t.no, name: t.name })), { id: 'other', no: '', name: '其他名詞' }]

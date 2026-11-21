@@ -15,7 +15,7 @@
   const WEEK = 7 * 864e5;
 
   /* ---------------------------------------------------------------- the map, version 8 (../../../roadmap8.js, made by make_roadmap8.py): v8.5: 3 stages, 4 roles, 17 topics, 137 lessons.
-     The first release (its order is the course map's first_release, set in 網站/學習站/開課選單/) is 21 of them; STAGES here are the AI Power User topics, each with its first-release lessons (FIRST).
+     The first release (its order is the course map's first_release, set in 網站/學習站/picker/) is 21 of them; STAGES here are the AI Power User topics, each with its first-release lessons (FIRST).
      Only the ones with a lesson page (LESSON_PAGES in ../../routes.js) are open: LESSONS, the path that progress, the next step and 程度評估 follow.
      A new lesson page goes into LESSON_PAGES and joins the path by itself, in first-release order. */
   const STAGES = Array.isArray(window.STAGES) ? window.STAGES : [];
@@ -30,6 +30,11 @@
       if (l) FIRST.push(Object.assign({}, l, { can: t.outcome, stage: -1 }));
     }); }
   const LESSONS = FIRST.filter((l) => window.LESSON_PAGES && window.LESSON_PAGES[l.id]);
+  // a lesson page outside the first release (an elective, e.g. 6-E4) still joins the path, after the first-release ones, in map order
+  { const M8 = window.ROADMAP8, have = new Set(LESSONS.map((l) => l.id));
+    if (M8) M8.topics.forEach((t) => (t.all || []).forEach(([id, ti, ty]) => {
+      if (!have.has(id) && window.LESSON_PAGES && window.LESSON_PAGES[id]) { LESSONS.push({ id, title: ti, type: ty, can: t.outcome, stage: -1 }); have.add(id); }
+    })); }
   const byId = {}; LESSONS.forEach((l) => { byId[l.id] = l; });
   const TOTAL = LESSONS.length || 8;
   const MAP8 = window.ROADMAP8 || null;
@@ -66,7 +71,7 @@
     return { self: [...new Set(self.map(newId).filter(Boolean))], known: [], done: s.done || {}, log: Array.isArray(s.log) ? s.log : [], start: newId(s.start), goal: s.goal || null, level: s.level == null ? null : s.level, visits: (s.visits || 0) + 1, last: s.last || null };
   }
   const state = load();
-  // lessons finished on the lesson pages (課程/lesson-page.js keeps them in localStorage 'pd-done'): count them as learned here too.
+  // lessons finished on the lesson pages (lessons/lesson-page.js keeps them in localStorage 'pd-done'): count them as learned here too.
   // One way only: what you tick in 程度評估 stays in this page's own record and is not written into pd-done.
   function mergeDone() {
     if (Q.has('fresh') && !Q.has('keep')) return false;   // ?fresh: as if this were the first visit
@@ -164,7 +169,7 @@
     q: '以下兩則提示，何者能取得較高品質的回答？',
     a: '幫我寫讀書計畫。',
     b: '我大二，下週三考微積分第 3 到 5 章，每天晚上只有 2 小時。幫我排 5 天的讀書計畫，用表格。',
-    why: 'B 明確提供背景、任務與限制條件，模型無須推測需求，輸出因此更精準。這即是 Prompt 四要素（2-1）的核心原則。',
+    why: 'B 明確提供背景、任務與限制條件，模型無須推測需求，輸出因此更精準。這就是 Prompt 四要素的核心原則，後面的課會完整教。',
   };
   function openTask() {
     show('task', 'solve', `
@@ -207,6 +212,16 @@
   // map v8.5 (2026-11-13; only lessons with a page are recommended): never used → 1-1; used a few times → 1-4; uses it a lot → by what they want to learn (2-1 / 3-1 / 4-1 / 6-3; map v8.1, 6-3 was 5-5 in v8.0).
   // The whole table, for checking: 首頁資料夾的 程度評估對應表.md
   // What they tick in question 3 counts as learned; if the start is one of those, move on to the next lesson not learned.
+  function nearestOpen(id, skip) {
+    const M8 = window.ROADMAP8; if (!M8) return id;
+    const order = []; M8.topics.forEach((t) => (t.all || []).forEach(([x]) => order.push([x, t.id])));
+    const i = order.findIndex(([x]) => x === id); if (i < 0) return id;
+    const ok = ([x]) => byId[x] && !(skip || []).includes(x);
+    const same = order.find(([x, t]) => t === order[i][1] && ok([x]));
+    if (same) return same[0];
+    const after = order.slice(i + 1).find(ok), before = order.slice(0, i).reverse().find(ok);
+    return (after || before || [id])[0];
+  }
   function recommend(level, goal, checks) {
     const known = SKILLS.map(([id]) => id).filter((id) => checks[id] && byId[id]);
     if (level >= 1 && byId['1-1'] && !known.includes('1-1')) known.push('1-1');   // only once 1-1 has a page: a lesson that is not open is never counted as learned
@@ -218,6 +233,7 @@
       const after = LESSONS.slice(i + 1).concat(LESSONS.slice(0, i)).find((l) => !all.includes(l.id));
       start = after ? after.id : start;
     }
+    if (!byId[start]) start = nearestOpen(start, all);   // the lesson for that answer has no page yet: the closest open one on the map (same topic first)
     return { known, start: byId[start] ? start : (LESSONS[0] || {}).id, all: all.length };
   }
   function openPick(step) {

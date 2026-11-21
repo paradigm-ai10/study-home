@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<meta name="description" content="Connectors 入門：連接 Gmail、日曆與雲端硬碟。Paradigm AI 學習站的免費中文課程，附完整教學 PDF 與動手練習，不會寫程式也學得會。">
+<link rel="canonical" href="https://paradigm-ai10.github.io/study-home/lessons/6-1.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Paradigm AI 學習站">
+<meta property="og:title" content="Connectors 入門：連接 Gmail、日曆與雲端硬碟｜Paradigm 學 AI">
+<meta property="og:description" content="Connectors 入門：連接 Gmail、日曆與雲端硬碟。Paradigm AI 學習站的免費中文課程，附完整教學 PDF 與動手練習，不會寫程式也學得會。">
+<meta property="og:url" content="https://paradigm-ai10.github.io/study-home/lessons/6-1.html">
+<meta property="og:image" content="https://paradigm-ai10.github.io/study-home/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Connectors 入門：連接 Gmail、日曆與雲端硬碟｜Paradigm 學 AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap">
+<link rel="stylesheet" href="media/6-1/pdf.css">
+<link rel="stylesheet" href="pdf-lesson.css">
+<link rel="stylesheet" href="pdf-flip.css">
+<link rel="stylesheet" href="pdf-chapter.css">
+</head>
+<body data-flip="chapter">
+<!-- 網頁課（6-1）：內容是定稿 PDF 的原文（lessons/06_Connectors入門/PDF/index.html），由 tools/from_pdf.py 產生，不要手改；
+     要改字請改 PDF 那邊，再重跑這支工具。外框與互動在 pdf-lesson.js、pdf-lesson.css。 -->
+<header class="pl-top" id="top"></header>
+<div class="pl-map" id="map"></div>
+<div class="pl-strip" id="strip" aria-hidden="true"></div>
+<button type="button" class="pl-opener" id="opener" aria-controls="side" aria-expanded="false" hidden>目錄</button>
+<div class="pl-wrap">
+  <nav class="pl-side" id="side" aria-label="這課的章節"></nav>
+  <div class="pl-main">
+  <div class="pl-run" id="run"></div>
+  <main class="pdfdoc" id="doc">
+<section class="pdfpage cover" id="p1" data-n="1">
+  <div class="brand">PARADIGM · 6-1</div>
+  <h1>Connectors 入門</h1>
+  <div class="tagline">連接 Gmail、日曆與雲端硬碟</div>
+  <p class="who">給已經會用 Claude 聊天、每天要翻信箱、對行事曆、找雲端檔案的學生和上班族。不用會寫程式。</p>
+  <div class="learn-t">學完這課，你能</div>
+  <ol class="pz-ol">
+    <li><b>說出</b> Connector 是什麼：它需要時自己到你授權的 App 找資料，也能在裡面動手。</li>
+    <li><b>連上</b> Gmail、Google Calendar（Google 日曆）、Google Drive（雲端硬碟），需要的話再加 Notion，並確認對話裡的連接器開關有開。</li>
+    <li><b>在一個 Project 裡</b>用三個連接器把一場會議準備好：回信、把會議記進日曆、把雲端的資料匯出下載、存回摘要並起草下一封信。</li>
+    <li><b>看懂</b>寫入前的確認畫面，知道怎麼中斷連接，以及自己的方案能做到哪。</li>
+  </ol>
+  <div class="make">
+    <p class="make-t">這課你會動手做</p>
+    <p>連上自己的 Gmail、日曆和雲端硬碟，照「統合分析進度會議」的情境做一次。做完，你會<b>寄出一封由 Claude 擬好的回信、在日曆裡多一個會議行程，手上拿到從雲端匯出的 Excel 和 Word，雲端多一份進度摘要、Gmail 多一封待寄的草稿</b>。</p>
+  </div>
+  <div class="meta"><span>閱讀約 8–12 分鐘</span><span>動手約 10–20 分鐘</span><span>要一個 Google 帳號</span><span>不用寫程式</span></div>
+  <div class="toc" id="toc"><div class="toc-t">目錄</div></div>
+</section>
+<section class="pdfpage" id="p2" data-n="2" data-ch="what" data-tl="Connector 是什麼、一個情境">
+  <p class="kicker">Connector 是什麼</p>
+  <h1>怎麼把 Gmail、行事曆、雲端硬碟接上 Claude，讓它幫你排行程、回信、找檔案？</h1>
+  <p class="lead">答案是 Connector（介面上叫「連接器」）。<span class="em">接上之後，Claude 可以直接到你授權的 App 讀資料，也能在裡面動手：擬草稿、建行程、存檔。</span>照預設，要動手之前它會先問你。</p>
+  <p class="pz-p">沒有連接器的時候，要 Claude 幫你處理信件或檔案，得自己先找出來：打開信箱翻那封信、複製內文貼進對話；到雲端硬碟下載檔案、再上傳給它。資料一多，光是搬資料就要花不少時間。</p>
+  <p class="pz-p">接上連接器之後，你只要說要做什麼，它會自己去信箱搜尋、到雲端硬碟找檔案、看你的行事曆，讀完再回答你。它只讀這次任務找得到、用得上的部分，不保證不漏；重要的事，請它附上讀了哪封信、哪個檔案，自己點開對一次。</p>
+
+  <h2>一個情境</h2>
+  <p class="pz-p">你平常用 <b>Gmail</b> 收信、用 <b>Google Calendar</b> 排行程、把資料放在 <b>Google Drive</b>。今天教授寄信來：下週日早上要開會，請你回信確認會不會到，會前把他要的資料整理好寄給他。那些資料就在你的雲端硬碟裡。</p>
+  <p class="pz-p">你要做三件事：<b>回信</b>說會出席、把會議<b>記進行事曆</b>、把<b>雲端的資料</b>拿出來準備。接上連接器之後，這三件事在 Claude 的同一個 Project 裡就能交代完。要連起來的是這四個：</p>
+  <div class="logoflow">
+    <div class="node"><img src="media/6-1/img/logo/claude.svg" alt="Claude"><b>Claude</b><span>你在這裡下指令</span></div>
+    <div class="arr">⇄<small>連接器</small></div>
+    <div class="node"><img src="media/6-1/img/logo/google-gmail.svg" alt="Gmail"><b>Gmail</b><span>讀教授的信、回信</span></div>
+    <div class="node"><img src="media/6-1/img/logo/google-calendar.svg" alt="Google Calendar"><b>Google Calendar</b><span>記下會議時間地點</span></div>
+    <div class="node"><img src="media/6-1/img/logo/google-drive.svg" alt="Google Drive"><b>Google Drive</b><span>找到資料、匯出下載</span></div>
+  </div>
+  <p class="small muted">圖中的 logo 屬於各公司，這裡只用來標示是哪個服務。連接器背後用的是一套叫 MCP 的通用接法；想接清單上沒有的服務，可以自己加「自訂連接器」，這課用不到。</p>
+  <p class="pl-key"><span>這段重點</span>它需要時自己去 App 裡找，也能動手</p>
+</section>
+<section class="pdfpage" id="p3" data-n="3" data-ch="what" data-tl="為什麼值得接">
+  <p class="kicker">Connector 是什麼</p>
+  <h1>為什麼值得接：資料散在三個地方</h1>
+  <p class="lead">一件事的資料常常分散：要求在信箱，檔案在雲端硬碟，期限記在行事曆。<span class="em">接上之後，一句話就能跨 App 整理。</span></p>
+  <p class="pz-p">拿開頭那個情境來說。以前你要打開信箱找那封信、自己回信，打開行事曆手動輸入時間地點，再到雲端硬碟把資料一個個找出來下載。接上連接器後，在同一個 Project 裡交代幾句話就好：它去 Gmail 找信、擬好回信，去 Google Calendar 記下會議，到 Google Drive 把資料匯出給你下載，順便整理重點。每一個要改到你 App 的動作，它都會先問你。後面「情境演示」會完整走一遍。</p>
+  <h2>大家最常拿來做的事</h2>
+  <ul class="pz-ul">
+    <li>整理信箱：這幾天有哪些重要信、哪些還沒回</li>
+    <li>擬回信：讀完那封信，先擬一份草稿給你看</li>
+    <li>從信裡抓日期排進行事曆：考試、報告、會議</li>
+    <li>在雲端硬碟找檔案並摘要：上次的會議紀錄、某一科的講義</li>
+  </ul>
+  <p class="pl-key"><span>這段重點</span>一句話，跨信箱、雲端、行事曆</p>
+</section>
+<section class="pdfpage" id="p4" data-n="4" data-ch="connect" data-tl="接上 Google 三個">
+  <p class="kicker">怎麼連</p>
+  <h1>接上 Gmail、Google Calendar、Google Drive</h1>
+  <p class="lead">在網頁版 claude.ai 做，免費版就可以。<span class="em">三個 App 一個一個接，這課三個都用同一個 Google 帳號登入授權。</span></p>
+  <ol class="steps">
+    <li>左側欄點「自訂」，上方切到「連接器」，右邊切到「探索」。這裡跟裝 Skill 是同一個地方，細節可以看「Skills 入門」那課。</li>
+    <li>在「最多人使用的連接器」找到 Gmail，按那一列右邊的「＋」。</li>
+    <li>跳到 Google：選你要接的 Google 帳號，按 Continue（繼續）。</li>
+    <li><b>權限頁的方框預設都沒勾，先勾最上面的 Select all（全選）</b>，再按 Continue。</li>
+    <li>回到 Claude，右下角出現「已連接至 Gmail。」就好了。</li>
+    <li>Google Calendar、Google Drive 照同樣步驟各接一次。</li>
+  </ol>
+  <figure class="pz-fig">
+    <img src="media/6-1/img/s1_connectors_explore.png" alt="自訂 → 連接器 → 探索：最多人使用的連接器清單，Google Drive、Gmail、Google Calendar 每列右邊一個加號">
+    <figcaption>免費版：「自訂」→「連接器」→「探索」。要接哪個，按那一列右邊的「＋」；接好的會變成打勾（圖裡三個 Google 已經接好）。</figcaption>
+  </figure>
+  <figure class="pz-fig">
+    <img src="media/6-1/img/s2_google_consent.png" alt="Google 的授權頁：Claude for Gmail 要存取你的 Google 帳號，右邊三個權限方框都還沒勾，最上面是 Select all">
+    <figcaption>Google 的權限頁（我們的示範帳號是英文介面）。方框預設都沒勾，要全勾再按 Continue，不然會連不完整。</figcaption>
+  </figure>
+  <p class="pz-p">付費方案的介面，左側欄這裡叫「外掛程式」（Skills 和連接器的總稱），進去一樣有「連接器」分頁，搜尋 Gmail 打開就能連。你的畫面若跟這裡不同，找「自訂」或「外掛程式」其中一個。</p>
+  <h2>接之前先知道</h2>
+  <ul class="pz-ul">
+    <li><b>它只看你接的那一個 Google 帳號。</b> 資料放在別的帳號就找不到。一次只能連一個（我們實測沒有加第二個帳號的入口）；要換帳號，先中斷連接再用另一個接。</li>
+    <li><b>學校或公司的 Google 帳號可能被管理員擋住。</b> 用公司信箱前，先確認公司允不允許把信件交給 AI 工具；只是想練習，先用個人帳號。</li>
+    <li><b>它不會拿到超過你本人的權限。</b> 你沒權限的檔案它讀不到；別人分享給你的，它也可能讀得到。</li>
+  </ul>
+  <p class="pl-key"><span>這段重點</span>自訂 → 連接器 → 用 Google 帳號授權，權限要全勾</p>
+</section>
+<section class="pdfpage" id="p5" data-n="5" data-ch="connect" data-tl="對話裡打開開關">
+  <p class="kicker">怎麼連</p>
+  <h1>最常卡的一步：設定顯示已連接，Claude 卻說找不到</h1>
+  <p class="lead">設定裡連好，只是「接上了」。<span class="em">每個對話還有自己的開關，開著它才會用。</span></p>
+  <ol class="steps">
+    <li>開一個新對話，按輸入框左下的「＋」。</li>
+    <li>選「連接器」，旁邊會列出你接過的連接器，每個一個開關。（付費版這一項叫「外掛程式」。）</li>
+    <li>確認 Gmail、Google Calendar、Google Drive 三個都打開。剛連好的預設是開著的。</li>
+    <li>注意：這些開關是整個帳號共用的。在一個對話關掉，開新對話也還是關的，要自己開回來。</li>
+  </ol>
+  <figure class="pz-fig narrow">
+    <img src="media/6-1/img/s3_chat_toggles.png" alt="輸入框的加號選單，選連接器後，右邊子選單列出 Gmail、Google Calendar、Google Drive，三個開關都開著">
+    <figcaption>「＋」→「連接器」：三個開關都開著。子選單裡也有「管理連接器」，可以直接回到設定。最下面的「工具存取方式」管的是工具什麼時候載入，跟要不要先問你無關，維持預設就好。</figcaption>
+  </figure>
+  <p class="pz-p">開關沒開時，它不一定會報錯：我們實測關掉 Gmail 再問信，它回「我這邊沒辦法開啟 Gmail」，然後改從雲端硬碟的文件找答案。所以它說沒辦法開啟、找不到，或答案看起來不是從信裡來的，照這個順序查：</p>
+  <ol class="pz-ol">
+    <li>這個對話的開關有沒有開。</li>
+    <li>接的是不是放這些資料的那個 Google 帳號。</li>
+    <li>你自己打開 Gmail 或雲端硬碟，找不找得到那封信、那個檔。</li>
+    <li>把寄件人、檔名、日期講具體一點再問一次。</li>
+    <li>出現「尚未完成」或授權錯誤，才回「自訂 → 連接器」重新連接，權限頁記得全勾。</li>
+  </ol>
+
+  <h2>想再接 Notion</h2>
+  <p class="pz-p">筆記和待辦都放在 Notion 的人，可以再接一個 Notion，做法一樣：在「探索」找到 Notion，按「＋」，用 Notion 帳號登入、選要給它讀的頁面。接好後一樣要在對話的「＋ → 連接器」打開。免費版按 Notion 的「＋」沒有要你升級，會直接跳到 Notion 的登入頁，用你自己的 Notion 帳號授權就好。其他 App（Microsoft 365、Slack 等）大致也從這裡開始，但帳號和管理員的要求可能不同。</p>
+  <p class="pl-key"><span>這段重點</span>每個對話的開關要開</p>
+</section>
+<section class="pdfpage" id="p6" data-n="6" data-ch="can" data-tl="三個 App 的讀與寫">
+  <p class="kicker">各能做什麼</p>
+  <h1>大家最常用的三個 connector，各能幫你做什麼</h1>
+  <p class="lead">Gmail、Google Calendar、Google Drive 是最多人連的三個。每個連接器都分「讀」和「寫」。<span class="em">先只讓它讀、把要寫的內容在對話裡先寫給你看；看過結果，再讓它動手。</span></p>
+  <table class="pz-table">
+    <thead><tr><th></th><th>讀（不會改到任何東西）</th><th>寫（會改到你的 App）</th></tr></thead>
+    <tbody>
+      <tr><th>Gmail</th><td>搜尋信件、讀整串對話、讀附件（約 12 MB 內）、挑出重要信</td><td>擬草稿、回信、寄信、轉寄、加標籤、丟垃圾桶</td></tr>
+      <tr><th>Google Calendar</th><td>看行程、找空檔、找跟別人共同的空檔</td><td>建立、修改、刪除行程，回覆邀請</td></tr>
+      <tr><th>Google Drive</th><td>搜尋檔案，讀 Google 文件、試算表、簡報和 PDF</td><td>上傳、建資料夾、把 Claude 做好的檔存回雲端、移動、分享</td></tr>
+    </tbody>
+  </table>
+  <h2>做不到、要注意的</h2>
+  <ul class="pz-ul">
+    <li><b>看不到 Google 文件裡的圖片。</b> 只讀得到文字。</li>
+    <li><b>附件：</b>每個附件大約 12 MB 以內；要讀附件內容，設定裡要開「程式碼執行與檔案建立」。</li>
+    <li><b>把檔案存回雲端硬碟</b>，要先在設定裡開「程式碼執行與檔案建立」。</li>
+    <li><b>下載到你的電腦：</b>可以，但要你自己按下載。它會把 Google 文件匯出成 Word、試算表匯出成 Excel，對話裡出現檔案卡片，點開預覽或按「下載全部」。它不會直接存進你電腦的資料夾。畫面在「情境演示」第 ④ 步。</li>
+    <li><b>存回雲端的 Google 文件，要再改得另接 Google Docs 連接器。</b> 只接雲端硬碟，它能建新檔，但不能編輯文件內容。</li>
+  </ul>
+  <p class="pl-key"><span>這段重點</span>先讀，看過再讓它動手</p>
+</section>
+<section class="pdfpage" id="p7" data-n="7" data-ch="do" data-tl="開專案、回信" data-step="1,2">
+  <p class="kicker">情境演示</p>
+  <h1>教授來信要開會：在一個 Project 裡把事情做完</h1>
+  <p class="lead">教授來信：下週日早上開進度會議，要你回信確認、會前把資料寄給他。<span class="em">先開一個 Project，在裡面交代四件事：回信、記進日曆、把資料匯出下載、把整理好的摘要存回去並起草下一封信。</span></p>
+  <p class="small muted">信件和資料都是虛構的示範用檔案（示範用的是一份研究的資料表和文件，換成你自己的資料一樣做）。這一章用的是付費帳號的畫面，確認框長得跟免費版不太一樣，下一章會對照。</p>
+  <div class="note"><b>免費版先看這一段：</b>連接器任務很吃用量。我們用免費帳號實測，5 則訊息就用完了 5 小時的訊息上限。所以每一句都把要做的事講完整，不要一點一點問。</div>
+
+  <h2>① 開一個 Project</h2>
+  <ol class="steps">
+    <li>左側欄「專案」→ 右上「新增專案」。</li>
+    <li>「您正在進行什麼工作？」填這件事的名字（示範填「SGLT2 統合分析」），「您想達成什麼目標？」寫一句這個專案要做什麼，按「建立專案」。Project 怎麼用，詳見「Chat 與 Project」那課。</li>
+  </ol>
+  <figure class="pz-fig">
+    <img src="media/6-1/img/d1_new_project.png" alt="建立專案視窗：您正在進行什麼工作填 SGLT2 統合分析（示範用），您想達成什麼目標填一句說明">
+    <figcaption>「建立專案」視窗：填工作名稱和目標，背景資訊可以先不放。</figcaption>
+  </figure>
+
+  <h2>② 請它找出那封信、回信</h2>
+  <div class="prompt"><span class="tag">第一句：回信</span>
+    <p>林醫師寄信通知我統合分析的進度會議。幫我找出那封信，回信跟老師說我會準時出席，資料萃取表和納入排除標準會在前一天晚上 9 點前寄出。寄出前先給我看草稿。</p>
+  </div>
+  <p class="pz-p">大約 20 秒，它找到那封信，列出時間、地點和老師要你準備的兩件事，再給一份回信草稿。署名它不知道，會留空讓你填。</p>
+  <figure class="pz-fig">
+    <img src="media/6-1/img/d4_found_draft.png" alt="Claude 找到林醫師的信，列出時間地點和要準備的事，下面是回信草稿">
+    <figcaption>框起來的是你傳給它的指令。它先說找到哪封信，再列出信裡的時間、地點、要準備的事，最後是回信草稿。</figcaption>
+  </figure>
+  <p class="pz-p">看過草稿，回它：「署名寫『學生 阿糰』，其他不改，寄出。」要寄信之前，輸入框上方跳出確認框，而且<b>把要寄出的內文整段列出來</b>。內容對了，按「傳送回覆」。</p>
+  <figure class="pz-fig">
+    <img src="media/6-1/img/d5_confirm_reply.png" alt="付費版確認框：Claude 想要使用來自 Gmail 的 Reply to email，列出回信內文，按鈕：拒絕、傳送回覆、一律允許">
+    <figcaption>付費版的確認框：「Claude 想要使用來自 Gmail 的 Reply to email」，上面是要寄出的內文。按鈕：拒絕｜傳送回覆｜一律允許。</figcaption>
+  </figure>
+  <p class="small muted">寄出後它那一則回覆用了英文。遇到這種情況，下一句加「請用中文回答」就好。</p>
+  <p class="pl-key"><span>這段重點</span>開一個 Project，再交代</p>
+</section>
+<section class="pdfpage" id="p8" data-n="8" data-ch="do" data-tl="記進日曆、匯出下載" data-step="3,4">
+  <p class="kicker">情境演示</p>
+  <h1>記進日曆、把資料匯出下載</h1>
+  <h2>③ 照那封信，把會議記進 Google Calendar</h2>
+  <div class="prompt"><span class="tag">第二句：記進日曆</span>
+    <p>照那封信把進度會議記進我的 Google 日曆，地點也寫上，備註寫老師要我準備的兩件事。</p>
+  </div>
+  <figure class="pz-fig">
+    <img src="media/6-1/img/d7_confirm_event.png" alt="付費版建行程確認框：列出活動名稱、11 月 29 日 10:00 到 11:00、地點醫學大樓 5 樓 502 討論室、說明，按鈕：拒絕、一律允許、允許一次">
+    <figcaption>建行程的確認框列出活動、時間、地點和說明。按鈕：拒絕｜一律允許｜允許一次。</figcaption>
+  </figure>
+  <p class="pz-p">確認框出現時，看三樣：</p>
+  <ol class="pz-ol">
+    <li><b>建在哪、給誰：</b>寄信看收件人；建行程看是不是你的日曆、有沒有加入其他邀請對象。</li>
+    <li><b>日期時間：</b>是不是你要的那天、那個時段。</li>
+    <li><b>內容：</b>標題、地點、信件內文有沒有寫錯。</li>
+  </ol>
+  <p class="pz-p">三樣都對，按<b>「允許一次」</b>。不對就按「拒絕」，告訴它哪裡要改。按拒絕不會寫入任何東西。「一律允許」代表這個動作以後都不再問你，剛開始不要按。</p>
+  <figure class="pz-fig">
+    <img src="media/6-1/img/d8_event_done.png" alt="Claude 回報行程已建好：標題、11/29 10:00–11:00、地點、備註，並問要不要加 11/28 寄件提醒">
+    <figcaption>建好了。它還主動問要不要再加一個 11/28 晚上 9 點前寄資料的提醒。</figcaption>
+  </figure>
+
+  <h2>④ 把雲端硬碟的兩份資料匯出下載，順便報進度</h2>
+  <div class="prompt"><span class="tag">第三句：匯出下載</span>
+    <p>接著到我的雲端硬碟找「SGLT2統合分析」開頭的兩份資料，資料萃取表匯出成 Excel、納入排除標準匯出成 Word，讓我下載到電腦；順便告訴我萃取表目前納入幾篇、還缺哪些欄位。</p>
+  </div>
+  <p class="pz-p">這一步只讀，不跳確認框。大約 30 秒，它回報納入 12 篇、缺的欄位都在第 12 篇，還主動指出兩個會議上可能被問的地方。</p>
+  <figure class="pz-fig">
+    <img src="media/6-1/img/d9_word_summary.png" alt="Claude 回報納入 12 篇、第 12 篇缺的欄位，右邊預覽納入排除標準的 Word 檔">
+    <figcaption>左邊是進度整理，右邊是匯出的 Word 預覽，右上角「下載為 DOCX」。</figcaption>
+  </figure>
+  <figure class="pz-fig">
+    <img src="media/6-1/img/d11_file_cards.png" alt="對話下方兩張檔案卡片：試算表 XLSX、文件 DOCX，和下載全部，右邊預覽 Excel">
+    <figcaption>對話裡出現兩張檔案卡片（Excel 和 Word），按「下載全部」，或點開預覽、右上角下載。它不會直接存進你電腦的資料夾。</figcaption>
+  </figure>
+  <p class="pl-key"><span>這段重點</span>內容看對了，按允許一次</p>
+</section>
+<section class="pdfpage" id="p9" data-n="9" data-ch="do" data-tl="存回雲端、起草回信" data-step="5">
+  <p class="kicker">情境演示</p>
+  <h1>把摘要存回雲端，再起草一封信給老師</h1>
+  <h2>⑤ 存成 Google 文件、起草信件（只存草稿，不寄）</h2>
+  <div class="prompt"><span class="tag">第四句：存回雲端＋起草</span>
+    <p>把剛剛的進度摘要（納入幾篇、還缺哪些欄位、兩個可能被問的問題）存成一份 Google 文件放到我的雲端硬碟，檔名「SGLT2統合分析_進度摘要」。再起草一封信給林醫師，附上資料萃取表、納入排除標準和這份摘要的連結，先存成 Gmail 草稿、不要寄出。請用中文回答。</p>
+  </div>
+  <p class="pz-p">這一句有兩個寫入動作，所以會<b>跳兩次確認框</b>：先是在雲端硬碟建檔，再是在 Gmail 建草稿。每個都列出要寫入的內容。</p>
+  <figure class="pz-fig narrow">
+    <img src="media/6-1/img/d13_confirm_drive.png" alt="確認框：Claude 想要使用來自 Google Drive 的 Create file，列出檔名、類型和內容，按鈕：拒絕、一律允許、允許一次">
+    <figcaption>第一個：在雲端硬碟建檔，列出檔名和內容。按鈕順序：拒絕｜一律允許｜允許一次（右邊深色的是允許一次）。</figcaption>
+  </figure>
+  <figure class="pz-fig narrow">
+    <img src="media/6-1/img/d14_confirm_draft.png" alt="確認框：Claude 想要使用來自 Gmail 的 Create draft email，列出收件人、主旨、內文，按鈕：拒絕、允許一次、一律允許">
+    <figcaption>第二個：在 Gmail 建草稿，列出收件人、主旨和內文。這次按鈕順序換了：拒絕｜允許一次｜一律允許，右邊深色的變成「一律允許」。</figcaption>
+  </figure>
+  <div class="note"><b>按之前看字，不要看位置。</b> 兩個確認框的按鈕順序不一樣，深色的那顆有時是「允許一次」、有時是「一律允許」。習慣按右邊那顆，可能就把「以後都不用問」打開了。</div>
+  <figure class="pz-fig narrow">
+    <img src="media/6-1/img/d15_done.png" alt="Claude 回報兩件事都完成：進度摘要存成 Google 文件，信件只存成草稿沒有寄出">
+    <figcaption>兩件事都完成：摘要存成 Google 文件，和其他兩份資料放在同一個資料夾；信只存成草稿，放在林醫師原信的同一串，沒有寄出。</figcaption>
+  </figure>
+  <p class="pz-p">打開 Gmail 的草稿匣看一次，內容對了再自己按傳送。它整理的數字和欄位，開會前自己打開檔案對一次。</p>
+  <h2>這一趟，你用 connector 做到了什麼</h2>
+  <div class="cmap">
+    <div class="cmap-core"><img src="media/6-1/img/logo/claude.svg" alt="Claude"><b>Claude</b><span>一個 Project、四句話</span></div>
+    <div class="cmap-arms">
+      <div class="cmap-arm"><div class="cmap-h"><img src="media/6-1/img/logo/google-gmail.svg" alt="Gmail"><b>Gmail</b></div>
+        <ul><li>找出教授那封信，整理出時間、地點、要準備的事</li><li>回信說會出席（寄出前先看過）</li><li>起草下一封信，附上三份資料的連結，存成草稿</li></ul></div>
+      <div class="cmap-arm"><div class="cmap-h"><img src="media/6-1/img/logo/google-calendar.svg" alt="Google Calendar"><b>Google Calendar</b></div>
+        <ul><li>把會議記進行事曆，連地點和要準備的事一起寫上</li></ul></div>
+      <div class="cmap-arm"><div class="cmap-h"><img src="media/6-1/img/logo/google-drive.svg" alt="Google Drive"><b>Google Drive</b></div>
+        <ul><li>找到兩份資料，匯出成 Excel、Word 下載</li><li>整理出目前進度和缺什麼</li><li>把進度摘要存回雲端</li></ul></div>
+    </div>
+  </div>
+  <p class="pz-p">以前要開三個 App、來回複製貼上的事，這次只在一個對話裡交代。每一個會改到你 App 的動作，都先經過你按允許。</p>
+  <p class="pl-key"><span>這段重點</span>一個 Project，三個 connector，把事情做完</p>
+</section>
+<section class="pdfpage" id="p10" data-n="10" data-ch="safe" data-tl="確認與中斷連接">
+  <p class="kicker">寫入前會先問你</p>
+  <h1>它會先問你：照預設的權限</h1>
+  <p class="lead">照預設，<span class="em">會改到你 App 的動作（寄信、建行程、存檔、刪除），執行前都會先跳確認。</span>讀信、讀檔這種只讀的動作不會問。</p>
+  <p class="pz-p">打開任一個連接器的頁面，下面是「工具權限」：唯讀工具預設「永遠允許」，寫入和刪除工具預設要核准。每個工具右邊有三個小圖示（允許／需核准／封鎖），可以一個一個改。在確認框按過「永遠允許」的動作，就會變成不再問。</p>
+  <h2>確認框有兩種長相</h2>
+  <ul class="pz-ul">
+    <li><b>免費版：</b>出現在對話裡，標「需要您的輸入」，卡片寫「Claude 想要使用來自 Google Calendar 的 Creates a calendar event」，按鈕「拒絕｜允許一次｜永遠允許」。</li>
+    <li><b>付費版：</b>出現在輸入框上方，<b>會把要寫入的內容列出來</b>（信的內文、行程的時間地點），按鈕依動作不同：寄信是「拒絕｜傳送回覆｜一律允許」，建行程是「拒絕｜一律允許｜允許一次」。</li>
+  </ul>
+  <p class="pz-p">付費版的按鈕順序會依動作換位置，深色那顆不一定是「允許一次」，按之前看字。兩種都一樣：按「允許一次」或「傳送回覆」就做這一次；按「永遠允許」或「一律允許」，這個動作以後都不再問你，剛開始不要按；按「拒絕」什麼都不會寫入。</p>
+  <figure class="pz-fig narrow">
+    <img src="media/6-1/img/s5_write_confirm.png" alt="免費版確認框：Claude 想要使用來自 Google Calendar 的 Creates a calendar event，按鈕拒絕、允許一次、永遠允許">
+    <figcaption>免費版的確認框。付費版的長相見「情境演示」。</figcaption>
+  </figure>
+  <figure class="pz-fig">
+    <img src="media/6-1/img/a2_gmail_detail.png" alt="Gmail 連接器頁：右上中斷連接按鈕，下面工具權限，唯讀工具 6 個、永遠允許">
+    <figcaption>免費版的 Gmail 連接器頁：右上「中斷連接」，下面「工具權限」，唯讀工具預設永遠允許。</figcaption>
+  </figure>
+  <div class="note"><b>用付費方案的人：</b>輸入框下方有「權限模式」，選「自動」時它可能不問就直接做。不確定的話選「手動」，細節下一課講。免費版沒有這個選單。</div>
+  <h2>不想用了：中斷連接</h2>
+  <ol class="steps">
+    <li>左側欄「自訂」→「連接器」→「您的項目」，打開那個連接器（例如 Gmail）。</li>
+    <li>按右上角的「中斷連接」。付費版在「已連接」那一列右邊的「⋯」裡。</li>
+  </ol>
+  <p class="pz-p">只是這次對話不想讓它碰，關掉對話裡「＋ → 連接器」的開關就好，不用中斷連接。</p>
+  <p class="pz-p">資料方面：官方說明寫，Google 連接器取回的資料跟著那個對話保存；訓練和刪除的細節，以官方說明為準（連結在課程最後）。</p>
+  <p class="small muted">信件和檔案裡也可能藏著要 Claude 照做的字。怎麼防，下一課「Connector 安全設定」會講。</p>
+  <p class="pl-key"><span>這段重點</span>寫入前會問；用不到就中斷連接</p>
+</section>
+<section class="pdfpage" id="p11" data-n="11" data-ch="safe" data-tl="你的方案能做到哪">
+  <p class="kicker">寫入前會先問你</p>
+  <h1>免費版能做到哪？</h1>
+  <p class="lead">這課的每一步，<span class="em">免費版都做得到。</span>差在用量：免費版很快就用完。</p>
+  <table class="pz-table">
+    <thead><tr><th></th><th>免費版</th><th>付費版</th></tr></thead>
+    <tbody>
+      <tr><th>連接 Gmail、日曆、雲端硬碟</th><td>可以</td><td>可以</td></tr>
+      <tr><th>讀信、看行程、讀檔案</th><td>可以</td><td>可以</td></tr>
+      <tr><th>建行程、回信、寄信、存檔到雲端</th><td>可以，每次都跳確認</td><td>可以；自動模式下可能不問</td></tr>
+      <tr><th>用量</th><td><mark>實測 5 則訊息就用完 5 小時上限</mark></td><td>多很多</td></tr>
+      <tr><th>自訂連接器</th><td>最多 1 個</td><td>可以加更多</td></tr>
+    </tbody>
+  </table>
+  <figure class="pz-fig">
+    <img src="media/6-1/img/a_free_limit.png" alt="升級以繼續對話：您已達到 5 小時訊息上限，上限將於上午 5:50 重設">
+    <figcaption>免費帳號做完第 5 則訊息跳出的畫面：「您已達到 5 小時訊息上限」，要等時間到才能繼續。</figcaption>
+  </figure>
+  <p class="pz-p">連上了卻突然不回應，先看是不是用量用完了，不是連接壞掉。用學校或公司的 Team、Enterprise 方案，要組織的擁有者先開放連接器，你才看得到。其他方案差別（模型、用量、價格），在「方案比較」那一課。</p>
+  <p class="small muted">「免費版能連能讀」照官方說明；建行程、回信寄出、存檔是 2026 年 11 月 20 日用免費示範帳號實測。有報導說寄信限付費方案，我們實測免費帳號可以。</p>
+  <p class="pl-key"><span>這段重點</span>免費版都做得到，但用量很快用完</p>
+</section>
+<section class="pdfpage" id="p12" data-n="12" data-ch="end" data-tl="常用 connector 與推薦">
+  <p class="kicker">起手包與延伸</p>
+  <h1>還有哪些 connector？你該連哪幾個</h1>
+  <p class="lead">Google 這三個只是開始。<span class="em">連接器目錄裡最多人用的有這些，接法都一樣：「自訂 → 連接器 → 探索」按「＋」。</span></p>
+  <h2>常用的 connector</h2>
+  <p class="small muted">照目錄「最多人使用的連接器」排序（2026-11-20）。標「未實測」的，我們還沒用免費帳號試過；有些 App 本身的功能也要對方的付費帳號。</p>
+  <ol class="pz-ol">
+    <li><b>Google Drive：</b>搜尋、讀取、存檔到雲端硬碟，也能匯出成 Word、Excel 下載。</li>
+    <li><b>Gmail：</b>搜尋信件、整理長串來回的信、草擬回信並寄出。</li>
+    <li><b>Google Calendar：</b>查行程、找空檔、建立或修改活動。</li>
+    <li><b>Microsoft 365：</b>連 Outlook 信件、行事曆和 OneDrive、SharePoint 檔案。官方說明寫免費版可連個人 Microsoft 帳號。</li>
+    <li><b>Canva：</b>搜尋、建立、套版和匯出設計。<span class="tbd">未實測</span></li>
+    <li><b>Slack：</b>讀頻道訊息、整理討論、發訊息。<span class="tbd">未實測</span></li>
+    <li><b>Google Sheets：</b>讀試算表、分析數字、更新儲存格。<span class="tbd">未實測</span></li>
+    <li><b>Notion：</b>搜尋筆記與資料庫、新增或更新頁面。<span class="tbd">免費版只確認到能開始連接</span></li>
+    <li><b>Atlassian：</b>Jira 工單、Confluence 文件、Bitbucket 程式碼。<span class="tbd">未實測</span></li>
+    <li><b>Google Docs：</b>編輯、留言、摘要 Google 文件。<span class="tbd">未實測</span></li>
+    <li><b>Figma：</b>讀設計稿，生成圖表或程式碼。<span class="tbd">未實測</span></li>
+    <li><b>Supabase：</b>管理資料庫、登入與儲存空間，給要做網站或 App 的人。<span class="tbd">未實測</span></li>
+  </ol>
+  <h2>依你是誰，先連這幾個</h2>
+  <table class="pz-table">
+    <thead><tr><th></th><th>先連</th><th>也可以連</th></tr></thead>
+    <tbody>
+      <tr><th>大學生、研究生</th><td>Gmail、Google Calendar、Google Drive</td><td>Notion（筆記）、Consensus（查研究）、Paperguide（找文獻、系統性回顧）</td></tr>
+      <tr><th>上班族</th><td>Gmail 或 Microsoft 365（看公司用哪套）、Google Calendar、Google Drive、Slack</td><td>Google Sheets、Notion、Asana</td></tr>
+      <tr><th>做內容、社群</th><td>Canva、Google Drive、Notion、Google Calendar</td><td>Windsor.ai 或 Supermetrics（抓社群、廣告成效數據，偏進階）</td></tr>
+      <tr><th>設計</th><td>Figma、Canva、Slack、Google Drive</td><td>Notion（整理客戶意見）</td></tr>
+      <tr><th>寫程式／專案管理</th><td>寫程式：GitHub、Atlassian（Jira、Confluence）、Linear、Slack<br>專案管理：Asana、monday.com、Slack、Google Calendar</td><td>Vercel、Supabase（做網站的人）</td></tr>
+    </tbody>
+  </table>
+  <h2>Connectors 起手包</h2>
+  <p class="pz-p">起手包是一份 6 頁的 PDF，加一個可以直接複製的「常用指令.txt」：必連的 3 個 connector、常用連接器總覽、上面五種人各一個情境和推薦指令（大學生、研究生那頁就是這課示範的四步）、跨 App 常用指令，以及寫入前看什麼、卡住時怎麼辦。到 IG @paradigmai_tw 這課的貼文留言「connector」，我們私訊傳給你。</p>
+  <figure class="pz-fig narrow">
+    <img src="media/6-1/img/gift_cover.png" alt="Connectors 起手包的一頁：大學生／研究生的推薦連接器和示範四步的指令">
+    <figcaption>起手包的「大學生／研究生」那頁：推薦連哪幾個，加上這課示範的四句指令。</figcaption>
+  </figure>
+  <p class="pl-key"><span>這段重點</span>留言 connector，拿起手包</p>
+</section>
+<section class="pdfpage" id="p13" data-n="13" data-ch="end" data-tl="常見問題與下一課">
+  <p class="kicker">常見問題</p>
+  <h1>常見問題</h1>
+  <div class="faq">
+    <div><b>設定裡已連接，它卻說找不到信或檔案？</b>先看這個對話的「＋ → 連接器」開關（付費版叫「外掛程式」）；開著還找不到，照「怎麼連」那節的五步查。</div>
+    <div><b>連完回到 Claude，卻寫「您已開始連接 Gmail，但尚未完成」？</b>Google 權限頁沒有全勾。按「連接」重來一次，權限頁勾 Select all 再按 Continue。</div>
+    <div><b>才問幾句就說訊息用完了？</b>免費版的連接器任務很吃用量，我們實測 5 則就到 5 小時上限。一句話把事情講完，或等上限重設。</div>
+    <div><b>能接兩個 Gmail 嗎？</b>不行，一次連一個 Google 帳號。要換帳號，先中斷連接再用另一個帳號接。</div>
+    <div><b>學校信箱連不上？</b>學校或公司的帳號可能被管理員擋住。先用個人 Google 帳號試，或問學校、公司的 IT。</div>
+    <div><b>它會不會亂寄信？</b>照預設，寄信、建行程這類動作會先跳確認，你按「允許一次」才會做。不要按「永遠允許」；用付費方案的人，確認輸入框下方是手動模式。</div>
+    <div><b>它讀得到附件嗎？</b>每個附件約 12 MB 以內，設定裡要開「程式碼執行與檔案建立」。Google 文件裡的圖片看不到。</div>
+    <div><b>能幫我把雲端的檔案下載到電腦嗎？</b>可以。它把檔案匯出成 Word 放在對話裡的檔案卡片，點開預覽、右上按下載。它不會自己存進你的資料夾。</div>
+    <div><b>關掉開關後，新對話怎麼也讀不到信？</b>開關是整個帳號共用的，在哪個對話關掉，其他對話也跟著關。到「＋ → 連接器」開回來。</div>
+  </div>
+  <h2>做到這三件，就學會了</h2>
+  <ul class="dots">
+    <li>連上 Gmail、Google 日曆、Google 雲端硬碟，對話裡三個開關都開著</li>
+    <li>在一個 Project 裡用連接器回過信、建過行程、下載過檔案</li>
+    <li>看過寫入確認畫面，知道什麼時候按允許一次、什麼時候按拒絕</li>
+  </ul>
+  <h2>考考你</h2>
+  <div class="quiz">
+    <p>第 1 題：設定頁顯示 Gmail「已連接」，但在新對話裡問信件，Claude 說它沒辦法存取你的信箱。最可能是哪裡沒做？</p>
+    <ol>
+      <li>還要另外上傳一次信件</li>
+      <li>這個對話的「＋ → 連接器」裡，Gmail 的開關沒開</li>
+      <li>要先付費才能讀信</li>
+      <li>要先中斷連接再接一次</li>
+    </ol>
+    <span class="ans">答案：B。設定裡連好只是接上了，每個對話還有自己的開關，這是第一個要查的地方。免費版也能讀信。</span>
+  </div>
+  <div class="quiz">
+    <p>第 2 題：權限照預設、沒有開自動模式的情況下，下面哪一個動作，Claude 執行前會先跳確認、等你按？</p>
+    <ol>
+      <li>搜尋這週的信件</li>
+      <li>讀雲端硬碟裡的一份報告</li>
+      <li>在日曆建一個行程</li>
+      <li>看下週二的空檔</li>
+    </ol>
+    <span class="ans">答案：C。只讀的動作不會問；會改到你 App 的動作（建行程、寄信、存檔、刪除）才會先問。</span>
+  </div>
+  <div class="next">
+    <div class="k">下一課・即將推出</div>
+    <div class="t">Connector 安全設定</div>
+    <p>接上之後怎麼控管權限，以及怎麼防信件裡藏的指令。</p>
+  </div>
+  <div class="end-cta">
+    <div class="big">先接上 Gmail、日曆和雲端硬碟，<br>今天就丟出第一句跨 App 的指令。</div>
+    <p>留言「connector」，拿起手包：各族群推薦的 connector 和直接能用的指令。</p>
+    <p data-res-link>不用等私訊：教學 PDF 和贈品都在 <a href="../resources/index.html">資源下載</a> 頁，免費下載。</p>
+  </div>
+  <h2>想看官方說明</h2>
+  <ul class="refs">
+    <li>Use connectors to extend Claude's capabilities｜support.claude.com/en/articles/11176164</li>
+    <li>Use Google Workspace connectors｜support.claude.com/en/articles/10166901</li>
+  </ul>
+  <p class="small muted">介面名稱與畫面是 2026 年 11 月的 Claude 網頁版（中文介面）。官方說明頁還寫「自訂›連接器」，免費示範帳號看到的是「自訂›連接器」，付費帳號是「外掛程式›連接器」；照你畫面上有的那個找。</p>
+  <p class="pl-key"><span>這段重點</span>卡住就回來翻這頁</p>
+</section>
+  </main>
+  </div>
+</div>
+<script>window.PDFLESSON = {"id": "6-1", "title": "Connectors 入門：連接 Gmail、日曆與雲端硬碟", "pdf": "media/6-1/connectors-guide.pdf", "pdfName": "Connectors完整教學.pdf", "chapters": [{"k": "what", "t": "Connector 是什麼", "d": "一個情境、跟上傳檔案差在哪、為什麼值得接"}, {"k": "connect", "t": "怎麼連", "d": "接上 Google 三個連接器、對話裡打開開關、再加 Notion"}, {"k": "can", "t": "各能做什麼", "d": "Gmail、Google Calendar、Google Drive 的讀與寫"}, {"k": "do", "t": "情境演示", "d": "統合分析進度會議：回信、記進日曆、匯出下載、存回雲端並起草"}, {"k": "safe", "t": "寫入前會先問你", "d": "確認畫面、限制、中斷連接、方案"}, {"k": "end", "t": "起手包與延伸", "d": "還有哪些 connector、依族群推薦、起手包、常見問題、課後測驗"}], "source": "lessons/06_Connectors入門/PDF", "built": "2026-11-20", "draft": false}</script>
+<script src="../pixel.js"></script>
+<script src="roadmap8.js"></script>
+<script src="glossary.js"></script>
+<script src="pdf-chapter-core.js"></script>
+<script src="pdf-chapter.js"></script>
+</body>
+</html>

@@ -1,16 +1,31 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<meta name="description" content="Skills 入門：呼叫、更新、自己做一個。Paradigm AI 學習站的免費中文課程，附完整教學 PDF 與動手練習，不會寫程式也學得會。">
+<link rel="canonical" href="https://paradigm-ai10.github.io/study-home/lessons/4-4.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Paradigm AI 學習站">
+<meta property="og:title" content="Skills 入門：呼叫、更新、自己做一個｜Paradigm 學 AI">
+<meta property="og:description" content="Skills 入門：呼叫、更新、自己做一個。Paradigm AI 學習站的免費中文課程，附完整教學 PDF 與動手練習，不會寫程式也學得會。">
+<meta property="og:url" content="https://paradigm-ai10.github.io/study-home/lessons/4-4.html">
+<meta property="og:image" content="https://paradigm-ai10.github.io/study-home/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Skills 入門：呼叫、更新、自己做一個｜Paradigm 學 AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap">
 <link rel="stylesheet" href="media/4-4/pdf.css">
 <link rel="stylesheet" href="pdf-lesson.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 8 5%22 shape-rendering=%22crispEdges%22%3E%3Cpath fill=%22%23FF6B57%22 d=%22M1 0h6v1h1v3H7v1H6V4H5v1H4V4H3v1H2V4H1v1H0V1h1z%22/%3E%3Cpath fill=%22%233A2E5C%22 d=%22M2 1h1v1H2zM5 1h1v1H5z%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="pdf-flip.css">
+<link rel="stylesheet" href="pdf-chapter.css">
 </head>
-<body>
-<!-- 網頁課（4-4）：內容是定稿 PDF 的原文（課程/01_Skills介紹/PDF/index.html），由 tools/from_pdf.py 產生，不要手改；
+<body data-flip="chapter">
+<!-- 網頁課（4-4）：內容是定稿 PDF 的原文（lessons/01_Skills介紹/PDF/index.html），由 tools/from_pdf.py 產生，不要手改；
      要改字請改 PDF 那邊，再重跑這支工具。外框與互動在 pdf-lesson.js、pdf-lesson.css。 -->
 <header class="pl-top" id="top"></header>
 <div class="pl-map" id="map"></div>
@@ -22,14 +37,15 @@
   <div class="pl-run" id="run"></div>
   <main class="pdfdoc" id="doc">
 <section class="pdfpage cover" id="p1" data-n="1">
-  <div class="brand">PARADIGM · 01</div>
-  <h1>Skills 入門：<br>呼叫、更新、自己做一個</h1>
+  <div class="brand">PARADIGM · 4-4</div>
+  <h1>Skills 入門</h1>
   <div class="tagline">教 AI 一次，之後它自己照做</div>
   <p class="who">給常用 Claude、但每次都要重講同樣要求的學生和上班族。不用會寫程式。</p>
-  <div class="learn">
-    <div><i>01</i><b>呼叫</b>一句話叫 Claude 用你的 Skill</div>
-    <div><i>02</i><b>更新</b>加一行規則，結果跟著變</div>
-    <div><i>03</i><b>自己做一個</b>把你常做的事存成 Skill</div>
+  <div class="learn-t">看完這份，你會學到 3 件事</div>
+  <div class="learn3">
+    <div><i>1</i><p><b>什麼是 Skills</b>它是什麼、為什麼用了就不用每次重講</p></div>
+    <div><i>2</i><p><b>怎麼做一個自己的 Skill</b>把你常做的事存起來，還能隨時加規則</p></div>
+    <div><i>3</i><p><b>怎麼呼叫 Skills</b>一句話，Claude 就照你存好的做法做</p></div>
   </div>
   <div class="meta"><span>約 15–20 分鐘</span><span>免費版可用</span><span>不用寫程式</span></div>
   <div class="skip">
@@ -54,57 +70,17 @@
   <p class="lead">Skill 就是把你交代 AI 的那段要求打包起來。下次不用再講一遍，<span class="em">一句話就好</span>。</p>
 
   <h2>把它想成 AI 的食譜</h2>
-  <p>Claude 是廚師，Skill 是食譜，你每次給的講義是食材。食譜寫一次，之後換什麼食材，都照同一套做法做。</p>
-  <div class="flow3">
-    <div class="st">
-      <div class="n">1</div>
-      <div class="t">寫一次食譜</div>
-      <div class="pic">
-        <div class="mini-card">
-          <div class="mt">handout-quiz</div>
-          <div class="ln"></div><div class="ln s"></div><div class="ln"></div><div class="ln s"></div>
-        </div>
-      </div>
-      <p>把你要的做法、格式、規則寫成一份食譜。</p>
-    </div>
-    <div class="ar">→</div>
-    <div class="st">
-      <div class="n">2</div>
-      <div class="t">每次換食材</div>
-      <div class="pic papers">
-        <div class="paper">講義 A</div><div class="paper">講義 B</div><div class="paper">講義 C</div>
-      </div>
-      <p>這週是統計，下週是英文，講義每次附上。</p>
-    </div>
-    <div class="ar">→</div>
-    <div class="st">
-      <div class="n">3</div>
-      <div class="t">做出同一道菜</div>
-      <div class="pic papers">
-        <div class="paper dish">測驗 A</div><div class="paper dish">測驗 B</div><div class="paper dish">測驗 C</div>
-      </div>
-      <p>題目不同，但版面、規則、解析都照食譜。</p>
-    </div>
-  </div>
+  <p>把 Claude 想成廚師：Skill 是它的食譜，你每次附上的講義是食材。食譜只要寫一次，之後不管換什麼食材，Claude 都照同一份食譜做。</p>
+  <ol class="pz-ol">
+    <li><b>先寫好食譜</b>：把你要的做法、格式、規則寫進 Skill。</li>
+    <li><b>每次換食材</b>：這週附統計講義，下週附英文講義。</li>
+    <li><b>做出同一道菜</b>：題目每次不同，但版面、規則和解析的寫法都跟食譜一樣。</li>
+  </ol>
 
   <h2>食譜可以一直改</h2>
-  <div class="revise">
-    <div class="mini-card big">
-      <div class="mt">handout-quiz 的食譜 <span class="ver">v2</span></div>
-      <ol>
-        <li>題目和答案只能來自講義</li>
-        <li>做成可以點選作答的互動測驗</li>
-        <li>選完顯示對錯和解析</li>
-        <li>做完看總分、輸出錯題 PDF</li>
-        <li class="add">＋ 多一個「我不會」選項</li>
-      </ol>
-    </div>
-    <div class="revise-txt">
-      <p><b>哪裡不滿意，跟 Claude 說一句，食譜就多一行。</b></p>
-      <p>下次再叫它，新的規則就在裡面了，不用從頭重講。第 8 頁會實際改一次。</p>
-      <p class="muted small">Skill 裡可以只有文字規則，也可以附範本、參考資料或小程式。這堂課全部交給 Claude 幫你整理，你不用自己寫程式。</p>
-    </div>
-  </div>
+  <p class="pz-p"><b>哪裡不滿意，跟 Claude 說一句，食譜就多一行。</b>例如 handout-quiz 原本有四條規則：題目和答案只能來自講義、做成可以點選作答的互動測驗、選完顯示對錯和解析、做完看總分並輸出錯題 PDF。後來想加一個「我不會」選項，跟 Claude 說一句，它就加進去，變成第二版。</p>
+  <p class="pz-p">下次再叫它，新規則已經在裡面，不用從頭重講。第 8 頁會實際改一次。</p>
+  <p class="muted small">Skill 裡可以只有文字規則，也可以附範本、參考資料或小程式。這堂課全部交給 Claude 幫你整理，你不用自己寫程式。</p>
   <p class="pl-key"><span>這段重點</span>Skill＝AI 的食譜</p>
 </section>
 <section class="pdfpage" id="p3" data-n="3" data-ch="learn" data-tl="食譜裡有什麼">
@@ -129,23 +105,13 @@
   </div>
 
   <h2>Claude 怎麼用食譜</h2>
-  <div class="flow4">
-    <div><span class="n">1</span>你說「幫我用這份講義出題」</div>
-    <div class="ar">→</div>
-    <div><span class="n">2</span>Claude 先看食譜架上每份的<b>名字和描述</b></div>
-    <div class="ar">→</div>
-    <div><span class="n">3</span>找到對得上的那份，打開讀全文</div>
-    <div class="ar">→</div>
-    <div><span class="n">4</span>照做法做出測驗</div>
-  </div>
-  <div class="shelf">
-    <div class="shelf-t">你的食譜架（設定 → 自訂 → Skills）</div>
-    <div class="shelf-row">
-      <div class="mini-card on"><div class="mt">handout-quiz</div><div class="d">給講義、說出題時用</div></div>
-      <div class="mini-card"><div class="mt">meeting-notes</div><div class="d">給會議逐字稿時用</div></div>
-      <div class="mini-card"><div class="mt">weekly-report</div><div class="d">寫週報時用</div></div>
-    </div>
-  </div>
+  <ol class="pz-ol">
+    <li>你說「幫我用這份講義出題」。</li>
+    <li>Claude 先看食譜架上每份的<b>名字和描述</b>。</li>
+    <li>找到對得上的那份，打開讀全文。</li>
+    <li>照做法做出測驗。</li>
+  </ol>
+  
   <p class="small muted">Claude 平常先看名字和描述，用到才打開全文。所以描述寫得清楚，比名字取得漂亮更重要。</p>
   <p class="pl-key"><span>這段重點</span>名字、描述、做法、附件</p>
 </section>
@@ -153,36 +119,22 @@
   <p class="kicker">核心概念</p>
   <h1>為什麼要用 Skill？</h1>
   <p class="lead">因為你不用每次都重講一次。同一份測驗，有沒有 Skill 的差別：</p>
-  <div class="compare">
-    <div class="box before">
-      <div class="label">沒有 Skill：每次都要打</div>
-      一段四行的要求，交代這些事（完整版在第 5 頁）：
-      <ul class="dots" style="margin:1.5mm 0 0">
-        <li>題目和答案只能來自講義</li>
-        <li>做成可以點選作答的互動測驗</li>
-        <li>選完馬上顯示對錯和解析</li>
-        <li>做完看總分、輸出錯題 PDF</li>
-      </ul>
-    </div>
-    <div class="arrow">→</div>
-    <div class="box after">
-      <div class="label">有 Skill：只要打</div>
-      <div class="say">用 handout-quiz 出題</div>
-    </div>
-  </div>
-  <p class="compare-cap">一樣的做法，你只打一句。講義還是每次附上。</p>
-  <div class="three">
-    <div><b>省時間</b>不用每次翻出那段要求、複製貼上。</div>
-    <div><b>不會漏</b>規則都在食譜裡，不會這次忘了講「要附解析」。</div>
-    <div><b>越用越好</b>每次發現問題就加一行，食譜越改越合你的口味。</div>
-  </div>
+  <p class="pz-p">沒有 Skill 時，每次都要貼一段四行的要求（完整版在第 5 頁）：題目和答案只能來自講義、做成可以點選作答的互動測驗、選完馬上顯示對錯和解析、做完看總分並輸出錯題 PDF。有了 Skill，只要打一句 <span class="pz-say">用 handout-quiz 出題</span>，Claude 就照同樣的做法出題。講義還是每次要附上。</p>
+  <ul class="pz-ul">
+    <li><b>省時間</b>：不用每次翻出那段要求、複製貼上。</li>
+    <li><b>不會漏</b>：規則都在食譜裡，不會這次忘了講「要附解析」。</li>
+    <li><b>越用越好</b>：每次發現問題就加一行，食譜越改越合你的口味。</li>
+  </ul>
 
   <h2>跟 Prompt、Project 有什麼不同？三個可以一起用</h2>
-  <div class="cards">
-    <div class="card"><h3>Prompt（提示詞）</h3>你在這次對話裡打的要求。只寫在這次對話裡的，換一個對話就要重打。</div>
-    <div class="card"><h3>Project（專案）</h3>放同一件事的檔案、背景說明和專案指示（例如語氣）。只有在那個 Project 裡的對話用得到。</div>
-    <div class="card hot"><h3>Skill</h3>把某種任務的做法存起來。開著的話，網頁和桌面 app 的任何對話都能用，需要這套做法時 Claude 才讀它。</div>
-  </div>
+  <table class="pz-table">
+    <thead><tr><th></th><th>是什麼</th><th>在哪裡用得到</th></tr></thead>
+    <tbody>
+      <tr><th>Prompt（提示詞）</th><td>你在這次對話裡打的要求。</td><td>只在這次對話有效，換一個對話就要重打。</td></tr>
+      <tr><th>Project（專案）</th><td>放同一件事的檔案、背景說明和專案指示（例如語氣）。</td><td>只有在那個 Project 裡的對話用得到。</td></tr>
+      <tr><th>Skill</th><td>把某種任務的做法存起來。</td><td>開著的話，網頁和桌面 app 的任何對話都能用，需要這套做法時 Claude 才讀它。</td></tr>
+    </tbody>
+  </table>
   <p class="pl-key"><span>這段重點</span>不用每次重講</p>
 </section>
 <section class="pdfpage" id="p5" data-n="5" data-ch="do" data-tl="做一次" data-step="1">
@@ -245,41 +197,18 @@
   <p class="kicker">實作流程 ③ 呼叫</p>
   <h1>開新對話，一句話叫出來</h1>
   <p class="lead">開一個全新的對話，附上這次要考的講義，只打一句。Skill 存的是做法，<span class="em">講義每次還是要給</span>。</p>
-  <div class="callflow">
-    <div class="mock cf-chat">
-      <span class="badge">示意圖</span>
-      <p class="cf-t">① 新對話</p>
-      <div class="cf-file"><span>PDF</span>統計講義.pdf</div>
-      <div class="input">用 handout-quiz 出題<span class="cur">｜</span></div>
-      <p class="cf-n">附講義＋打一句，送出</p>
-    </div>
-    <div class="cf-arrow">→</div>
-    <div class="mock cf-quiz">
-      <p class="cf-t">② 右側打開測驗</p>
-      <div class="cf-q">
-        <div class="cf-bar"><b>第 1 / 10 題</b><span>答對 0 / 0</span></div>
-        <div class="cf-prog"><i></i></div>
-        <p class="cf-qq">題目（出自講義 p.1）</p>
-        <div class="cf-o">A　選項</div><div class="cf-o">B　選項</div><div class="cf-o">C　選項</div><div class="cf-o">D　選項</div>
-      </div>
-      <p class="cf-n">跟上次同一套做法：10 題、選完看解析</p>
-    </div>
-  </div>
+  <figure>
+    <img src="media/4-4/img/c_r3_open.png" alt="新對話附講義、打「用 handout quiz 出題」，右側打開測驗">
+    <figcaption>開新對話、附上講義，打一句送出，右側就會打開測驗。做法跟上次一樣：10 題，選完就看解析。</figcaption>
+  </figure>
   <p class="small">換一份講義，只打一句，出來的測驗做法一樣、版面大致相同。</p>
   <h2>三種叫法</h2>
-  <div class="ways">
-    <div class="way"><span class="n">講要做的事</span><span>「幫我用這份講義出題」。Claude 會看每個 Skill 的描述，對得上就自己用；沒用到就改用點名。</span></div>
-    <div class="way"><span class="n">點名</span><span><span class="say">用 handout-quiz 出題</span> 最穩。我們實測打成「handout quiz」（中間空格）也叫得到。</span></div>
-    <div class="way"><span class="n">從清單選</span><span>在輸入框打「/」，跳出 Skill 清單，選 handout-quiz（下面示意圖）。</span></div>
-  </div>
-  <div class="mock" style="width:62%; margin:0 0 4mm">
-    <span class="badge">示意圖</span>
-    <div class="menu" style="width:100%">
-      <div class="sel">handout-quiz<small>講義出測驗</small></div>
-      <div>你的其他 Skill…</div>
-    </div>
-    <div class="input"><span class="cur">/</span>handout</div>
-  </div>
+  <ul class="pz-ul">
+    <li><b>講要做的事</b>：「幫我用這份講義出題」。Claude 會看每個 Skill 的描述，對得上就自己用；沒用到的話，就改用點名。</li>
+    <li><b>點名</b>：<span class="pz-say">用 handout-quiz 出題</span> 最穩。我們實測打成「handout quiz」（中間空格）也叫得到。</li>
+    <li><b>從清單選</b>：在輸入框打「/」，跳出 Skill 清單，選 handout-quiz。</li>
+  </ul>
+  
   <div class="note"><b>換一份講義試一次。</b> 確認題數、格式、解析、下載都還照你的要求；每次出的題目不會一模一樣，但做法一樣。需要的話，一次也可以叫好幾個 Skill 一起用。</div>
   <p class="pl-key"><span>這段重點</span>做法一樣，你只打一句</p>
 </section>
@@ -316,13 +245,8 @@
 
   <div class="warnbox">
     <h3>⚠ 最常卡住的地方：要上傳的是 zip 檔</h3>
-    <div class="row">
-      <div class="files">
-        <div class="fi ok"><div class="zip"><span>ZIP</span></div><b>handout-quiz-plus.zip</b><em>✓ 上傳這個</em></div>
-        <div class="fi no"><div class="fold"></div><b>handout-quiz-plus</b><em>✗ 資料夾不行</em></div>
-      </div>
-      <div><p class="tight">下載後<b>不要解壓縮</b>。</p><p class="tight">Mac 的 Safari 可能自動把 zip 解成資料夾：在資料夾上按右鍵 →「壓縮」，得到 zip 再上傳。</p></div>
-    </div>
+    <p class="tight">要上傳的是 <b>handout-quiz-plus.zip</b> 這個檔案；解壓縮後的 handout-quiz-plus 資料夾不行。</p>
+    <p class="tight">下載後<b>不要解壓縮</b>。</p><p class="tight">Mac 的 Safari 可能自動把 zip 解成資料夾：在資料夾上按右鍵 →「壓縮」，得到 zip 再上傳。</p>
   </div>
 
   <h2>安裝兩步（約 1 分鐘）</h2>
@@ -427,10 +351,14 @@
   </div>
 
   <h2>跟你自己做的 handout-quiz 差在哪</h2>
-  <div class="fit">
-    <div class="yes"><h3>handout-quiz（影片裡做的）</h3><ul><li>一種出題</li><li>「我不會」是紅框，算答錯</li><li>錯題整理 PDF</li></ul></div>
-    <div class="no"><h3>handout-quiz-plus（送你的）</h3><ul><li>AI 出題＋考古題、合併相似題</li><li>「我不會」是虛線框，另標「我不會」、列入弱點</li><li>鍵盤、自評難度、AI 重點解析</li></ul></div>
-  </div>
+  <table class="pz-table">
+    <thead><tr><th></th><th>handout-quiz（影片裡做的）</th><th>handout-quiz-plus（送你的）</th></tr></thead>
+    <tbody>
+      <tr><th>出題</th><td>一種出題</td><td>AI 出題＋考古題、合併相似題</td></tr>
+      <tr><th>我不會</th><td>「我不會」是紅框，算答錯</td><td>「我不會」是虛線框，另標「我不會」、列入弱點</td></tr>
+      <tr><th>其他</th><td>錯題整理 PDF</td><td>鍵盤、自評難度、AI 重點解析</td></tr>
+    </tbody>
+  </table>
   <p class="small">兩個可以同時裝著；出題時點名你要的那個，例如「用 handout-quiz-plus 出題」。</p>
   <p class="pl-key"><span>這段重點</span>留言「skills」領取</p>
 </section>
@@ -459,24 +387,22 @@
     </div>
   </div>
   <h2>例子</h2>
-  <div class="ex">
-    <div>
-      <h3>學習</h3>
-      <ul>
+  
+      <h3 class="pz-h3">學習</h3>
+      <ul class="pz-ul">
         <li>上課錄音的逐字稿 → 重點筆記，固定用同一種標題和表格</li>
         <li>英文論文 → 中文摘要，一定附研究方法和限制</li>
         <li>考前把大家一起整理的課堂筆記，濃縮成一頁比較表</li>
       </ul>
-    </div>
-    <div>
-      <h3>工作</h3>
-      <ul>
+    
+    
+      <h3 class="pz-h3">工作</h3>
+      <ul class="pz-ul">
         <li>每週週報：固定段落、固定語氣</li>
         <li>會議逐字稿 → 決議、待辦、負責人</li>
         <li>回客戶信：照公司的稱呼和簽名格式</li>
       </ul>
-    </div>
-  </div>
+    
   <div class="note"><b>反過來看：</b>「幫我查一下今天某則新聞」只做一次，直接問就好；「每週把新聞整理成固定格式的重點摘要」做法固定，就適合。</div>
   <p class="pl-key"><span>這段重點</span>一直重講、要求一樣的事</p>
 </section>
@@ -540,13 +466,14 @@
   <h1>你已經會做 Skill 了</h1>
   <p class="lead">接下來，挑一件你每週都要重講的事，做成你的第一個 Skill。</p>
   <div class="next">
-    <div class="k">下一課</div>
+    <div class="k">下一課・即將推出</div>
     <div class="t">用別人寫好的 Skill</div>
     <p>網路上已經有很多現成的 Skill。下一課教你去哪裡找、裝之前看哪裡、怎麼改成你自己的版本。</p>
   </div>
   <div class="end-cta">
     <div class="big">做完了？留言告訴我們<br>你做了什麼 Skill。</div>
     <p>追蹤 @paradigmai_tw，看下一課。</p>
+    <p data-res-link>不用等私訊：教學 PDF 和贈品都在 <a href="../resources/index.html">資源下載</a> 頁，免費下載。</p>
   </div>
   <h2>想看官方說明</h2>
   <ul class="refs">
@@ -560,10 +487,11 @@
   </main>
   </div>
 </div>
-<script>window.PDFLESSON = {"id": "4-4", "title": "Skills 入門：呼叫、更新、自己做一個", "pdf": "media/4-4/skills-intro.pdf", "pdfName": "Skills入門.pdf", "chapters": [{"k": "learn", "t": "核心概念", "d": "定義、結構與運作方式"}, {"k": "do", "t": "實作流程", "d": "試做 → 儲存 → 呼叫 → 更新"}, {"k": "plus", "t": "安裝 Skill", "d": "下載、安裝與使用 handout-quiz-plus"}, {"k": "own", "t": "建立你的 Skill", "d": "適用情境判斷與建立步驟"}, {"k": "end", "t": "疑難排解與延伸", "d": "常見問題、課後測驗、下一課"}], "source": "課程/01_Skills介紹/PDF", "built": "2026-11-14", "draft": false}</script>
+<script>window.PDFLESSON = {"id": "4-4", "title": "Skills 入門：呼叫、更新、自己做一個", "pdf": "media/4-4/skills-intro.pdf", "pdfName": "Skills入門.pdf", "chapters": [{"k": "learn", "t": "核心概念", "d": "定義、結構與運作方式"}, {"k": "do", "t": "實作流程", "d": "試做 → 儲存 → 呼叫 → 更新"}, {"k": "plus", "t": "安裝 Skill", "d": "下載、安裝與使用 handout-quiz-plus"}, {"k": "own", "t": "建立你的 Skill", "d": "適用情境判斷與建立步驟"}, {"k": "end", "t": "疑難排解與延伸", "d": "常見問題、課後測驗、下一課"}], "source": "lessons/01_Skills介紹/PDF", "built": "2026-11-17", "draft": false}</script>
 <script src="../pixel.js"></script>
 <script src="roadmap8.js"></script>
 <script src="glossary.js"></script>
-<script src="pdf-lesson.js"></script>
+<script src="pdf-chapter-core.js"></script>
+<script src="pdf-chapter.js"></script>
 </body>
 </html>

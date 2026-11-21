@@ -11,7 +11,7 @@ window.MapChrome = (() => {
     const R8 = window.ROADMAP8 || { topics: [], first: [], idmap: {} }, PAGES = window.LESSON_PAGES || {};
     const title = {}, topicOf = {};
     R8.topics.forEach((t) => { (t.all || []).forEach(([id, ti]) => { title[id] = ti; topicOf[id] = t; }); t.lessons.forEach((l) => { title[l.id] = l.title; topicOf[l.id] = t; }); });
-    const open = R8.first.filter((id) => PAGES[id]);
+    const open = R8.first.filter((id) => PAGES[id]).concat(Object.keys(PAGES).filter((id) => title[id] && !R8.first.includes(id)));   // electives with a page count too (same as app.js)
     let known = [], next = null, kind = 'pick';
     if (window.F4 && F4.state) {
       known = F4.state.known.slice(); const n = F4.nextStep(); kind = n.kind; if (n.kind === 'lesson') next = n.lesson.id;
@@ -44,7 +44,7 @@ window.MapChrome = (() => {
     function sync() {
       p = progress();
       const head = p.doneOpen ? `已完成 ${p.doneOpen} / ${p.openCount} 課` : '';
-      const tail = p.kind === 'lesson' ? `下一步：${p.next} ${p.nextTitle}` : p.kind === 'done' ? '已開放課程全部完成' : `建議起點：主題 1（可先完成程度評估）`;
+      const tail = p.kind === 'lesson' ? `下一步：${p.next} ${p.nextTitle}` : p.kind === 'done' ? '已開放課程全部完成' : `建議起點：${window.F4 && F4.LESSONS && F4.LESSONS[0] ? F4.LESSONS[0].id + ' ' + F4.LESSONS[0].title : '先完成程度評估'}`;
       chip.innerHTML = `${head ? `<span>${esc(head)}</span>` : ''}<b>${esc(tail)}</b><i aria-hidden="true">在地圖上顯示 ›</i>`;
       chip.setAttribute('aria-label', `${head ? head + '。' : ''}${tail}。在地圖上顯示`);
       chip.hidden = false;

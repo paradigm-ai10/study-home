@@ -1,0 +1,101 @@
+/* 翻頁試做（2026-11-16）：接在 pdf-lesson.css 後面，只給 draft-4-4-flip*.html 用。三種翻法看 body[data-flip]。 */
+html { scroll-behavior: auto; }   /* 翻頁版不用平滑捲動，換畫面時直接回到這節開頭 */
+.pdfdoc { position: relative; overflow-anchor: none; }
+.pl-screen { position: relative; outline: none; }
+.pl-screen[hidden] { display: none; }
+.pl-screen.leaving { position: absolute; left: 0; right: 0; pointer-events: none; z-index: 1; }
+.pl-screen.s-page .pdfpage, .pl-screen.s-cover .pdfpage { margin-bottom: 0; }
+.pl-screen.s-cover .pdfpage.cover { margin-bottom: 10mm; }
+/* 每個畫面至少有一整個視窗高，翻頁鈕才會在下面 */
+.pl-screen { min-height: calc(100vh / var(--z) - 70px); display: flex; flex-direction: column; }
+.pl-screen > .pl-flipnav { margin-top: auto; }
+
+/* ── 章扉頁（共同） ── */
+.pdfdoc .pl-screen.s-ch .pl-chhead { display: block; border: 0; margin: 0; padding: 12mm 0 0; }
+.pl-chtitle { display: flex; gap: 6mm; align-items: flex-start; }
+.pl-chtitle .no { font: 700 34pt/1 var(--pixel); color: var(--coral-ink); background: none; padding: 0; }
+.pl-chtitle b { display: block; font-size: 24pt; line-height: 1.25; }
+.pl-chtitle div > span { display: block; margin-top: 2mm; font-size: 11.5pt; color: var(--grape-2); }
+.pl-chcount { margin: 11mm 0 3mm; font: 700 9pt/1 var(--ui); letter-spacing: .06em; color: var(--grape-2); }
+.pl-chlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 2mm; max-width: 120mm; }
+.pl-chlist a { display: flex; gap: 3mm; align-items: center; padding: 2.6mm 3.5mm; border-radius: 2.5mm; text-decoration: none; color: var(--grape); font-size: 11.5pt; font-weight: 700; }
+.pl-chlist a .n { font: 700 8.5pt/1 var(--ui); width: 5.5mm; height: 5.5mm; border-radius: 50%; display: grid; place-items: center; background: #efe4cd; color: var(--grape-2); flex: none; }
+.pl-chlist a:hover { background: #f5e6c8; }
+.pl-chlist a.seen::after { content: '✓ 讀過'; margin-left: auto; font-size: 9pt; color: var(--ok); font-weight: 700; }
+
+/* ── 翻頁鈕（共同） ── */
+.pl-flipnav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 4mm; margin: 14mm 0 0; padding: 6mm 0 2mm; border-top: 1px solid var(--line); }
+.pl-flipnav > :last-child { justify-self: end; }
+.pl-prev { border: 0; background: none; color: var(--grape-2); font: 600 10.5pt/1.3 var(--ui); padding: 2mm 1mm; text-align: left; justify-self: start; }
+.pl-prev:hover { color: var(--grape); text-decoration: underline; }
+.pl-next { display: inline-flex; align-items: center; gap: 3mm; border: 0; border-radius: 3mm; background: var(--grape); color: var(--cream); font: 700 11.5pt/1.3 var(--ui); padding: 3.4mm 5mm; text-align: left; }
+.pl-next b { font-size: 13pt; transition: transform .2s; }
+.pl-next:hover b { transform: translateX(3px); }
+.pl-where { display: flex; gap: 1.6mm; align-items: center; justify-self: center; }
+.pl-where i { width: 2.2mm; height: 2.2mm; border-radius: 50%; background: #e2d5bb; }
+.pl-where i.past { background: var(--grape-2); }
+.pl-where i.now { background: var(--coral); width: 5mm; border-radius: 2mm; }
+.pl-where small { margin-left: 2mm; font-size: 8.5pt; color: var(--grape-2); white-space: nowrap; }
+
+/* ══ A 翻書 ══ */
+body[data-flip="book"] .pl-screen.s-ch { background: var(--grape); color: var(--cream); border-radius: 5mm; padding: 0 12mm 6mm; }
+body[data-flip="book"] .pl-screen.s-ch .pl-chtitle .no { color: var(--sun); }
+body[data-flip="book"] .pl-screen.s-ch .pl-chtitle div > span, body[data-flip="book"] .pl-chcount { color: #cfc4e4; }
+body[data-flip="book"] .pl-chlist a { color: var(--cream); }
+body[data-flip="book"] .pl-chlist a .n { background: rgba(255,255,255,.12); color: var(--sun); }
+body[data-flip="book"] .pl-chlist a:hover { background: rgba(255,255,255,.08); }
+body[data-flip="book"] .pl-chlist a.seen::after { color: #9fe0bf; }
+body[data-flip="book"] .s-ch .pl-flipnav { border-top-color: rgba(255,255,255,.15); }
+body[data-flip="book"] .s-ch .pl-prev { color: #cfc4e4; }
+body[data-flip="book"] .s-ch .pl-next { background: var(--sun); color: var(--grape); }
+body[data-flip="book"] .pl-screen { backface-visibility: hidden; }
+/* 翻頁時舊的那頁帶一點陰影，像紙翻起來 */
+body[data-flip="book"] .pl-screen.leaving { background: var(--cream); box-shadow: 24px 0 50px -20px rgba(58,46,92,.45), inset -30px 0 40px -30px rgba(58,46,92,.25); z-index: 2; }
+
+/* ══ B 疊卡 ══ */
+body[data-flip="stack"] .pl-screen.leaving { z-index: 1; }
+body[data-flip="stack"] .pl-screen { background: var(--cream); }
+body[data-flip="stack"] .pl-screen.s-ch .pl-chtitle { flex-direction: column; gap: 3mm; }
+body[data-flip="stack"] .pl-screen.s-ch .pl-chtitle .no { font-size: 60pt; color: var(--grape); opacity: .12; line-height: .8; }
+body[data-flip="stack"] .pl-chlist { max-width: none; gap: 0; border-top: 1px solid var(--line); }
+body[data-flip="stack"] .pl-chlist a { border-radius: 0; border-bottom: 1px solid var(--line); padding: 4mm 2mm; font-size: 13pt; }
+body[data-flip="stack"] .pl-flipnav { grid-template-columns: 1fr; justify-items: stretch; border-top: 0; gap: 3mm; }
+body[data-flip="stack"] .pl-flipnav > :last-child { justify-self: stretch; }
+body[data-flip="stack"] .pl-flipnav .pl-where { order: -1; }
+body[data-flip="stack"] .pl-next { order: 0; width: 100%; justify-content: space-between; background: var(--coral); color: #fff; padding: 5mm 6mm; font-size: 13pt; border-radius: 3.5mm; box-shadow: 0 2.5mm 0 #e0503c; }
+body[data-flip="stack"] .pl-next:active { transform: translateY(1.5mm); box-shadow: 0 1mm 0 #e0503c; }
+body[data-flip="stack"] .pl-next b { transform: rotate(-90deg); }
+body[data-flip="stack"] .pl-next:hover b { transform: rotate(-90deg) translateX(3px); }
+body[data-flip="stack"] .pl-prev { order: 1; justify-self: center; }
+/* 下一節還疊在下面的感覺：底下露出兩條紙邊 */
+body[data-flip="stack"] .pl-screen.s-page:not(.leaving)::after { content: ''; display: block; height: 3mm; margin: 4mm 3mm 0; border-radius: 0 0 2mm 2mm; background: #f3e4c6; box-shadow: 0 2.5mm 0 -0.6mm #ead7b2; order: 9; }
+
+/* ══ C 讀完才翻 ══ */
+body[data-flip="gate"] .pl-flipnav.locked { opacity: .35; filter: grayscale(1); pointer-events: none; }
+body[data-flip="gate"] .pl-flipnav.locked .pl-next span::before { content: '🔒 '; }
+body[data-flip="gate"] .pl-flipnav.opened .pl-next { animation: pl-pop .5s cubic-bezier(.3,1.6,.5,1); background: var(--coral); }
+@keyframes pl-pop { 0% { transform: scale(.7); } 100% { transform: scale(1); } }
+.pl-gatehint { position: fixed; right: 24px; bottom: 22px; z-index: 20; font: 700 13px/1 var(--ui); color: var(--grape); background: var(--sun); padding: 10px 14px; border-radius: 999px; box-shadow: 0 4px 14px rgba(58,46,92,.2); opacity: 0; transform: translateY(8px); transition: opacity .25s, transform .25s; pointer-events: none; }
+.pl-gatehint.on { opacity: 1; transform: none; }
+.pl-gatehint b { display: inline-block; animation: pl-bob 1.2s ease-in-out infinite; }
+@keyframes pl-bob { 50% { transform: translateY(3px); } }
+.pl-recap { padding: 7mm 8mm; border-radius: 4mm; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); margin: 0 0 12mm; }
+.pl-recap .done { margin: 0 0 5mm; font-size: 13pt; font-weight: 800; display: flex; gap: 3mm; align-items: center; }
+.pl-recap .done b { width: 8mm; height: 8mm; border-radius: 50%; display: grid; place-items: center; background: var(--ok); color: #fff; font-size: 11pt; }
+.pl-recap .h { margin: 0 0 2mm; font: 700 9pt/1 var(--ui); letter-spacing: .06em; color: var(--grape-2); }
+.pl-recap ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 2.4mm; }
+.pl-recap li { font-size: 10.5pt; line-height: 1.55; padding-left: 4mm; border-left: 2px solid var(--sun); }
+.pl-recap li b { display: block; font-size: 9pt; color: var(--grape-2); }
+.pl-nextch { margin: 0 0 3mm; font: 700 9pt/1 var(--ui); letter-spacing: .06em; color: var(--coral-ink); }
+
+@media (prefers-reduced-motion: reduce) { .pl-gatehint b, body[data-flip="gate"] .pl-flipnav.opened .pl-next { animation: none; } }
+
+/* 窄螢幕 */
+@media (max-width: 760px) {
+  .pl-flipnav { grid-template-columns: 1fr; justify-items: stretch; }
+  .pl-flipnav > :last-child { justify-self: stretch; }
+  .pl-next { justify-content: space-between; }
+  .pl-where { order: -1; }
+  body[data-flip="book"] .pl-screen.s-ch { padding: 0 6mm 4mm; }
+  .pl-gatehint { right: 12px; bottom: 12px; }
+}

@@ -31,3 +31,11 @@ Paradigm 學習站首頁（f4 雨夜書桌）的預覽版，用 GitHub Pages 放
 - 新增根目錄 `first-trial.js`：套用試看清單的小程式，首頁兩版和捲軸地圖都會載入。
 - 第二堂課上線：`lessons/5-1.html`「Cowork 入門」（PDF 改名 `cowork-intro.pdf`）。
 - 首頁照首版順序推課（原本只照主題順序）；課程地圖 v8.6（新 1-3 方案比較，首版 21 課）。
+
+## 2026-11-21 更新（上線前整理）
+
+- 改由 Thomas 電腦的 `網站/上線/build.py` 自動產生整份網站（只帶訪客用得到的檔、路徑英文、每頁補分享預覽與說明），不再手動複製。
+- 新增第三堂課 `lessons/6-1.html`（Connectors 入門）與選修 `lessons/6-E4.html`（Threads 找好店）；舊的 5-1 Cowork 課拿掉。
+- 拿掉開課選單 `picker/`、`first-trial.js` 與舊樣品（skills.html、syllabus.js 等）。
+- 新增 404.html、robots.txt、sitemap.xml、og.jpg、favicon；這個預覽版設成不讓搜尋引擎收錄（正式站之後在 paradigmai.tw）。
+- 資源下載頁有 3 包；課程地圖 v8.7.2、首版 21 課（已開放 3 課）。

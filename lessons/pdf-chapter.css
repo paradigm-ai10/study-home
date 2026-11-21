@@ -1,0 +1,53 @@
+/* 一章一翻試做（2026-11-16）：接在 pdf-lesson.css、pdf-flip.css 後面，只給 draft-4-4-chapter.html 用。 */
+/* 封面：不要葡萄紫的卡片（Thomas 11/16：像一張紙貼在上面），字直接寫在網頁的奶油底上 */
+body[data-flip="chapter"] .pdfdoc .pdfpage.cover { background: none; color: var(--grape); border-radius: 0; padding: 6mm 0 0; }
+body[data-flip="chapter"] .pdfdoc .cover h1, body[data-flip="chapter"] .pdfdoc .cover .learn b, body[data-flip="chapter"] .pdfdoc .toc-row .tx b { color: var(--grape); }
+body[data-flip="chapter"] .pdfdoc .cover .brand { color: var(--coral-ink); }
+body[data-flip="chapter"] .pdfdoc .cover .tagline { color: var(--coral-ink); }
+body[data-flip="chapter"] .pdfdoc .cover .who, body[data-flip="chapter"] .pdfdoc .cover .skip, body[data-flip="chapter"] .pdfdoc .toc-row, body[data-flip="chapter"] .pdfdoc .cover .head, body[data-flip="chapter"] .pdfdoc .cover .foot { color: var(--grape-2); }
+body[data-flip="chapter"] .pdfdoc .cover .learn > * { color: var(--grape-2); background: none; border-color: var(--line); box-shadow: inset 0 0 0 1px var(--line); }
+body[data-flip="chapter"] .pdfdoc .cover .learn i { color: var(--coral-ink); }
+body[data-flip="chapter"] .pdfdoc .cover .meta > * { background: #f3e6cb; color: var(--grape); }
+body[data-flip="chapter"] .pdfdoc .toc-row { border-top-color: var(--line); }
+body[data-flip="chapter"] .pdfdoc .toc-row .pg, body[data-flip="chapter"] .cover .pl-ref { color: var(--coral-ink); }
+body[data-flip="chapter"] a.toc-row:hover { background: #f5e6c8; }
+body[data-flip="chapter"] a.toc-row:hover .tx b { color: var(--coral-ink); }
+body[data-flip="chapter"] .pdfdoc .skip b, body[data-flip="chapter"] .pdfdoc .toc-t { color: var(--coral-ink); }
+/* 01 封面 11/16 新版「看完這份，你會學到 3 件事」（.learn-t、.learn3）：字也改成直接寫在奶油底上 */
+body[data-flip="chapter"] .pdfdoc .cover .learn-t { color: var(--coral-ink); }
+body[data-flip="chapter"] .pdfdoc .cover .learn3 > div { background: none; border-color: var(--line); box-shadow: inset 0 0 0 1px var(--line); }
+body[data-flip="chapter"] .pdfdoc .cover .learn3 p { color: var(--grape-2); }
+body[data-flip="chapter"] .pdfdoc .cover .learn3 b { color: var(--grape); }
+
+/* 章開頭 */
+.pdfdoc .pl-screen.s-chap > .pl-chhead { display: block; border: 0; margin: 0 0 16mm; padding: 4mm 0 8mm; border-bottom: 2px solid var(--grape); }
+.s-chap .pl-chtitle small { display: block; margin-bottom: 1.5mm; font: 700 8.5pt/1 var(--ui); letter-spacing: .06em; color: var(--coral-ink); }
+.pl-chips { list-style: none; margin: 7mm 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 2mm; }
+.pl-chips a { display: inline-flex; gap: 2mm; align-items: center; padding: 1.8mm 3.2mm; border-radius: 99px; background: #f3e6cb; color: var(--grape); text-decoration: none; font-size: 10pt; font-weight: 700; }
+.pl-chips a span { font-size: 8pt; color: var(--coral-ink); }
+.pl-chips a:hover { background: var(--sun-soft); }
+/* 章裡的節：分隔清楚一點 */
+.pl-screen.s-chap > .pdfpage { margin-bottom: 16mm; }
+.pl-screen.s-chap > .pdfpage + .pdfpage { padding-top: 16mm; border-top: 1px dashed var(--line); }
+/* Take home message */
+.pl-takehome { margin: 6mm 0 0; padding: 7mm 8mm 6mm; border-radius: 4mm; background: var(--grape); color: var(--cream); }
+.pl-takehome .th-h { margin: 0 0 4.5mm; display: flex; justify-content: space-between; align-items: baseline; gap: 4mm; flex-wrap: wrap; }
+.pl-takehome .th-h b { font: 700 15pt/1.2 var(--ui); color: var(--sun); }
+.pl-takehome .th-h span { font-size: 9pt; color: #cfc4e4; }
+.pl-takehome ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 3mm; counter-reset: th; }
+.pl-takehome li { counter-increment: th; display: grid; grid-template-columns: 7mm 1fr; column-gap: 2mm; font-size: 11pt; line-height: 1.5; }
+.pl-takehome li::before { content: counter(th); grid-row: span 2; width: 5.5mm; height: 5.5mm; margin-top: .6mm; border-radius: 50%; display: grid; place-items: center; background: var(--coral); color: #fff; font: 700 8pt/1 var(--ui); }
+.pl-takehome li span { font-size: 9pt; color: #cfc4e4; line-height: 1.4; }
+.pl-takehome li b { font-weight: 800; font-size: 12pt; }
+/* 章末翻頁鈕：讀到才解鎖 */
+.s-chap > .pl-flipnav { border-top: 0; }
+.pl-flipnav.locked { opacity: .35; filter: grayscale(1); pointer-events: none; }
+.pl-flipnav.locked .pl-next span::before { content: '🔒 '; }
+.pl-flipnav.opened .pl-next { animation: pl-pop .5s cubic-bezier(.3,1.6,.5,1); background: var(--coral); }
+@media (prefers-reduced-motion: reduce) { .pl-flipnav.opened .pl-next { animation: none; } }
+/* 05（6-E4）封面：學完你能清單（.learn4）、動手做什麼（.make）、做完的樣子（.result）也寫在奶油底上 */
+body[data-flip="chapter"] .pdfdoc .cover .learn4 { color: var(--grape-2); }
+body[data-flip="chapter"] .pdfdoc .cover .learn4 li::marker { color: var(--coral-ink); }
+body[data-flip="chapter"] .pdfdoc .cover .make { color: var(--grape-2); border-left-color: var(--coral-ink); }
+body[data-flip="chapter"] .pdfdoc .cover .make b, body[data-flip="chapter"] .pdfdoc .cover .result .t { color: var(--coral-ink); }
+body[data-flip="chapter"] .pdfdoc .cover .result { display: none; } /* 網頁封面下已有「做完的樣子」卡，PDF 封面右下那張不重複放 */

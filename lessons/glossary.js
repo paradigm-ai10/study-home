@@ -25,7 +25,7 @@ window.GLOSSARY = [
   "term": "模型",
   "en": "Model",
   "plain": "訓練完成的 AI 本體；同一個 app 裡可以換不同模型。",
-  "lesson": "1-3",
+  "lesson": "1-E2",
   "topic": "T1"
  },
  {
@@ -39,7 +39,7 @@ window.GLOSSARY = [
   "term": "token（詞元）",
   "en": "Token",
   "plain": "AI 讀寫文字的最小單位，可能是一個字或半個詞；額度和費用都用它算。",
-  "lesson": "1-3",
+  "lesson": "1-E2",
   "topic": "T1"
  },
  {
@@ -53,7 +53,7 @@ window.GLOSSARY = [
   "term": "上下文視窗（context window）",
   "en": "Context window",
   "plain": "AI 一次能看到的內容總量，包含你的訊息、它的回答、上傳的檔案；超過就會忘記前面或變不準，越長也越耗額度。",
-  "lesson": "1-3",
+  "lesson": "1-E2",
   "topic": "T1"
  },
  {
@@ -215,7 +215,7 @@ window.GLOSSARY = [
   "term": "推理模型／思考",
   "en": "Reasoning / Thinking",
   "plain": "模型先在內部一步步想再回答，比較慢但比較準。在 Claude 的模型選單裡開關，名稱依模型不同（Thinking 或 Extended）；部分模型一律會思考。跟 Effort 是兩個分開的設定。",
-  "lesson": "1-3",
+  "lesson": "1-E2",
   "topic": "T1",
   "alias": [
    "Thinking",
@@ -226,7 +226,7 @@ window.GLOSSARY = [
   "term": "Effort（努力程度）",
   "en": "Effort",
   "plain": "設定模型要想多深（Low 到 Max）：越高越準但越慢、越耗額度；Free 能不能調以畫面為準。",
-  "lesson": "1-3",
+  "lesson": "1-E2",
   "topic": "T1"
  },
  {
@@ -633,7 +633,7 @@ window.GLOSSARY = [
   "term": "額度",
   "en": "Usage limit",
   "plain": "訂閱方案在一段時間內能用多少（例如每 5 小時、每週），用完要等重置或加購 usage credits。",
-  "lesson": "1-3",
+  "lesson": "1-E2",
   "topic": "T1"
  },
  {
@@ -924,7 +924,7 @@ window.GLOSSARY = [
   "term": "usage credits（用量加值）",
   "en": "Usage credits",
   "plain": "訂閱額度之外另外付費的用量。額度用完後可以用它繼續使用；Fable 上市優惠結束後（台灣時間 2026-11-17 起），Pro 與 Team 標準席使用 Fable 也從這裡扣。跟 API credits 不同。",
-  "lesson": "1-3",
+  "lesson": "1-E2",
   "topic": "T1"
  },
  {
@@ -959,7 +959,7 @@ window.GLOSSARY = [
   "term": "Claude 模型名稱",
   "en": "Fable / Opus / Sonnet / Haiku",
   "plain": "Claude 的模型分級，由強到快：Fable、Opus、Sonnet、Haiku（小而快、便宜）。2026-11 最新是 Fable 5.2（11/09 上線）與 Opus 5.5、Sonnet 5.5、Haiku 5.5；名稱會換，以畫面上的選單為準。",
-  "lesson": "1-3",
+  "lesson": "1-E2",
   "topic": "T1"
  },
  {
@@ -1678,14 +1678,14 @@ window.GLOSSARY = [
   "term": "模型自動選擇",
   "en": "Model routing",
   "plain": "系統依問題難度自動決定用哪個模型、要不要多想，例如 ChatGPT 的 Auto；Claude 以模型選單為準。跟 Claude Code 權限模式裡的 Auto 是兩回事。",
-  "lesson": "1-3",
+  "lesson": "1-E2",
   "topic": "T1"
  },
  {
   "term": "context rot（上下文腐化）",
   "en": "Context rot",
   "plain": "放進對話的內容越多，模型越容易漏看、表現變差，即使還沒超過上下文上限。長對話越來越不準，多半是這個原因。",
-  "lesson": "1-3",
+  "lesson": "1-E2",
   "topic": "T1"
  },
  {
@@ -1964,5 +1964,23 @@ window.GLOSSARY = [
   "plain": "放在網站根目錄、專門給 AI 讀的網站簡介檔，說明網站有哪些重要頁面；目前是提案格式，主要 AI 搜尋會不會讀取還沒有定論。",
   "lesson": "16-E1",
   "topic": "T16"
+ },
+ {
+  "term": "Apify",
+  "en": "Apify",
+  "plain": "一個雲端爬資料平台，有現成的工具可以抓 Threads、Google Maps 等網站的公開資料；接成 Connector 後，Claude 可以直接叫它去抓。",
+  "lesson": "6-E4",
+  "topic": "T6"
+ },
+ {
+  "term": "網頁爬蟲",
+  "en": "Web scraper",
+  "plain": "自動打開網頁、把上面的公開資料整理成表格的程式。只抓公開內容，也要遵守網站規則。",
+  "lesson": "6-E4",
+  "topic": "T6",
+  "alias": [
+   "爬蟲",
+   "scraper"
+  ]
  }
 ]

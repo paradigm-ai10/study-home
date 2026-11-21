@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<meta name="description" content="Threads 找好店完整教學。Paradigm AI 學習站的免費中文課程，附完整教學 PDF 與動手練習，不會寫程式也學得會。">
+<link rel="canonical" href="https://paradigm-ai10.github.io/study-home/lessons/6-E4.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Paradigm AI 學習站">
+<meta property="og:title" content="Threads 找好店完整教學｜Paradigm 學 AI">
+<meta property="og:description" content="Threads 找好店完整教學。Paradigm AI 學習站的免費中文課程，附完整教學 PDF 與動手練習，不會寫程式也學得會。">
+<meta property="og:url" content="https://paradigm-ai10.github.io/study-home/lessons/6-E4.html">
+<meta property="og:image" content="https://paradigm-ai10.github.io/study-home/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Threads 找好店完整教學｜Paradigm 學 AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap">
+<link rel="stylesheet" href="media/6-E4/pdf.css">
+<link rel="stylesheet" href="pdf-lesson.css">
+<link rel="stylesheet" href="pdf-flip.css">
+<link rel="stylesheet" href="pdf-chapter.css">
+</head>
+<body data-flip="chapter">
+<!-- 網頁課（6-E4）：內容是定稿 PDF 的原文（lessons/05_Threads找餐廳/PDF/index.html），由 tools/from_pdf.py 產生，不要手改；
+     要改字請改 PDF 那邊，再重跑這支工具。外框與互動在 pdf-lesson.js、pdf-lesson.css。 -->
+<header class="pl-top" id="top"></header>
+<div class="pl-map" id="map"></div>
+<div class="pl-strip" id="strip" aria-hidden="true"></div>
+<button type="button" class="pl-opener" id="opener" aria-controls="side" aria-expanded="false" hidden>目錄</button>
+<div class="pl-wrap">
+  <nav class="pl-side" id="side" aria-label="這課的章節"></nav>
+  <div class="pl-main">
+  <div class="pl-run" id="run"></div>
+  <main class="pdfdoc" id="doc">
+<section class="pdfpage cover" id="p1" data-n="1">
+  <div class="brand">PARADIGM · 6-E4</div>
+  <h1>Threads 找好店<br>完整教學</h1>
+  <div class="tagline">讓 Claude 接上 Threads，一句話整理出大家推薦的店</div>
+  <p class="who">給想把 Claude 用在生活裡、聽過 Connector 但還沒接過外部工具的學生和上班族。不用會寫程式。</p>
+  <div class="learn-t">學完你能</div>
+  <ol class="learn4">
+    <li>在 Claude 加上 Apify 自訂 Connector，用一句話叫它去 Threads 搜某類餐廳</li>
+    <li>讓 Claude 把爬回來的貼文去雜訊、抽店名、合併重複，做成 10–20 家的審閱表</li>
+    <li>在審閱表上打星、勾選要存的店、寫筆記，再把結果交回給 Claude</li>
+    <li>加碼：用 Claude in Chrome 開一個 Google Maps 新清單，把勾選的店存進去（Free 方案：拿 Claude 列的 Maps 連結自己按儲存）</li>
+  </ol>
+  <p class="make"><b>這課你會動手做：</b>挑一種你想吃的，自己跑完一輪。做完手上會有一個存著 10 家左右餐廳的 Google Maps 清單，和一張下次還能再用的審閱表。</p>
+  <div class="meta"><span>看完約 8–12 分鐘</span><span>自己試 15–25 分鐘</span><span>主線 Free 就能做</span></div>
+  <div class="skip">
+    <p><b>只想用送你的找好店 Skill？</b>翻到第 6 頁，裝好就能一句話開始找店。</p><p><b>還沒接 Apify？</b>先看第 3 頁。</p>
+  </div>
+  <div class="toc" id="toc"><div class="toc-t">目錄</div></div>
+</section>
+<section class="pdfpage" id="p2" data-n="2" data-ch="learn" data-tl="流程怎麼運作">
+  <p class="kicker">核心概念</p>
+  <h1>這套流程怎麼運作</h1>
+  <p class="lead">Claude 自己進不去 Threads。接上 Apify 之後，它就能去 Threads 抓大家的貼文、整理成店家清單；想要的話，再存進 Google Maps。</p>
+
+  <div class="plan-band"><span class="fr">Free 也能用</span><span class="pd">加碼：付費方案（Pro 以上）</span></div>
+  <div class="logoflow">
+    <div class="node"><img src="media/6-E4/img/logo/threads.svg" alt="Threads"><b>Threads</b><span>大家發的公開貼文</span></div>
+    <div class="arr">→<small>爬蟲抓貼文</small></div>
+    <div class="node"><img class="wide" src="media/6-E4/img/logo/i_apify.svg" alt="Apify"><b>Apify</b><span>爬蟲平台，經由 Connector 接到 Claude</span></div>
+    <div class="arr">→<small>貼文交給 Claude</small></div>
+    <div class="node"><img src="media/6-E4/img/logo/i_claude-icon.svg" alt="Claude"><b>Claude</b><span>抽店名、合併，整理成店家清單</span></div>
+    <div class="arr cut">→<small>Claude in Chrome</small></div>
+    <div class="node paid"><img src="media/6-E4/img/logo/i_google-maps.svg" alt="Google Maps"><b>Google Maps</b><span>把挑好的店存成清單</span></div>
+  </div>
+  <p class="small muted">Free 方案：最後一步改成 Claude 給你每家的 Google Maps 連結，自己點開按「儲存」。</p>
+
+  <h2>每個東西在做什麼</h2>
+  <ul class="pz-ul">
+    <li><b>Threads</b>：資料來源。大家吃完會發心得、列清單，這課只抓公開貼文。</li>
+    <li><b>Apify</b>：一個爬蟲平台，上面有很多別人做好的爬蟲（英文叫 Actor）。這課用它的 Threads 爬蟲把貼文抓回來。</li>
+    <li><b>Connector（連接器）</b>：把 Apify 接到 Claude 的那條線。接好之後，你在對話裡說一句，Claude 就能叫 Apify 的爬蟲跑，不用自己開 Apify 網站。</li>
+    <li><b>Claude</b>：讀貼文、抽店名、合併重複，整理成一張你能直接挑的店家清單。</li>
+    <li><b>Claude in Chrome</b>（加碼）：Chrome 擴充功能，讓 Claude 在你已登入的 Chrome 裡打開 Google Maps、一家一家按「儲存」。Google 沒有開放讓程式直接寫入清單，所以只能這樣存。</li>
+    <li><b>Google Maps</b>（加碼）：最後存店的地方，清單存好手機也看得到。</li>
+  </ul>
+  <p class="pz-p">這課的主角是前三個：<b>讓 Claude 接上 Threads</b>，一句話把大家推薦的店整理出來。存進 Google Maps 是加碼，想要再做。</p>
+  <p class="small muted">圖中的 logo 屬於各公司，這裡只用來標示是哪個服務。</p>
+  <p class="pl-key"><span>這段重點</span>Threads → Apify → Claude → Google Maps</p>
+</section>
+<section class="pdfpage" id="p3" data-n="3" data-ch="setup" data-tl="接上 Apify">
+  <p class="kicker">事前準備</p>
+  <h1>接上 Apify Connector</h1>
+  <p class="lead">只要做一次。接好之後，任何對話都能叫 Apify 的爬蟲。</p>
+  <ol class="steps">
+    <li>到 <span class="path">apify.com</span> 註冊一個免費帳號，不用填信用卡。</li>
+    <li>回到 Claude，左側點 <span class="path">自訂</span> → <span class="path">連接器</span>，右上 <span class="path">＋新增</span> → <span class="path">新增自訂連接器</span>。</li>
+    <li>名稱填 <span class="path">apify</span>，網址填 <span class="path">https://mcp.apify.com</span>，按「繼續」。下一個視窗的驗證設定照預設，按「新增」。</li>
+  </ol>
+  <figure style="width:47%"><img src="media/6-E4/img/s1_connector.jpg" alt="新增自訂連接器視窗，名稱 apify、網址 https://mcp.apify.com"></figure>
+  <div class="row">
+    <div style="flex:1.1">
+      <ol class="steps" start="4" style="counter-reset: s 3">
+        <li>跳到 Apify 的網頁「Claude asks for permission」，確認是你的 Apify 帳號，按 <span class="path">Allow access</span>。</li>
+        <li>回到 Claude，連接器清單裡有 apify，就接好了。</li>
+      </ol>
+      <div class="note"><b>不要從目錄加。</b>連接器目錄搜「Apify」看得到一個，但標著「無法從這裡新增」，所以要用「新增自訂連接器」自己填網址。也只用 Apify 官方網址，第三方包裝的網址不同、要另外註冊。</div>
+    </div>
+    <figure style="flex:.9"><img src="media/6-E4/img/s2_apify_perm.jpg" alt="Apify 授權頁 Claude asks for permission"><figcaption>Apify 的授權頁（英文），帳號名已糊掉。</figcaption></figure>
+  </div>
+  <h2>接好先試一句</h2>
+  <div class="prompt"><span class="tag">可以直接複製</span><p>確認你能使用 Apify 的工具，列出來給我看，先不要搜尋。</p></div>
+  <p class="pl-key"><span>這段重點</span>網址只填 mcp.apify.com</p>
+</section>
+<section class="pdfpage" id="p4" data-n="4" data-ch="do" data-tl="搜尋" data-step="1">
+  <p class="kicker">實作流程 ① 搜尋</p>
+  <h1>一句話，叫爬蟲去 Threads 找</h1>
+  <p class="lead">開一個新對話，貼上這句就好。</p>
+  <div class="prompt"><span class="tag">可以直接複製</span>
+    <p>用 Apify 幫我找 Threads 上的台北拉麵，抓最熱門的 20 則。</p>
+  </div>
+  <div class="row">
+    <figure style="flex:1"><img src="media/6-E4/img/s3_tool_perm.jpg" alt="Claude 想要使用來自 apify 的 Call Actor，允許一次"></figure>
+    <div style="flex:1"><p class="pz-p">第一次叫 Apify 的工具，Claude 會停下來問你，每種工具問一次。按「允許一次」，或確定以後都要用就按「永遠允許」。</p></div>
+  </div>
+
+  <h2>關鍵字怎麼下，決定抓不抓得到</h2>
+  <ul class="pz-ul">
+    <li><b>只用一個「地點＋食物」短詞</b>：「台北拉麵」抓得到。多加「推薦」這種字就可能一則都沒有（我們實測「台北拉麵推薦」是 0 則）；地點寫太細也可能抓不到（「東區拉麵」也是 0 則）；只打「拉麵」又幾乎都是別的縣市。想找特定區域，先抓「台北拉麵」，再請 Claude 篩。短詞只是比較容易抓到，不保證每種組合都有結果。</li>
+    <li><b>抓回一堆外文？</b>再補一句「語言設中文」。</li>
+    <li><b>時間範圍</b>：限定最近一年，舊文會少很多，但讚數很高的舊整理文也會被濾掉。我們的做法是不限日期，表上列出每則的日期，由你自己判斷。</li>
+  </ul>
+  <p class="pz-p">換成你想吃的：「台中燒肉」「新竹早午餐」「台南牛肉湯」，句子其他部分不用改。</p>
+  <p class="pl-key"><span>這段重點</span>一個短詞、設中文、想好要不要限日期</p>
+</section>
+<section class="pdfpage" id="p5" data-n="5" data-ch="do" data-tl="整理" data-step="2">
+  <p class="kicker">實作流程 ② 整理</p>
+  <h1>請 Claude 整理成店家清單</h1>
+  <p class="lead">抓回來的是一堆貼文，不是店家清單。這一步請 Claude 從<span class="em">讚數最高的貼文</span>開始，一則一則找出店名。</p>
+  <div class="prompt"><span class="tag">可以直接複製</span>
+    <p>幫我把這些貼文整理成店家清單：照讚數排，被多則提到的放前面，附 Google Maps 連結，不要放作者帳號。</p>
+  </div>
+
+  <p class="pz-p">Claude 會跳過其他城市、跟吃無關、只有發問、業配和店家自己的宣傳，只抽內文寫出來的店名，同一家不同寫法合成一家。想更準，可以再補一句「讚數不要加總，只看最高那則」。</p>
+  <h2>表上每一欄在看什麼</h2>
+  <ul class="pz-ul">
+    <li><b>反覆提及</b>：至少兩則貼文提到這家店，可以優先點開看。兩則也可能是同一個人發的、或其中一則在抱怨，所以還是要點原文看一下。</li>
+    <li><b>貼文讚數</b>：是整篇貼文的讚數，不是這家店的評分。一篇整理文的讚，會落在裡面每一家身上，所以只看最高那則、不加總，免得被放大。</li>
+    <li><b>貼文日期</b>：太久以前的推薦，店可能已經變了，甚至收掉。</li>
+    <li><b>Google Maps 連結</b>：點開看是不是同一家、還有沒有營業。</li>
+  </ul>
+  <h2>挑出你要的</h2>
+  <p class="pz-p">看完表，跟 Claude 說要存哪幾家，例如「存第 1、3、5、6 家」。挑的時候看有沒有寫細節（排隊多久、湯頭怎樣），寫明合作、招待或附折扣碼的先打個問號。</p>
+  <div class="note"><b>其實做到這裡就很夠用了。</b>用 Apify 爬 Threads、整理出店家清單，就是這課的主線。後面的找好店 Skill（一句話跑完、可以勾選的審閱表）和存進 Google Maps 都是加碼，只想學前半段的人可以停在這裡。</div>
+  <p class="pl-key"><span>這段重點</span>反覆提及的先看，點原文再確認</p>
+</section>
+<section class="pdfpage" id="p6" data-n="6" data-ch="plus" data-tl="安裝">
+  <p class="kicker">加碼｜找好店 Skill</p>
+  <h1>我們把它做成了找好店 Skill</h1>
+  <p class="pz-p">前面爬 Threads、整理出店家清單，其實就很夠用了。接下來是加碼：想更省事，或想把店存進 <b class="heavy">Google Maps</b> 地圖，再往下看。</p>
+  <p class="lead">前面這套做法，我們整理成一個 Skill。裝好之後，<span class="em">一句話</span>就能：</p>
+  <ul class="pz-ul">
+    <li><b class="heavy">去 Threads 抓 60 則公開貼文，從讚數最高的找出店名，被反覆提到的排最前面</b></li>
+    <li><b class="heavy">做出一張審閱表：勾選要存的店、打星、寫筆記，Google Maps 和 Threads 原文一點就開</b></li>
+    <li><b class="heavy">加碼：審完貼回去，自動存進 Google Maps 新清單；沒有 Claude in Chrome 就給你每家的連結自己存</b></li>
+  </ul>
+  <p class="small muted">要先接好 Apify（第 3 頁）。留言「拉麵店」，我們會私訊你下載連結。Skill 的英文名字是 find-good-eats。</p>
+
+  <div class="warnbox">
+    <h3>⚠ 最常卡住的地方：要上傳的是 zip 檔</h3>
+    <div class="okno">
+      <div class="ok"><span class="mk">✓</span><b>find-good-eats.zip</b><small>下載下來的那個檔案，直接上傳</small></div>
+      <div class="no"><span class="mk">✗</span><b>find-good-eats 資料夾</b>或裡面的 SKILL.md<small>Mac 下載後常自動解壓成資料夾</small></div>
+    </div>
+    <p class="tight">變成資料夾了：在資料夾上按右鍵 →「壓縮」，得到 zip 再上傳。</p>
+  </div>
+
+  <h2>安裝兩步</h2>
+  <ol class="steps">
+    <li>到 <span class="path">設定 → 自訂 → Skills</span>，右上「＋新增」→「上傳 Skill」→ 選 find-good-eats.zip。桌面 app 也可以從左側 <span class="path">外掛程式</span> →「新增」→「上傳外掛程式」，畫面如下，按「上傳」。</li>
+  </ol>
+  <figure style="width:46%"><img src="media/6-E4/img/s7_upload.jpg" alt="上傳外掛程式，選好 find-good-eats.zip"></figure>
+  <ol class="steps" start="2" style="counter-reset: s 1">
+    <li>看到「已新增 find-good-eats」，或清單出現 find-good-eats、旁邊沒有標「已停用」，就裝好了。開新對話打「/」，清單裡找得到 find-good-eats 就確定能用。</li>
+  </ol>
+  <p class="pl-key"><span>這段重點</span>上傳的是 zip，不是資料夾</p>
+</section>
+<section class="pdfpage" id="p7" data-n="7" data-ch="plus" data-tl="使用">
+  <p class="kicker">加碼｜找好店 Skill</p>
+  <h1>開始使用：一句話找店</h1>
+  <div class="prompt"><span class="tag">可以直接複製</span>
+    <p>用找好店 Skill 幫我找台北拉麵</p>
+  </div>
+  <p class="pz-p">換成任何「城市＋想吃的」：「用找好店 Skill 幫我找台中燒肉」。叫不到的話，先打「/」，從清單點 find-good-eats，再接「幫我找台北拉麵」（我們錄影時就是這樣叫的）。</p>
+
+  <h2>它會照這個順序做</h2>
+  <ol class="pz-ol">
+    <li><b>先講清楚</b>：哪些步驟 Free 就能用、這一輪大約花多少 Apify 額度。</li>
+    <li><b>搜 Threads</b>：用一個「地點＋食物」關鍵字抓約 60 則公開貼文，不限日期；整理完不到 8 家，會自動再抓一次最新的。</li>
+    <li><b>整理</b>：照讚數抽店名，被 2 則以上提到的標「反覆提及」。對話裡回報一行：抓回幾則、看了幾則、找到幾家、幾家被反覆提到。</li>
+    <li><b>做審閱表</b>：在右邊打開，用法見下一頁。</li>
+    <li><b>存地圖（加碼）</b>：審完貼回「複製結果」，它會先問你「勾了 N 家，要我用 Claude in Chrome 自動存進 Google Maps 清單嗎？」回「要」就建好新清單、一家一家存，名字對不上或看到「永久停業」的會跳過，最後回報存了幾家。回「不要」或沒有 Claude in Chrome，它給你每家的 Maps 連結自己存。</li>
+  </ol>
+
+
+  <figure style="width:74%"><img style="height:44mm;object-fit:cover;object-position:left bottom" src="media/6-E4/img/s5_ask_save.jpg" alt="貼回結果後，Claude 問要不要用 Claude in Chrome 自動存"><figcaption>貼回「複製結果」後，Claude 會先問要不要幫你自動存。</figcaption></figure>
+  <p class="pl-key"><span>這段重點</span>一句話開始，審完貼回去</p>
+</section>
+<section class="pdfpage" id="p8" data-n="8" data-ch="plus" data-tl="審閱表">
+  <p class="kicker">加碼｜找好店 Skill</p>
+  <h1>審閱表：打星、勾選、寫筆記</h1>
+  <p class="lead">Claude 幫你縮小範圍，<span class="em">決定去哪家的是你</span>。</p>
+  <div class="row">
+    <figure style="flex:.95"><img src="media/6-E4/img/s4_table.jpg" alt="找好店 Skill 做出的審閱表"></figure>
+    <div style="flex:1.05">
+      <h2 style="margin-top:0">審閱表怎麼用</h2>
+      <ul class="pz-ul">
+        <li><b>分兩區</b>：上面「反覆提及」，下面「其他推薦」。每家有讚數、貼文日期和一句摘錄。</li>
+        <li><b>勾選＝要存</b>：點左邊的圓圈。給星等也會自動勾選。</li>
+        <li><b>先看再決定</b>：「Google Maps」「Threads 原文」兩顆按鈕，點開看地點和原貼文。</li>
+        <li><b>寫筆記</b>：點「加筆記」，例如「週末才去」。筆記只留在表上，不會寫進 Google Maps。</li>
+        <li><b>篩選</b>：最上面切「全部／已勾選／沒勾的」，底部顯示「已勾選 N 家」。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>挑店時可以看這四件事</h2>
+  <ul class="pz-ul">
+    <li><b>反覆提及</b>：同一家被好幾則貼文提到，點原文看看是不是不同的人。</li>
+    <li><b>有寫細節</b>：排隊多久、湯頭怎樣、哪道不推，寫得具體的心得比較有參考價值。</li>
+    <li><b>看有沒有合作標示</b>：寫明合作、招待，或附折扣碼的，先打個問號。</li>
+    <li><b>日期夠新</b>：兩三年前的推薦，先點開 Maps 看最近的評論。</li>
+  </ul>
+  <h2>審完，交回給 Claude</h2>
+  <p class="pz-p">按底部的「複製結果」，看到「已複製」就回對話框貼上送出。貼上的字開頭是「請用找好店 Skill 把下面的店存進 Google Maps 清單」，不用自己打。清單名稱也在底部，存之前可以改。審閱表會留在原本的對話裡，下次從對話紀錄點回來就找得到。</p>
+  <p class="pl-key"><span>這段重點</span>Claude 縮小範圍，你拍板</p>
+</section>
+<section class="pdfpage" id="p9" data-n="9" data-ch="bonus" data-tl="裝 Claude in Chrome">
+  <p class="kicker">加碼</p>
+  <h1>存進 Google Maps 清單</h1>
+  <p class="lead">整理出店家清單就很夠用了；想把店直接存進 Google Maps，再做這步加碼。</p>
+  <p class="small muted"><b>用找好店 Skill 的話：</b>貼回「複製結果」後，Claude 會先問你要不要用 Claude in Chrome 自動存；回「要」才存，回「不要」就只給 Maps 連結。下面的步驟是沒用 Skill 時自己來的做法。</p>
+
+  <h2>付費方案：先裝 Claude in Chrome</h2>
+  <ol class="steps">
+    <li>用 Chrome 搜尋「claude in chrome」，點第一個結果 <span class="path">claude.com/claude-in-chrome</span>。</li>
+  </ol>
+  <figure style="width:64%"><img src="media/6-E4/img/s9_chrome_search.jpg" alt="Google 搜尋 claude in chrome，第一個結果是 claude.com 的 Claude in Chrome"></figure>
+  <ol class="steps" start="2" style="counter-reset: s 1">
+    <li>按「Add to Chrome」，會開 Chrome 線上應用程式商店的 Claude 擴充功能，加到 Chrome 後用你的 Claude 帳號登入。按鈕以商店頁面為準。Free 帳號登入會看到「需要付費方案」。</li>
+  </ol>
+  <figure style="width:50%"><img src="media/6-E4/img/s9_chrome_page.jpg" alt="claude.com 的 Claude in Chrome 頁面，Add to Chrome 按鈕"><figcaption>頁面下方寫著只開放付費方案（Available on all paid plans）。</figcaption></figure>
+  <ol class="steps" start="3" style="counter-reset: s 2">
+    <li>在同一個 Chrome 登入你的 Google 帳號。</li>
+  </ol>
+
+  <h2>Free 方案：拿連結自己存</h2>
+  <div class="prompt"><span class="tag">可以直接複製</span>
+    <p>把我挑的店列成清單，每家附 Google Maps 連結。</p>
+  </div>
+  <p class="pz-p">一家一家點開連結，按「儲存」，第一家選「新增清單」取好名字，之後都存進同一個清單。</p>
+  <p class="pl-key"><span>這段重點</span>Claude in Chrome 只開放付費方案</p>
+</section>
+<section class="pdfpage" id="p10" data-n="10" data-ch="bonus" data-tl="開始存">
+  <p class="kicker">加碼</p>
+  <h1>讓 Claude 一家一家存進去</h1>
+  <ol class="steps" start="4" style="counter-reset: s 3">
+    <li>回到有店家清單的那個 Claude 對話（不是 Chrome 的側欄），挑好要存哪幾家，貼上這句：</li>
+  </ol>
+  <div class="prompt"><span class="tag">可以直接複製</span>
+    <p>用 Claude in Chrome 打開 Google Maps，新增一個清單叫「Threads 找好店｜台北拉麵」，把我挑的店一家一家存進去。存之前先確認名字對、在台北；看到「永久停業」或不確定是哪家，就跳過並告訴我。全部存完，打開清單讓我看。</p>
+  </div>
+  <ol class="steps" start="5" style="counter-reset: s 4">
+    <li>Claude 會用你電腦上的 Chrome 自己點，Chrome 上方會出現「Claude started debugging this browser」。<b>看著它做</b>，需要你按允許時它會停下來。</li>
+    <li>最後打開清單，數一下家數、有沒有存到同名的別家分店。我們實測存了 3 家，都成功。</li>
+  </ol>
+  <div class="row">
+    <figure style="flex:1.2"><img src="media/6-E4/img/s6_chrome_run.jpg" alt="Claude 載入 Claude in Chrome，正在用電腦上的 Chrome 開 Google Maps"><figcaption>對話裡會顯示「已載入 Claude in Chrome」和正在操作的 Chrome 畫面。</figcaption></figure>
+    <figure style="flex:.6"><img src="media/6-E4/img/s8_maps_list.jpg" alt="Google Maps 清單存了 3 家"><figcaption>存好的清單（英文介面、測試時的清單名）。</figcaption></figure>
+  </div>
+  <p class="pl-key"><span>這段重點</span>存完打開清單核對一次</p>
+</section>
+<section class="pdfpage" id="p11" data-n="11" data-ch="end" data-tl="費用與用量">
+  <p class="kicker">費用與方案</p>
+  <h1>要花錢嗎？哪個方案做得到？</h1>
+  <p class="lead">這條流程會碰到兩筆帳：Claude 的方案，和 Apify 的額度。</p>
+
+  <h2>Claude：主線 Free 就能做，只有加碼要付費</h2>
+  <div class="plan2">
+    <div class="free">
+      <h3>Free 方案</h3>
+      <ul>
+        <li>可以加 <b>1 個</b>自訂 Connector，所以接得上 Apify。</li>
+        <li>搜尋、整理、審閱表都能做。</li>
+        <li>沒有 Claude in Chrome。加碼那步改成 Claude 列出每家的 Google Maps 連結，你自己點開按「儲存」。</li>
+        <li>已經加過別的自訂 Connector 的話，要先移掉才能加 Apify。</li>
+      </ul>
+    </div>
+    <div>
+      <h3>付費方案（Pro 以上）</h3>
+      <ul>
+        <li>加碼那步也能交給 Claude，自動存進 Google Maps。</li>
+        <li>Claude in Chrome 只支援 Chrome 瀏覽器，不支援其他瀏覽器和手機。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Apify：每月 US$5 免費額度</h2>
+  <ul class="pz-ul">
+    <li>免費帳號每個月有 US$5 的額度，不用信用卡。</li>
+    <li>額度用完會停到下個週期，<b>不會扣款</b>；沒用完的也不會累積到下個月。</li>
+    <li>我們這次實測：找一輪台北拉麵（抓 60 則 Threads 貼文）大約 US$0.2，免費額度一個月大約夠跑二十輪。找好店 Skill 不夠還會補抓，或 Apify 調整價格，費用會再多一點。</li>
+  </ul>
+  <div class="note"><b>省額度的做法：</b>一次只搜一個詞、先抓 20 則就好。不要一句話叫它同時搜十個關鍵字。</div>
+  <p class="pl-key"><span>這段重點</span>Apify 額度和 Claude 用量是兩筆帳</p>
+</section>
+<section class="pdfpage" id="p12" data-n="12" data-ch="end" data-tl="費用與用量">
+  <p class="kicker">費用與方案</p>
+  <h1>哪裡特別吃 Claude 的用量</h1>
+  <p class="lead">Apify 花的是 Apify 的額度，不算 Claude 的用量。Claude 這邊，有兩個地方特別吃用量：</p>
+  <ul class="pz-ul">
+    <li><b>🔥 整理貼文</b>：Claude 要讀完幾十則貼文、抽出店名，再整理成清單；用找好店 Skill 還會做出一張互動審閱表。</li>
+    <li><b>🔥 存進 Google Maps（加碼）</b>：Claude in Chrome 每存一家，都要看畫面、點好幾下，十家就是幾十步。</li>
+  </ul>
+  <h2>省用量的做法</h2>
+  <ul class="pz-ul">
+    <li>一次勾 5–10 家就好，不要整張表都存。</li>
+    <li>整理完開一個新對話，貼上「複製結果」再存地圖，不用把前面幾十則貼文一起帶著跑。</li>
+    <li>同一種店不用一直重跑，審閱表留在原本的對話，下次點回來就看得到。</li>
+  </ul>
+  <h2>想看官方說明</h2>
+  <ul class="refs">
+    <li>自訂 Connector｜support.claude.com/en/articles/11175166</li>
+    <li>Claude in Chrome｜support.claude.com/en/articles/12012173</li>
+    <li>Apify 方案與額度｜apify.com/pricing</li>
+  </ul>
+  <p class="pl-key"><span>這段重點</span>一次存 5–10 家就好</p>
+</section>
+<section class="pdfpage" id="p13" data-n="13" data-ch="end" data-tl="界線與常見問題">
+  <p class="kicker">疑難排解</p>
+  <h1>使用界線與常見問題</h1>
+  <h2>抓資料的界線</h2>
+  <ul class="pz-ul">
+    <li><b>只抓公開貼文、個人少量用</b>：Threads 的使用條款不允許未經許可的自動收集。公開、少量、自己用，不等於已經取得平台許可，所以只用來幫自己找吃的，不轉賣、不把抓到的資料公開出去。</li>
+    <li><b>不存作者帳號</b>：審閱表只留店名和內容重點，貼文作者是誰不需要記。</li>
+    <li><b>只接信得過的 Connector</b>：抓回來的貼文裡，也可能藏著寫給 AI 看的指令。這部分在 6-2「Connector 權限與提示詞注入」會細講。</li>
+  </ul>
+
+  <h2>常見問題</h2>
+
+  <h2>常見問題</h2>
+  <div class="faq">
+    <div><b>一則都抓不到？</b>關鍵字只留「地點＋食物」，例如「台北拉麵」，不要加「推薦」；並確認語言設成中文。</div>
+    <div><b>Claude 說它沒有 Apify 的工具？</b>按輸入框左下的「+」看連接器，把 apify 打開；清單裡沒有 Apify，回第 3 頁重新接。</div>
+    <div><b>Apify 說額度用完了？</b>免費額度停到下個週期，不會扣款。這個月就先用已經抓回來的資料整理。</div>
+    <div><b>Claude in Chrome 存到一半停下來？</b>它可能在等你按允許，或 Google 要你登入。處理完跟它說「繼續」。</div>
+    <div><b>Skill 沒被叫到？</b>打「/」，從清單點 find-good-eats，再接你要找的店。</div>
+    <div><b>只有文字、沒有審閱表？</b>到 <span class="path">設定 → 功能</span>，確認「程式碼執行和檔案建立」開著，再請 Claude「做成可以勾選的審閱表」。</div>
+    <div><b>「複製結果」按了沒反應？</b>表下方會跳出整段文字，全選複製，再貼回對話。</div>
+    <div><b>找到的店很少？</b>不到 8 家也可以直接審，不用硬湊。別連續重跑同一個關鍵字，先看 Claude 回報抓回幾則；換一個地點或食物再試。</div>
+  </div>
+  <p class="pl-key"><span>這段重點</span>卡住就回來翻這頁</p>
+</section>
+<section class="pdfpage" id="p14" data-n="14" data-ch="end" data-tl="下一步">
+  <p class="kicker">延伸</p>
+  <h1>你已經有一份自己挑的餐廳清單了</h1>
+  <h2>做到這三件，就學會了</h2>
+  <ul class="dots">
+    <li>連接器清單裡有 apify</li>
+    <li>一句話叫它搜 Threads，拿到一張可以打星、勾選的審閱表</li>
+    <li>Google Maps 裡多了一個清單，存著你勾選的店</li>
+  </ul>
+  <h2>考考你</h2>
+  <div class="quiz">
+    <p>審閱表上，哪一家最值得先點開看？</p>
+    <ol>
+      <li>只被一篇爆紅貼文提到的店</li>
+      <li>被 3 則不同貼文提到、標「反覆提及」的店</li>
+      <li>店家自己發文宣傳的店</li>
+      <li>店名最特別的店</li>
+    </ol>
+    <span class="ans">答案：B。被好幾則貼文提到，比只靠一篇爆紅貼文更值得先看；點開原文確認是不是不同的人。</span>
+  </div>
+  <div class="next">
+    <div class="k">下一課・即將推出</div>
+    <div class="t">讓它每週自動找一次新開的店</div>
+    <p>這課是你叫一次、它跑一次。下一課（6-3）教你排程，讓 Claude 每週自己去 Threads 看有沒有新店。</p>
+  </div>
+  <div class="end-cta">
+    <div class="big">留言「拉麵店」<br>領找好店 Skill。</div>
+    <p>追蹤 @paradigmai_tw，看下一課。</p>
+    <p data-res-link>不用等私訊：教學 PDF 和贈品都在 <a href="../resources/index.html">資源下載</a> 頁，免費下載。</p>
+  </div>
+
+  <p class="small muted">介面名稱與畫面是 2026 年 11 月的 Claude 網頁版。</p>
+</section>
+  </main>
+  </div>
+</div>
+<script>window.PDFLESSON = {"id": "6-E4", "title": "Threads 找好店完整教學", "pdf": "media/6-E4/threads-good-eats-guide.pdf", "pdfName": "Threads找好店完整教學.pdf", "chapters": [{"k": "learn", "t": "核心概念", "d": "這套流程怎麼運作"}, {"k": "setup", "t": "接上 Apify", "d": "讓 Claude 接上 Threads"}, {"k": "do", "t": "實作流程", "d": "搜尋 → 整理成店家清單"}, {"k": "plus", "t": "加碼：找好店 Skill", "d": "一句話找店、審閱表"}, {"k": "bonus", "t": "加碼：存地圖", "d": "存進 Google Maps 清單"}, {"k": "end", "t": "費用與延伸", "d": "費用、用量、常見問題、下一課"}], "source": "lessons/05_Threads找餐廳/PDF", "built": "2026-11-19", "draft": false}</script>
+<script src="../pixel.js"></script>
+<script src="roadmap8.js"></script>
+<script src="glossary.js"></script>
+<script src="pdf-chapter-core.js"></script>
+<script src="pdf-chapter.js"></script>
+</body>
+</html>

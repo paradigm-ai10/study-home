@@ -59,7 +59,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .pl-prog b { color: var(--grape); font-variant-numeric: tabular-nums; }
 .pl-chs { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
 .pl-chs > li > a { display: flex; gap: 8px; align-items: baseline; text-decoration: none; color: var(--grape); font-weight: 700; font-size: 15px; }
-.pl-chs > li > a .no { font-size: 12px; color: var(--coral); width: 14px; flex: none; }
+.pl-chs > li > a .no { font-size: 12px; color: var(--coral-ink); width: 14px; flex: none; }
 .pl-chs > li.done > a::after { content: '✓'; color: var(--ok); margin-left: auto; font-size: 13px; }
 .pl-side .pl-chs > li:not(.cur) > ol { display: none; }
 .pl-chs > li > a { padding: 6px 10px; margin-left: -10px; border-radius: 8px; transition: background .2s, color .2s; }
@@ -73,7 +73,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .pl-chs ol a:hover { color: var(--grape); }
 .pl-chs ol a.seen { color: var(--grape); }
 .pl-chs ol a[aria-current="true"] { border-left-color: var(--coral); color: var(--grape); font-weight: 700; }
-.pl-chs ol a[aria-current="true"] small { color: var(--coral); }
+.pl-chs ol a[aria-current="true"] small { color: var(--coral-ink); }
 .pl-sidebtns { display: grid; gap: 8px; margin: 22px 0 0; padding: 16px 0 0; border-top: 1px solid var(--line); }
 .pl-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 14px; border-radius: var(--r); border: 0; background: var(--grape); color: var(--cream); font: 700 14px/1.2 var(--ui); text-decoration: none; }
 .pl-btn:hover { background: #2c2347; }
@@ -120,7 +120,7 @@ body.pl-side-off .pl-side { display: none; }
 /* 索引：章名寫在章的點底下，可以點 */
 .pl-index { position: relative; height: 20px; margin: 4px 56px 0 4px; }
 .pl-index a { position: absolute; top: 0; display: flex; gap: 4px; align-items: baseline; font-size: 12.5px; line-height: 1.3; color: var(--grape-2); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transform: translateX(-6px); padding: 1px 4px; border-radius: 5px; }
-.pl-index a span { font-weight: 700; color: var(--coral); font-size: 11.5px; }
+.pl-index a span { font-weight: 700; color: var(--coral-ink); font-size: 11.5px; }
 .pl-index a:hover { color: var(--grape); background: #f5e6c8; }
 .pl-index a.now { color: var(--grape); font-weight: 700; }
 .pl-index a.seen:not(.now) { color: #8a7fa4; }
@@ -146,8 +146,8 @@ body.pl-side-off .pl-side { display: none; }
 .pdfdoc .pdfpage { width: auto; height: auto; margin: 0 0 30mm; padding: 0; background: none; overflow: visible; display: block; break-after: auto; position: relative; }
 .pdfdoc .pdfpage:last-child { margin-bottom: 0; }
 .pdfdoc .pdfpage .spacer { display: none; }
-.pl-key { display: flex; gap: 3mm; align-items: baseline; margin: 6mm 0 0 !important; padding: 2.5mm 0 0; border-top: 1px dashed var(--line); font-size: 9pt; color: var(--grape-2); }
-.pl-key span { font-weight: 700; color: var(--coral); font-size: 8pt; letter-spacing: .04em; white-space: nowrap; }
+.pl-key { display: flex; gap: 3mm; align-items: baseline; margin: 6mm 0 0 !important; padding: 2.5mm 0 0; border-top: 1px dashed var(--line); font-size: 12pt; line-height: 1.6; font-weight: 700; color: var(--grape-2); }  /* 這段重點字放大（2026-11-17 Thomas） */
+.pl-key span { font-weight: 700; color: var(--coral-ink); font-size: 10pt; letter-spacing: .04em; white-space: nowrap; }
 
 /* 章節開頭 */
 .pl-chhead { margin: 0 0 10mm; padding: 0 0 4mm; border-bottom: 2px solid var(--grape); display: flex; align-items: baseline; gap: 4mm; flex-wrap: wrap; }
@@ -262,7 +262,7 @@ a.toc-row:hover { background: rgba(255,255,255,.04); }
 .pdfdoc .faq details { border-bottom: 1px solid var(--line); }
 .pdfdoc .faq details > summary { list-style: none; cursor: pointer; display: flex; gap: 3mm; align-items: baseline; padding: 2.4mm 0; font-weight: 700; font-size: 10.6pt; }
 .pdfdoc .faq details > summary::-webkit-details-marker { display: none; }
-.pdfdoc .faq details > summary::before { content: '+'; color: var(--coral); font-weight: 800; width: 3mm; flex: none; transition: transform .2s; }
+.pdfdoc .faq details > summary::before { content: '+'; color: var(--coral-ink); font-weight: 800; width: 3mm; flex: none; transition: transform .2s; }
 .pdfdoc .faq details[open] > summary::before { content: '−'; }
 .pdfdoc .faq details > summary:hover { color: var(--coral-ink); }
 .pdfdoc .faq details > .pl-ans { padding: 0 0 3mm 6mm; font-size: 9.8pt; }
@@ -337,7 +337,7 @@ body.pl-finished .pl-fin .note-done { display: inline; }
   .pl-strip button { width: 100%; border: 0; background: none; text-align: left; padding: 10px 16px 9px; display: flex; gap: 10px; align-items: baseline; font-size: 14px; }
   .pl-strip button b { color: var(--grape); }
   .pl-strip button span { color: var(--grape-2); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .pl-strip button small { color: var(--coral); font-weight: 700; }
+  .pl-strip button small { color: var(--coral-ink); font-weight: 700; }
   .pl-strip .bar { display: none; }
   .pl-run { top: 41px; padding-top: 10px; }
   .pl-opener { display: none; }
@@ -390,12 +390,16 @@ body.pl-finished .pl-fin .note-done { display: inline; }
 .pdfdoc ul.tick.pl-ticks li[aria-checked="true"] { color: #6f6688; }
 .pdfdoc ul.tick.pl-ticks li:focus-visible { outline: 2px solid var(--coral); outline-offset: 1px; }
 @media (max-width: 900px) {
-  .pdfdoc .shot-row, .pdfdoc .roles, .pdfdoc .check3 { flex-direction: column; }
+  .pdfdoc .shot-row, .pdfdoc .roles, .pdfdoc .check3, .pdfdoc .src3 { flex-direction: column; }
   .pdfdoc .shot-row > .shot, .pdfdoc .shot-row > .cap { width: 100% !important; flex: none !important; }
   .pdfdoc .anno, .pdfdoc .vgrid { grid-template-columns: 1fr; }
   .pdfdoc .fixes div { flex-direction: column; gap: 1mm; }
   .pdfdoc .fixes b { width: auto; }
   .pdfdoc .files5 .fi { flex-wrap: wrap; padding-left: 0; word-break: break-all; }
+  /* 02 v2.7 上傳 zip 五步（.zsop）：手機上圖改放在字下面，高度照圖本身（PDF 寫死的 mm 高度在手機會把圖壓成細條；2026-11-19） */
+  .pdfdoc .zsop > div { grid-template-columns: 1fr; }
+  .pdfdoc .zsop > div > figure { grid-column: 1; grid-row: auto; margin-top: 1.5mm; }
+  .pdfdoc .zsop img { height: auto !important; max-height: 90mm; }
 }
 /* 「接著讀」等放在內文裡的實心按鈕連結：PDF 樣式的 a 顏色會蓋掉按鈕字色，變成紫底紫字（2026-11-15 修，所有課） */
 .pdfdoc a.pl-btn:not(.line) { color: var(--cream); }

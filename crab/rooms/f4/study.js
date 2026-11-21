@@ -1745,7 +1745,7 @@ async function boot() {
     }
     if (!REDUCED) play(pokes % 2 ? 'wiggle' : 'hop', { force: true });
     const n = F4.nextStep();
-    say([`下一步是${n.short || n.label}，便條紙上有寫。`, '想學什麼？點那封信跟我們說。', '不知道從哪課開始？筆筒裡抽一支籤。', '再戳一下試試看。'][pokes % 4], { hold: 3.0 });
+    say([`下一步是${n.short || n.label}，便條紙上有寫。`, '想學什麼？到 IG @paradigmai_tw 留言跟我們說。', '不知道從哪課開始？筆筒裡抽一支籤。', '再戳一下試試看。'][pokes % 4], { hold: 3.0 });
   }
 
   /* ---------------- a life of its own: reads, sips, stretches; left alone long enough, it nods off */

@@ -1,17 +1,29 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://paradigm-ai10.github.io/study-home/resources/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Paradigm AI 學習站">
+<meta property="og:title" content="資源下載｜Paradigm 學 AI">
+<meta property="og:description" content="Paradigm 各課的教學 PDF、可直接安裝的 Skill 與提示詞，免費下載。">
+<meta property="og:url" content="https://paradigm-ai10.github.io/study-home/resources/">
+<meta property="og:image" content="https://paradigm-ai10.github.io/study-home/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#FFF4E0">
 <title>資源下載｜Paradigm 學 AI</title>
 <meta name="description" content="Paradigm 各課的教學 PDF、可直接安裝的 Skill 與提示詞，免費下載。">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 13 7%27%3E%3Cpath fill=%27%23D97757%27 d=%27M2 0h9v2h2v2h-2v1H2V4H0V2h2z%27/%3E%3Cpath fill=%27%23D97757%27 d=%27M3 5h1v2H3zM5 5h1v2H5zM7 5h1v2H7zM9 5h1v2H9z%27/%3E%3Cpath fill=%27%231a1a1a%27 d=%27M4 1h1v2H4zM8 1h1v2H8z%27/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Outfit:wght@500;600&display=swap">
 <style>
-  /* 外觀照首頁簡潔版（核心螃蟹/環境/f4-雨夜書桌/simple.html）：奶油底、葡萄色字、陽光黃主按鈕。
+  /* 外觀照首頁簡潔版（crab/rooms/f4/simple.html）：奶油底、葡萄色字、陽光黃主按鈕。
      資料在 resources.js（由 make_resources.py 從各課私訊回覆稿產生），這頁只負責畫。 */
   :root {
     --cream: #FFF4E0; --sheet: #FFFAF0; --grape: #3A2E5C;
@@ -100,7 +112,7 @@ document.getElementById('packs').innerHTML = window.RESOURCES.map(p => `<li clas
     <ul class="notes">${p.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>
     <dl class="meta">
       <dt>對應課程</dt><dd><a href="${esc(p.lesson.href)}"><span class="num">${esc(p.lesson.id)}</span>${esc(p.lesson.title)}</a></dd>
-      <dt>IG 領取</dt><dd>在 <a href="${IG}" target="_blank" rel="noopener">IG @paradigmai_tw</a> 的 Reel 留言「${esc(p.keyword)}」，我們會私訊下載連結給你。</dd>
+      ${p.keyword ? `<dt>IG 領取</dt><dd>在 <a href="${IG}" target="_blank" rel="noopener">IG @paradigmai_tw</a> 的 Reel 留言「${esc(p.keyword)}」，我們會私訊下載連結給你。</dd>` : ''}
       <dt>更新日期</dt><dd>${esc(p.updated)}</dd>
     </dl>
   </div>

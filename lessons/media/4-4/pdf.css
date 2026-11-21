@@ -42,13 +42,13 @@
 .pdfdoc .head { top: 9mm; }
 .pdfdoc .foot { bottom: 8mm; }
 .pdfdoc .head b { color: var(--grape); font-weight: 700; }
-.pdfdoc .kicker { font-size: 9.5pt; color: var(--coral); font-weight: 700; margin: 0 0 1mm; }
+.pdfdoc .kicker { font-size: 9.5pt; color: var(--coral-ink); font-weight: 700; margin: 0 0 1mm; }
 .pdfdoc h1 { font-size: 24pt; line-height: 1.25; margin: 0 0 3mm; font-weight: 800; }
 .pdfdoc h2 { font-size: 13pt; margin: 5mm 0 2mm; font-weight: 700; }
 .pdfdoc h3 { font-size: 11pt; margin: 0 0 1mm; font-weight: 700; }
 .pdfdoc p { margin: 0 0 2.5mm; }
 .pdfdoc .lead { font-size: 12pt; line-height: 1.6; margin-bottom: 4mm; }
-.pdfdoc .em { color: var(--coral); font-weight: 700; }
+.pdfdoc .em { color: var(--coral-ink); font-weight: 700; }
 .pdfdoc .muted { color: var(--grape-2); }
 .pdfdoc .small { font-size: 9pt; }
 .pdfdoc ol.steps { list-style: none; padding: 0; margin: 0 0 3mm; counter-reset: s; }
@@ -61,7 +61,7 @@
 }
 .pdfdoc ul.dots { padding-left: 5mm; margin: 0 0 3mm; }
 .pdfdoc ul.dots li { margin-bottom: 1mm; }
-.pdfdoc ul.dots li::marker { color: var(--coral); }
+.pdfdoc ul.dots li::marker { color: var(--coral-ink); }
 .pdfdoc .path {
   display: inline; background: var(--paper); border: 1px solid var(--line);
   border-radius: 2mm; padding: .3mm 1.6mm; font-size: 9.5pt; white-space: nowrap;
@@ -89,7 +89,7 @@
   border-left: 0; background: var(--paper); border: 1px solid var(--line);
   border-radius: 3mm; padding: 3mm 4mm; font-size: 9.5pt; margin: 0 0 3mm;
 }
-.pdfdoc .note b { color: var(--coral); }
+.pdfdoc .note b { color: var(--coral-ink); }
 .pdfdoc .cards { display: flex; gap: 4mm; margin: 2mm 0 4mm; }
 .pdfdoc .card {
   flex: 1; background: var(--paper); border: 1px solid var(--line);
@@ -111,7 +111,7 @@
   font-size: 10pt; color: #E9E2F7;
 }
 .pdfdoc .cover .learn b { display: block; color: var(--cream); font-size: 13pt; margin-bottom: 1mm; }
-.pdfdoc .cover .learn i { font-style: normal; color: var(--coral); font-weight: 800; font-size: 10pt; }
+.pdfdoc .cover .learn i { font-style: normal; color: var(--coral-ink); font-weight: 800; font-size: 10pt; }
 .pdfdoc .cover .meta { display: flex; gap: 3mm; flex-wrap: wrap; margin-bottom: 4mm; }
 .pdfdoc .cover .meta span {
   background: var(--cream); color: var(--grape); border-radius: 10mm;
@@ -132,9 +132,9 @@
 .pdfdoc .compare .before { background: var(--paper); border: 1px solid var(--line); font-size: 9pt; line-height: 1.6; }
 .pdfdoc .compare .after { background: var(--grape); color: var(--cream); display: flex; flex-direction: column; justify-content: center; }
 .pdfdoc .compare .after .say { font-size: 15pt; font-weight: 800; color: var(--sun); line-height: 1.35; }
-.pdfdoc .compare .label { font-size: 8.5pt; font-weight: 700; margin-bottom: 2mm; color: var(--coral); }
+.pdfdoc .compare .label { font-size: 8.5pt; font-weight: 700; margin-bottom: 2mm; color: var(--coral-ink); }
 .pdfdoc .compare .after .label { color: #CFC6E6; }
-.pdfdoc .compare .arrow { width: 12mm; display: flex; align-items: center; justify-content: center; font-size: 18pt; color: var(--coral); font-weight: 800; }
+.pdfdoc .compare .arrow { width: 12mm; display: flex; align-items: center; justify-content: center; font-size: 18pt; color: var(--coral-ink); font-weight: 800; }
 .pdfdoc .compare-cap { text-align: center; font-size: 12pt; font-weight: 700; margin: 2mm 0 5mm; }
 .pdfdoc .three { display: flex; gap: 4mm; margin: 1mm 0 4mm; }
 .pdfdoc .three div { flex: 1; border-top: 2.5px solid var(--coral); padding-top: 2mm; font-size: 9.5pt; }
@@ -156,15 +156,15 @@
 .pdfdoc .ways { margin: 1mm 0 4mm; }
 .pdfdoc .way { display: flex; gap: 4mm; padding: 2.5mm 0; border-bottom: 1px solid var(--line); align-items: baseline; }
 .pdfdoc .way:last-child { border-bottom: 0; }
-.pdfdoc .way .n { font-weight: 800; color: var(--coral); width: 22mm; flex: none; font-size: 10pt; }
+.pdfdoc .way .n { font-weight: 800; color: var(--coral-ink); width: 22mm; flex: none; font-size: 10pt; }
 .pdfdoc .way .say { background: var(--paper); border: 1px solid var(--line); border-radius: 2mm; padding: .5mm 2mm; white-space: nowrap; }
 .pdfdoc .feat { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin: 1mm 0 4mm; }
 .pdfdoc .feat div { background: var(--paper); border: 1px solid var(--line); border-radius: 3mm; padding: 3mm 3.5mm; font-size: 9.2pt; }
 .pdfdoc .feat b { display: block; font-size: 10.2pt; }
-.pdfdoc .feat .n { color: var(--coral); font-weight: 800; margin-right: 1.5mm; }
+.pdfdoc .feat .n { color: var(--coral-ink); font-weight: 800; margin-right: 1.5mm; }
 .pdfdoc .ex { display: flex; gap: 5mm; margin: 1mm 0 4mm; }
 .pdfdoc .ex > div { flex: 1; }
-.pdfdoc .ex h3 { color: var(--coral); }
+.pdfdoc .ex h3 { color: var(--coral-ink); }
 .pdfdoc .ex ul { margin: 0; padding-left: 4.5mm; font-size: 9.6pt; }
 .pdfdoc .ex li { margin-bottom: 1.2mm; }
 .pdfdoc .faq { margin: 0 0 3mm; }
@@ -177,7 +177,7 @@
 .pdfdoc .end-cta .big { font-size: 17pt; font-weight: 800; line-height: 1.4; color: var(--sun); margin-bottom: 2mm; }
 .pdfdoc .end-cta p { font-size: 11pt; margin: 0; }
 .pdfdoc .next { border: 1.5px dashed var(--coral); border-radius: 4mm; padding: 5mm 6mm; margin-bottom: 6mm; }
-.pdfdoc .next .k { color: var(--coral); font-weight: 800; font-size: 9.5pt; }
+.pdfdoc .next .k { color: var(--coral-ink); font-weight: 800; font-size: 9.5pt; }
 .pdfdoc .next .t { font-size: 15pt; font-weight: 800; margin: 1mm 0 2mm; }
 .pdfdoc .refs { font-size: 9pt; }
 .pdfdoc .refs li { margin-bottom: 1mm; word-break: break-all; }
@@ -188,7 +188,7 @@
 .pdfdoc .fit .no { background: #FFF0EC; border: 1.5px solid var(--coral); }
 .pdfdoc .fit h3 { font-size: 12pt; margin-bottom: 2mm; }
 .pdfdoc .fit .yes h3 { color: var(--grape); }
-.pdfdoc .fit .no h3 { color: var(--coral); }
+.pdfdoc .fit .no h3 { color: var(--coral-ink); }
 .pdfdoc .fit ul { margin: 0; padding-left: 4.5mm; }
 .pdfdoc .fit li { margin-bottom: 1.6mm; }
 .pdfdoc .prompt.filled { background: var(--paper); border-color: var(--grape); }
@@ -205,11 +205,11 @@
 .pdfdoc .tl .seg.now i { background: var(--coral); }
 .pdfdoc .tl .seg.now { color: var(--grape); font-weight: 700; flex: 1.9; }
 .pdfdoc .tl .seg small { display: block; font-weight: 400; color: var(--grape-2); font-size: 7.2pt; }
-.pdfdoc .tl .seg small em { font-style: normal; color: var(--coral); font-weight: 700; }
+.pdfdoc .tl .seg small em { font-style: normal; color: var(--coral-ink); font-weight: 700; }
 .pdfdoc .toc { position: absolute; left: 18mm; bottom: 26mm; width: 84mm; }
 .pdfdoc .toc-t { font-size: 9pt; font-weight: 700; color: var(--sun); letter-spacing: .06em; margin-bottom: 2mm; }
 .pdfdoc .toc-row { display: flex; gap: 2.5mm; align-items: baseline; padding: 1.3mm 0; border-top: 1px solid #5A4E7C; font-size: 8.3pt; color: #CFC6E6; }
-.pdfdoc .toc-row .no { color: var(--coral); font-weight: 800; width: 3mm; }
+.pdfdoc .toc-row .no { color: var(--coral-ink); font-weight: 800; width: 3mm; }
 .pdfdoc .toc-row .tx { flex: 1; }
 .pdfdoc .toc-row .tx b { color: var(--cream); margin-right: 2mm; font-size: 9.2pt; }
 .pdfdoc .toc-row .pg { color: var(--sun); font-weight: 700; }
@@ -219,7 +219,7 @@
 .pdfdoc .flow3 .st p { margin: 2mm 0 0; color: var(--grape-2); }
 .pdfdoc .flow3 .n { display: inline-block; width: 6mm; height: 6mm; line-height: 6mm; border-radius: 50%; background: var(--grape); color: var(--cream); font-weight: 700; font-size: 8.5pt; }
 .pdfdoc .flow3 .t { font-weight: 700; font-size: 11pt; margin: 1mm 0 2.5mm; }
-.pdfdoc .flow3 .ar { width: 8mm; display: flex; align-items: center; justify-content: center; color: var(--coral); font-weight: 800; font-size: 15pt; }
+.pdfdoc .flow3 .ar { width: 8mm; display: flex; align-items: center; justify-content: center; color: var(--coral-ink); font-weight: 800; font-size: 15pt; }
 .pdfdoc .flow3 .pic { height: 30mm; display: flex; align-items: center; justify-content: center; }
 .pdfdoc .papers { gap: 0; }
 .pdfdoc .paper { width: 15mm; height: 20mm; background: #fff; border: 1px solid var(--line); border-radius: 1mm; font-size: 7.5pt; padding-top: 2mm; box-shadow: 0 .6mm 1.5mm rgba(58,46,92,.12); margin-left: -3mm; }
@@ -235,7 +235,7 @@
 .pdfdoc .mini-card.big { width: 82mm; flex: none; padding: 4mm 4.5mm; transform: rotate(-1.5deg); }
 .pdfdoc .mini-card.big .mt { font-size: 11pt; }
 .pdfdoc .mini-card.big ol { margin: 0; padding-left: 5mm; font-size: 9.3pt; line-height: 1.7; }
-.pdfdoc .mini-card.big .add { color: var(--coral); font-weight: 700; list-style: none; margin-left: -5mm; background: #FFE6E0; border-radius: 1.5mm; padding: .5mm 2mm; margin-top: 1mm; }
+.pdfdoc .mini-card.big .add { color: var(--coral-ink); font-weight: 700; list-style: none; margin-left: -5mm; background: #FFE6E0; border-radius: 1.5mm; padding: .5mm 2mm; margin-top: 1mm; }
 .pdfdoc .ver { background: var(--coral); color: #fff; font-size: 7.5pt; padding: .2mm 1.6mm; border-radius: 1.5mm; margin-left: 1mm; vertical-align: middle; }
 .pdfdoc .revise-txt { font-size: 10pt; }
 .pdfdoc .anatomy { display: flex; gap: 5mm; margin: 2mm 0 4mm; }
@@ -250,8 +250,8 @@
 .pdfdoc .labels b { display: block; font-size: 10pt; }
 .pdfdoc .flow4 { display: flex; align-items: stretch; margin: 2mm 0 3mm; font-size: 9pt; }
 .pdfdoc .flow4 > div:not(.ar) { flex: 1; background: var(--paper); border: 1px solid var(--line); border-radius: 2.5mm; padding: 2.5mm 3mm; }
-.pdfdoc .flow4 .n { display: block; color: var(--coral); font-weight: 800; font-size: 10pt; }
-.pdfdoc .flow4 .ar { width: 6mm; display: flex; align-items: center; justify-content: center; color: var(--coral); font-weight: 800; }
+.pdfdoc .flow4 .n { display: block; color: var(--coral-ink); font-weight: 800; font-size: 10pt; }
+.pdfdoc .flow4 .ar { width: 6mm; display: flex; align-items: center; justify-content: center; color: var(--coral-ink); font-weight: 800; }
 .pdfdoc .shelf { background: var(--grape); border-radius: 3mm; padding: 3mm 4mm 4mm; margin-bottom: 2mm; }
 .pdfdoc .shelf-t { color: var(--sun); font-size: 8.5pt; font-weight: 700; margin-bottom: 2mm; }
 .pdfdoc .shelf-row { display: flex; gap: 3mm; }
@@ -273,25 +273,25 @@
 .pdfdoc .ph.s { min-height: 26mm; }
 .pdfdoc .ph.tall { min-height: 78mm; }
 .pdfdoc .warnbox { background: #FFF0EC; border: 2px solid var(--coral); border-radius: 3mm; padding: 3.5mm 4.5mm; margin: 0 0 4mm; font-size: 9.6pt; }
-.pdfdoc .warnbox h3 { color: var(--coral); font-size: 12pt; margin: 0 0 2.5mm; }
-.pdfdoc .warnbox.thin b { color: var(--coral); }
+.pdfdoc .warnbox h3 { color: var(--coral-ink); font-size: 12pt; margin: 0 0 2.5mm; }
+.pdfdoc .warnbox.thin b { color: var(--coral-ink); }
 .pdfdoc .okno { display: flex; gap: 4mm; margin-bottom: 3mm; }
 .pdfdoc .okno > div { flex: 1; background: var(--paper); border-radius: 2.5mm; padding: 2.5mm 3.5mm; display: flex; align-items: center; gap: 2.5mm; flex-wrap: wrap; }
 .pdfdoc .okno .ok { border: 1.5px solid #3c8c5a; }
 .pdfdoc .okno .no { border: 1.5px solid var(--coral); }
 .pdfdoc .okno .mk { font-size: 15pt; font-weight: 800; line-height: 1; }
 .pdfdoc .okno .ok .mk { color: #3c8c5a; }
-.pdfdoc .okno .no .mk { color: var(--coral); }
+.pdfdoc .okno .no .mk { color: var(--coral-ink); }
 .pdfdoc .okno small { width: 100%; color: var(--grape-2); font-size: 8.5pt; }
 .pdfdoc .row3 { display: flex; gap: 4mm; }
 .pdfdoc .row3 > div { flex: 1; min-width: 0; }
-.pdfdoc .sn { font-weight: 700; color: var(--coral); margin: 0 0 1mm; }
+.pdfdoc .sn { font-weight: 700; color: var(--coral-ink); margin: 0 0 1mm; }
 .pdfdoc .tight { font-size: 9.4pt; margin: 0 0 2mm; }
 .pdfdoc .tight2 { gap: 3mm; }
 .pdfdoc .en, .pdfdoc .small { font-size: 8.8pt; color: var(--grape-2); margin: 0 0 3mm; }
 .pdfdoc .ab { display: flex; gap: 4mm; }
 .pdfdoc .ab > div { flex: 1; min-width: 0; background: var(--paper); border: 1px solid var(--line); border-radius: 3mm; padding: 3.5mm 4mm 1mm; font-size: 9.4pt; }
-.pdfdoc .ab h3 { color: var(--coral); font-size: 11pt; margin: 0 0 1.5mm; }
+.pdfdoc .ab h3 { color: var(--coral-ink); font-size: 11pt; margin: 0 0 1.5mm; }
 .pdfdoc .grid3 { display: flex; gap: 4mm; margin-bottom: 3mm; }
 .pdfdoc .grid3 > div { flex: 1; background: var(--paper); border: 1px solid var(--line); border-radius: 3mm; padding: 3mm 3.5mm 0; font-size: 9.2pt; }
 .pdfdoc .grid3 h3 { font-size: 10.5pt; margin: 0 0 1mm; }
@@ -307,7 +307,7 @@
 .pdfdoc .fi b { display: block; margin-top: 1.5mm; word-break: break-all; }
 .pdfdoc .fi em { display: block; font-style: normal; font-weight: 700; margin-top: .6mm; }
 .pdfdoc .fi.ok em { color: #3c8c5a; }
-.pdfdoc .fi.no em { color: var(--coral); }
+.pdfdoc .fi.no em { color: var(--coral-ink); }
 .pdfdoc .zip { width: 13mm; height: 16mm; margin: 0 auto; background: #fff; border: 1.4px solid var(--grape-2); border-radius: 1mm; position: relative;
   background-image: repeating-linear-gradient(0deg, var(--grape-2) 0 1mm, transparent 1mm 2mm); background-size: 1.6mm 9mm; background-repeat: no-repeat; background-position: center 1mm; }
 .pdfdoc .zip span { position: absolute; left: 0; right: 0; bottom: 1mm; font-size: 6.5pt; font-weight: 800; color: var(--grape); }
@@ -328,7 +328,7 @@
 .pdfdoc .callflow .mock { margin: 0; }
 .pdfdoc .cf-chat { flex: 1; }
 .pdfdoc .cf-quiz { flex: 1.25; }
-.pdfdoc .cf-arrow { font-size: 20pt; color: var(--coral); font-weight: 800; }
+.pdfdoc .cf-arrow { font-size: 20pt; color: var(--coral-ink); font-weight: 800; }
 .pdfdoc .cf-t { color: var(--sun); font-weight: 700; margin: 0 0 2mm; font-size: 10pt; }
 .pdfdoc .cf-n { color: #bdb8cb; font-size: 8.6pt; margin: 2mm 0 0; }
 .pdfdoc .cf-file { display: inline-flex; align-items: center; gap: 2mm; background: #3d3a49; color: #fff; border-radius: 2mm; padding: 1.5mm 3mm 1.5mm 1.5mm; font-size: 9pt; margin-bottom: 2mm; }
@@ -339,3 +339,32 @@
 .pdfdoc .cf-prog i { display: block; width: 10%; height: 100%; background: var(--grape); border-radius: 1mm; }
 .pdfdoc .cf-qq { font-weight: 700; margin: 0 0 1.5mm; }
 .pdfdoc .cf-o { background: #fff; border: 1px solid var(--line); border-radius: 1.5mm; padding: .8mm 2.5mm; margin-bottom: 1mm; }
+.pdfdoc .cover h1 { font-size: 44pt; margin: 5mm 0 3mm; }
+.pdfdoc .cover .tagline { margin-bottom: 6mm; }
+.pdfdoc .cover .who { margin-bottom: 7mm; }
+.pdfdoc .cover .learn-t { font-size: 15pt; font-weight: 800; color: var(--sun); margin-bottom: 3mm; }
+.pdfdoc .cover .learn3 { display: flex; flex-direction: column; gap: 2.5mm; margin-bottom: 6mm; }
+.pdfdoc .cover .learn3 > div {
+  display: flex; align-items: center; gap: 5mm;
+  border: 1.5px solid #6B6087; border-radius: 3mm; padding: 3.2mm 5mm;
+  background: rgba(255,244,224,.05);
+}
+.pdfdoc .cover .learn3 i { font-style: normal; font-weight: 800; font-size: 30pt; line-height: 1; color: var(--coral-ink); width: 9mm; text-align: center; }
+.pdfdoc .cover .learn3 p { margin: 0; font-size: 11pt; color: #E9E2F7; }
+.pdfdoc .cover .learn3 b { display: block; font-size: 19pt; line-height: 1.25; color: var(--cream); margin-bottom: .8mm; }
+.pdfdoc .pz-ol, .pdfdoc .pz-ul { margin: 0 0 4mm; padding-left: 6mm; }
+.pdfdoc .pz-ol li, .pdfdoc .pz-ul li { margin-bottom: 1.6mm; line-height: 1.8; }
+.pdfdoc .pz-ol li::marker { color: var(--coral-ink); font-weight: 700; }
+.pdfdoc .pz-ul li::marker { color: var(--coral-ink); }
+.pdfdoc .pz-p { line-height: 1.85; margin-bottom: 3.5mm; }
+.pdfdoc .pz-code { margin: 2mm 0 4mm; padding: 4mm 5mm; border-radius: 2mm; background: #1f1d24; color: #ece9f3; font: 9.6pt/1.85 ui-monospace, "SF Mono", Menlo, "PingFang TC", monospace; white-space: pre-wrap; }
+.pdfdoc .pz-code b { color: #ffb4a8; font-weight: 600; }
+.pdfdoc .pz-table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 9.8pt; line-height: 1.7; }
+.pdfdoc .pz-table th, .pdfdoc .pz-table td { text-align: left; vertical-align: top; padding: 2.4mm 3mm; border-bottom: 1px solid var(--line); }
+.pdfdoc .pz-table thead th { border-bottom: 1.5px solid var(--grape); font-size: 9pt; color: var(--grape-2); }
+.pdfdoc .pz-table tbody th { white-space: nowrap; }
+.pdfdoc .pz-say { padding: .3mm 2mm; border-radius: 1.5mm; background: var(--paper); border: 1px solid var(--line); white-space: nowrap; }
+.pdfdoc .pz-h3 { font-size: 11.5pt; margin: 5mm 0 1.5mm; }
+.pdfdoc .pz-fig { margin: 2mm 0 5mm; max-width: 72%; }
+.pdfdoc .pz-fig img { max-width: 100%; }
+.pdfdoc .pz-p kbd { font-size: 8.6pt; }
