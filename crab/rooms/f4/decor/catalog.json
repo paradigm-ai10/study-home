@@ -1,0 +1,176 @@
+{
+  "version": 2,
+  "note": "書桌擺飾的唯一資料來源。格式說明見 decor/README.md。",
+  "currency": {
+    "name": "代幣",
+    "perLesson": 10,
+    "firstTask": 5
+  },
+  "slots": {
+    "hang": {
+      "label": "窗戶上",
+      "pos": [
+        2.0,
+        2.84,
+        -2.02
+      ],
+      "rotY": 0
+    },
+    "sill-l": {
+      "label": "窗台左",
+      "pos": [
+        0.42,
+        1.05,
+        -2.45
+      ],
+      "rotY": -12
+    },
+    "sill-r": {
+      "label": "窗台右",
+      "pos": [
+        2.42,
+        1.05,
+        -2.42
+      ],
+      "rotY": 8
+    },
+    "desk-back": {
+      "label": "桌面後排",
+      "pos": [
+        2.35,
+        0,
+        -1.78
+      ],
+      "rotY": -10
+    },
+    "hang-l": {
+      "label": "窗戶左上",
+      "pos": [
+        -0.02,
+        3.3,
+        -2.04
+      ],
+      "rotY": 0
+    }
+  },
+  "items": [
+    {
+      "id": "garland",
+      "name": "暖光串燈",
+      "blurb": "愛迪生燈泡，點一下換閃法。",
+      "price": 20,
+      "slot": "hang",
+      "file": "garland.glb",
+      "behave": "twinkle",
+      "ready": true,
+      "line": "掛好了。關掉檯燈看看。"
+    },
+    {
+      "id": "globe",
+      "name": "地球儀",
+      "blurb": "上過亮光漆的紙地球儀，可以撥著轉。",
+      "price": 10,
+      "slot": "sill-r",
+      "file": "globe.glb",
+      "scale": 1.2,
+      "behave": "spin",
+      "ready": true,
+      "line": "擺好了。想去哪，先轉轉看。",
+      "face": 0
+    },
+    {
+      "id": "cactus",
+      "name": "小仙人掌",
+      "blurb": "陶盆裡開了一朵花，戳它會晃。",
+      "line": "小心，有刺。",
+      "price": 10,
+      "slot": "sill-l",
+      "file": "cactus.glb",
+      "behave": "wobble",
+      "ready": true,
+      "scale": 1.4
+    },
+    {
+      "id": "candle",
+      "name": "香氛蠟燭",
+      "blurb": "點一下點火或吹熄，火光會晃。",
+      "line": "雨天點蠟燭，剛剛好。",
+      "price": 10,
+      "slot": "sill-l",
+      "file": "candle.glb",
+      "behave": "flame",
+      "ready": true,
+      "scale": 1.5
+    },
+    {
+      "id": "luckycat",
+      "name": "招財貓",
+      "blurb": "白瓷招財貓，一直在招手。",
+      "line": "牠說會幫你招來好成績。",
+      "price": 15,
+      "slot": "sill-l",
+      "file": "luckycat.glb",
+      "behave": "beckon",
+      "ready": true,
+      "scale": 1.2
+    },
+    {
+      "id": "snowglobe",
+      "name": "雪花球",
+      "blurb": "裡面住著一隻小螃蟹，點一下會下雪。",
+      "line": "欸，裡面那隻是我嗎？",
+      "price": 15,
+      "slot": "sill-r",
+      "file": "snowglobe.glb",
+      "behave": "snow",
+      "ready": true,
+      "scale": 1.35
+    },
+    {
+      "id": "furin",
+      "name": "玻璃風鈴",
+      "blurb": "掛在窗邊隨風晃，點一下會響。",
+      "line": "叮鈴。有風的感覺。",
+      "price": 15,
+      "slot": "hang-l",
+      "file": "furin.glb",
+      "behave": "chime",
+      "ready": true,
+      "scale": 1.2
+    },
+    {
+      "id": "stars",
+      "name": "紙星星掛串",
+      "blurb": "手摺的和紙星星，會輕輕搖。",
+      "line": "一顆一顆摺的喔。",
+      "price": 15,
+      "slot": "hang",
+      "file": "stars.glb",
+      "behave": "dangle",
+      "ready": true
+    },
+    {
+      "id": "fishbowl",
+      "name": "小魚缸",
+      "blurb": "兩條金魚繞著水草游，點一下餵牠們。",
+      "line": "有伴了，以後不無聊。",
+      "price": 25,
+      "slot": "desk-back",
+      "file": "fishbowl.glb",
+      "behave": "swim",
+      "ready": true,
+      "scale": 1.25
+    },
+    {
+      "id": "typewriter",
+      "name": "復古打字機",
+      "blurb": "紫色烤漆打字機，點一下會打字。",
+      "line": "喀噠喀噠，這聲音真好。",
+      "price": 30,
+      "slot": "desk-back",
+      "file": "typewriter.glb",
+      "behave": "type",
+      "ready": true
+    }
+  ]
+}

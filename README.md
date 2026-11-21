@@ -39,3 +39,9 @@ Paradigm 學習站首頁（f4 雨夜書桌）的預覽版，用 GitHub Pages 放
 - 拿掉開課選單 `picker/`、`first-trial.js` 與舊樣品（skills.html、syllabus.js 等）。
 - 新增 404.html、robots.txt、sitemap.xml、og.jpg、favicon；這個預覽版設成不讓搜尋引擎收錄（正式站之後在 paradigmai.tw）。
 - 資源下載頁有 3 包；課程地圖 v8.7.2、首版 21 課（已開放 3 課）。
+
+## 2026-11-21 更新（書桌佈置）
+
+- 首頁 3D 書桌右下角新增「佈置」：完成課程得代幣（每課 10、60 秒體驗 5），可以兌換 10 件擺飾放到書桌上（串燈、紙星星、風鈴、地球儀、雪花球、仙人掌、蠟燭、招財貓、魚缸、打字機）。
+- 新增 `crab/rooms/f4/decor.js`（代幣、佈置模式、兌換過程、擺飾互動）、`decor-view.js`（擺飾架的 3D 預覽）、`decor.css`、`decor/catalog.json`（擺飾資料）、`decor/*.glb`（模型）。
+- 代幣和擺飾只存在訪客自己的瀏覽器，不用登入；只在電腦寬螢幕的 3D 書桌出現，手機和簡潔版沒有。

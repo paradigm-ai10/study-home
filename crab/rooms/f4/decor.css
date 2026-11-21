@@ -1,0 +1,90 @@
+/* 書桌佈置 v2（2026-11-21）：右下角「佈置」鈕、佈置模式的底部擺飾架、空位記號。只在 3D 書桌出現。 */
+:root { --d-out: cubic-bezier(.23, 1, .32, 1); }      /* a strong ease-out (emil-design-eng): moves at once, settles softly */
+.coin { width: .95em; height: .95em; vertical-align: -.12em; margin-right: .3em; }
+.coin circle:first-child { fill: var(--sun); stroke: #b98420; stroke-width: 1; }
+.coin circle:last-child { fill: none; stroke: #b98420; stroke-width: 1; opacity: .7; }
+#btn-decor b { color: var(--grape); font-family: var(--en); font-weight: 600; font-size: 13.5px; }
+#btn-decor { position: relative; }
+#btn-decor[hidden] { display: none; }
+#btn-decor.has-new::after { content: ""; position: absolute; right: -3px; top: -3px; width: 9px; height: 9px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 0 2px var(--cream); }
+#btn-decor[aria-expanded="true"] { background: var(--grape); color: var(--cream); }
+#btn-decor[aria-expanded="true"] b { color: var(--sun); }
+#btn-decor:focus-visible, .decor-tray :focus-visible { outline: 2px solid var(--sun); outline-offset: 2px; }
+
+/* 佈置模式：頁面上的字退場，把書桌讓出來 */
+.index, .ctl, .top { transition: opacity 240ms ease-out, visibility 0s; }
+html.is-decor .hero, html.is-decor .index, html.is-decor .ctl, html.is-decor .bubble, html.is-decor .tag, html.is-decor .mc-label,
+html.is-decor-show .hero, html.is-decor-show .index, html.is-decor-show .ctl, html.is-decor-show .tag {
+  opacity: 0 !important; visibility: hidden; pointer-events: none; transition: opacity 240ms ease-out, visibility 0s linear 240ms;
+}
+html.is-decor-show .top { opacity: 0; pointer-events: none; }
+
+.decor-tray {
+  position: absolute; z-index: 6; left: var(--pad); right: var(--pad); bottom: clamp(14px, 3vh, 28px);
+  color: var(--cream); font-family: var(--zh); opacity: 0; translate: 0 28px; visibility: hidden; pointer-events: none;
+  transition: opacity 180ms ease-out, translate 180ms ease-out, visibility 0s linear 180ms;      /* leaves faster than it came */
+}
+html.is-decor .decor-tray { opacity: 1; translate: 0 0; visibility: visible; pointer-events: auto; transition: opacity 240ms var(--d-out), translate 340ms var(--d-out), visibility 0s; }
+html.is-decor-show .decor-tray { opacity: 0; translate: 0 28px; pointer-events: none; transition: opacity 180ms ease-out, translate 180ms ease-out; }
+.decor-tray header { display: flex; align-items: flex-end; gap: 18px; margin: 0 2px 10px; text-shadow: 0 1px 10px rgba(14, 10, 30, .7); }
+.decor-tray header > div { flex: 1; min-width: 0; }
+.decor-tray h2 { margin: 0; font-size: 21px; font-weight: 400; letter-spacing: .08em; }
+.decor-tray .how { margin: 3px 0 0; font-size: 13px; letter-spacing: .03em; color: rgba(255, 244, 224, .82); }
+.decor-tray .purse { margin: 0; display: flex; align-items: baseline; gap: 2px; font-size: 13px; background: rgba(23, 20, 41, .62); padding: 7px 13px 7px 11px; border-radius: 6px; box-shadow: inset 0 0 0 1px rgba(255, 244, 224, .16); text-shadow: none; }
+.decor-tray .purse b { font-family: var(--en); font-size: 19px; font-weight: 600; margin-right: 5px; font-variant-numeric: tabular-nums; }
+.decor-tray .purse .coin { width: 17px; height: 17px; align-self: center; }
+.decor-tray .purse span { color: rgba(255, 244, 224, .8); }
+.decor-tray .done { appearance: none; border: 0; cursor: pointer; font: inherit; font-size: 14px; letter-spacing: .06em; padding: 9px 16px; border-radius: 6px; background: var(--cream); color: var(--grape); box-shadow: var(--card-shadow); text-shadow: none; transition: scale 140ms ease-out; }
+.decor-tray .done:active { scale: .97; }
+
+.decor-tray .shelf { list-style: none; margin: 0; padding: 6px 2px 6px; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: thin; scrollbar-color: rgba(255, 244, 224, .35) transparent; }
+.decor-tray li {
+  flex: 0 0 184px; scroll-snap-align: start; background: var(--cream); color: var(--grape); border-radius: 10px; padding: 0 0 12px; overflow: hidden;
+  box-shadow: var(--card-shadow); display: grid; grid-template-rows: auto auto 1fr auto; opacity: 0; transform: translateY(12px);
+  transition: opacity 160ms ease-out, transform 160ms ease-out, translate 180ms var(--d-out), box-shadow 180ms var(--d-out);
+}
+/* the cards come up one after another (40 ms apart); hovering one never waits for that */
+html.is-decor .decor-tray li { opacity: 1; transform: none; transition: opacity 260ms var(--d-out) calc(var(--i, 0) * 40ms), transform 340ms var(--d-out) calc(var(--i, 0) * 40ms), translate 180ms var(--d-out), box-shadow 180ms var(--d-out); }
+.decor-tray li:focus-within { translate: 0 -5px; box-shadow: 0 2px 3px rgba(14, 10, 30, .3), 0 14px 30px rgba(14, 10, 30, .42); }
+@media (hover: hover) and (pointer: fine) { .decor-tray li:hover { translate: 0 -5px; box-shadow: 0 2px 3px rgba(14, 10, 30, .3), 0 14px 30px rgba(14, 10, 30, .42); } }
+.decor-tray .pic { height: 112px; background: radial-gradient(120% 100% at 30% 15%, #54467c, #1d1832 78%); display: grid; place-items: center; }
+.decor-tray .pic canvas { width: 100%; height: 100%; display: block; object-fit: cover; }
+.decor-tray .pic span { font-size: 12.5px; letter-spacing: .1em; color: rgba(255, 244, 224, .55); border: 1px dashed rgba(255, 244, 224, .3); padding: 5px 10px; border-radius: 4px; }
+.decor-tray h3 { margin: 10px 12px 0; font-size: 15.5px; font-weight: 600; letter-spacing: .03em; }
+.decor-tray li p { margin: 2px 12px 9px; font-size: 12.5px; line-height: 1.5; color: rgba(58, 46, 92, .8); }
+.decor-tray li button {
+  margin: 0 12px; appearance: none; border: 0; cursor: pointer; border-radius: 6px; padding: 8px 10px; font: inherit; font-size: 13.5px; letter-spacing: .05em;
+  background: var(--sun); color: var(--grape); display: flex; justify-content: center; align-items: center; gap: 9px; transition: scale 140ms ease-out, background-color 140ms ease-out;
+}
+.decor-tray li button i { font-style: normal; font-family: var(--en); font-weight: 600; display: inline-flex; align-items: center; }
+.decor-tray li button:active { scale: .97; }
+.decor-tray li.own button { background: rgba(58, 46, 92, .1); }
+.decor-tray li.placed button { background: var(--grape); color: var(--cream); }
+.decor-tray li button:disabled { cursor: default; background: rgba(58, 46, 92, .07); color: rgba(58, 46, 92, .66); }
+.decor-tray li.soon { background: rgba(255, 244, 224, .86); }
+.decor-tray li.soon .pic { background: #2a2444; }
+.decor-tray li.soon h3 { font-weight: 400; }
+.decor-tray li.soon button { background: none; justify-content: flex-start; padding: 2px 0; }
+
+/* 擺飾架後面一層由下往上的暗，讓標題和卡片從書桌上分出來 */
+.decor-scrim { position: absolute; left: 0; right: 0; bottom: 0; height: min(62vh, 520px); z-index: 4; pointer-events: none; opacity: 0; transition: opacity 320ms ease-out;
+  background: linear-gradient(to top, rgba(18, 14, 34, .86), rgba(18, 14, 34, .62) 46%, rgba(18, 14, 34, 0)); }
+html.is-decor .decor-scrim { opacity: 1; }
+html.is-decor-show .decor-scrim { opacity: 0; }
+
+/* 空位記號 */
+.decor-marks { position: absolute; inset: 0; z-index: 4; pointer-events: none; opacity: 0; transition: opacity 300ms ease-out; }
+html.is-decor .decor-marks { opacity: 1; transition-delay: 300ms; }
+html.is-decor-show .decor-marks { opacity: 0; transition-delay: 0s; }
+.decor-marks i { position: absolute; left: 0; top: 0; width: 0; height: 0; display: none; }
+.decor-marks i.on { display: block; }
+.decor-marks i::before { content: ""; position: absolute; left: -9px; top: -9px; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid rgba(255, 244, 224, .85); box-shadow: 0 0 10px rgba(255, 200, 87, .5); animation: decor-mark 2.2s ease-in-out infinite; }
+.decor-marks i.hot::before { border-color: var(--sun); border-width: 2px; }
+.decor-marks b { position: absolute; left: 16px; top: -12px; white-space: nowrap; font: 400 12.5px/1 var(--zh); letter-spacing: .06em; color: var(--grape); background: var(--cream); padding: 6px 8px; border-radius: 4px; box-shadow: var(--card-shadow); opacity: 0; transition: opacity 160ms ease-out; }
+.decor-marks i.hot b { opacity: 1; }
+@keyframes decor-mark { 0%, 100% { scale: 1; opacity: .9; } 50% { scale: 1.35; opacity: .45; } }
+html.has-map .decor-tray, html.pk-leaving .decor-tray, html.has-map .decor-marks { display: none; }
+.decor-skip { position: absolute; z-index: 6; left: 50%; bottom: clamp(18px, 4.4vh, 40px); translate: -50% 0; margin: 0; font: 400 13px/1 var(--zh); letter-spacing: .08em; color: rgba(255, 244, 224, .82); text-shadow: 0 1px 8px rgba(14, 10, 30, .8); opacity: 0; pointer-events: none; transition: opacity 200ms ease-out; }
+html.is-decor-show .decor-skip { opacity: 1; transition: opacity 300ms ease-out 1s; }
+/* less motion, not none: things still fade, nothing slides */
+@media (prefers-reduced-motion: reduce) { .decor-tray, html.is-decor .decor-tray, html.is-decor-show .decor-tray { translate: none; transition: opacity 200ms ease-out, visibility 0s; } .decor-tray li, html.is-decor .decor-tray li { transform: none; translate: none !important; transition: opacity 200ms ease-out; } .decor-marks i::before { animation: none; } }

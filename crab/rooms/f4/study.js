@@ -2088,6 +2088,7 @@ async function boot() {
     hot: (id) => setHot(id, id ? 'tag' : null), focusOn, unfocus, celebrate, syncMap, mapFlags, skipIntro, lamp: (on) => setLamp(on, true), toggleLamp, pokeCrab, startLife, endLife, LIFE, setCurtain, setRain, wiper, RAIN, CURT,
     stats: () => ({ calls: renderer.info.render.calls, tris: renderer.info.render.triangles, tex: renderer.info.memory.textures, layout: S.layout, intro: S.intro }),
     S, L, scene, camera, renderer, props, LAYOUT, applyLayout, fit, canvas, acts,
+    say, play, walkTo, crabRoot, later,          // for decor.js (書桌佈置, 2026-11-21): the crab hands the thing over itself
   };
   if (CAPTURE) return;
   const clock = new THREE.Clock();
