@@ -65,7 +65,9 @@ window.PLCHAPTER = {
     const hint = document.createElement('div'); hint.className = 'pl-gatehint'; hint.setAttribute('aria-hidden', 'true'); hint.innerHTML = '讀完這章，往下就能翻到下一章 <b>↓</b>'; document.body.append(hint)
     const gate = () => {
       const s = screens[cur], nav = $(':scope > .pl-flipnav', s.el)
-      if (nav.classList.contains('locked') && nav.getBoundingClientRect().top < innerHeight - 30) { nav.classList.remove('locked'); nav.classList.add('opened') }
+      const reached = nav.getBoundingClientRect().top < innerHeight - 30
+      if (nav.classList.contains('locked') && reached) { nav.classList.remove('locked'); nav.classList.add('opened') }
+      if (reached && s.kind === 'ch' && !s.read && scrollY > 40) { s.read = true; dispatchEvent(new CustomEvent('pl-chapter-read', { detail: { i: s.ch.i } })) }   // 讀到這章最後了（最後一章沒有鎖，也算）
       hint.classList.toggle('on', s.kind === 'ch' && nav.classList.contains('locked') && scrollY > 200)
     }
     addEventListener('scroll', gate, { passive: true }); addEventListener('resize', gate)

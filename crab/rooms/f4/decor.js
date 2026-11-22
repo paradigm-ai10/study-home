@@ -10,6 +10,8 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
+import { sources, markVisit } from './coins.js';
+import { mountJournal } from './journal.js';
 
 const html = document.documentElement;
 const Q = new URLSearchParams(location.search);
@@ -38,7 +40,7 @@ function waitFor(test, ms = 25000) {
 /* ------------------------------------------------------------------ what you own (this browser only) */
 function load() {
   let s = {}; try { if (KEEP) s = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { s = {}; }
-  return { owned: Array.isArray(s.owned) ? s.owned : [], placed: s.placed && typeof s.placed === 'object' ? s.placed : {}, seen: +s.seen || 0 };
+  return { owned: Array.isArray(s.owned) ? s.owned : [], placed: s.placed && typeof s.placed === 'object' ? s.placed : {}, seen: +s.seen || 0, paid: Array.isArray(s.paid) ? s.paid : [] };   // paid ＝ 螃蟹已經交給你的那幾筆（coins.js 的 key）
 }
 const mine = load();
 const save = () => { try { if (KEEP) localStorage.setItem(KEY, JSON.stringify(mine)); } catch (e) { /* private mode */ } };
@@ -56,7 +58,11 @@ async function main() {
 
   /* tokens: only lessons finished on a lesson page count (pd-done), not the ones ticked as "already know" in 程度評估 */
   const lessonsDone = () => { let d = []; try { d = JSON.parse(localStorage.getItem('pd-done') || '[]'); } catch (e) { d = []; } return new Set(d.filter((id) => !F4 || !F4.byId || F4.byId[id])).size; };
-  const earned = () => (DEVMODE ? 9999 : DEV && Q.has('coins') ? +Q.get('coins') || 0 : lessonsDone() * cat.currency.perLesson + (F4 && F4.state.done && F4.state.done.t1 ? cat.currency.firstTask : 0));
+  /* 2026-11-23：代幣的來源改由 coins.js 一筆一筆列出來（完成一課、測驗全對、讀完一章、60 秒體驗、連續回來） */
+  markVisit(KEEP);
+  const allSources = () => sources(cat.currency, { has: (id) => !F4 || !F4.byId || !!F4.byId[id], firstTask: !!(F4 && F4.state.done && F4.state.done.t1), keep: KEEP });
+  const unpaid = () => allSources().filter((x) => !mine.paid.includes(x.key));
+  const earned = () => (DEVMODE ? 9999 : DEV && Q.has('coins') ? +Q.get('coins') || 0 : allSources().reduce((n, x) => n + x.n, 0));
   const spent = () => mine.owned.reduce((n, id) => n + byId[id].price, 0);
   const balance = () => Math.max(0, earned() - spent());
 
@@ -503,7 +509,7 @@ async function main() {
     if (ba < 1.3) { for (let i = 0; i < BITS; i++) { const v = bitsVel[i]; v.y -= 6.5 * dt; bitsPos[i * 3] += v.x * dt; bitsPos[i * 3 + 1] += v.y * dt; bitsPos[i * 3 + 2] += v.z * dt; } bitsGeo.attributes.position.needsUpdate = true; bits.material.opacity = clamp(1.3 - ba, 0, 1); } else if (bits.material.opacity) bits.material.opacity = 0;
     if (ghost && ghost.root) { const k = 0.34 + 0.12 * Math.sin((t - ghost.at) * 3.2); ghost.root.traverse((o) => { if (o.isMesh) o.material.opacity = k; }); }
     const wide = S.layout === 'wide';
-    if (wide !== wasWide && uiReady) { wasWide = wide; btn.hidden = !wide; if (!wide && decorating) decorate(false); for (const k in live) if (live[k].root && !live[k].wear) live[k].root.visible = wide; }
+    if (wide !== wasWide && uiReady) { wasWide = wide; btn.hidden = !wide; jr.btn.hidden = !wide; if (!wide) jr.show(false, false); if (!wide && decorating) decorate(false); for (const k in live) if (live[k].root && !live[k].wear) live[k].root.visible = wide; }
     if (decorating || showing) S.lastInteract = S.t;
     if (decorating && !showing) placeMarks();
     requestAnimationFrame(tick);
@@ -519,7 +525,7 @@ async function main() {
   };
   let hand = null;
   canvas.addEventListener('pointerdown', (e) => {
-    if (showing) { skip = true; e.stopImmediatePropagation(); return; }
+    if (showing || paying) { skip = true; e.stopImmediatePropagation(); return; }
     if (e.button !== 0 || hand) return; const x = under(e); if (!x) return;
     e.stopImmediatePropagation(); hand = { x, id: e.pointerId, px: e.clientX, moved: 0 };
     try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
@@ -556,12 +562,11 @@ async function main() {
       else { try { localStorage.setItem(DEV_KEY, '0'); } catch (err) { /* private mode */ } const u = new URL(location.href); u.searchParams.delete('dev'); location.replace(u.href); }
     });
   }
-  tray.querySelector('.how').textContent = `每完成一課得 ${cat.currency.perLesson} ${cat.currency.name}，完成 60 秒體驗得 ${cat.currency.firstTask} ${cat.currency.name}。`;
+  tray.querySelector('.how').textContent = `完成一課 ${cat.currency.perLesson}、測驗全對 ${cat.currency.perQuiz}、讀完一章 ${cat.currency.perChapter}、60 秒體驗 ${cat.currency.firstTask}；連續幾天回來另外有${cat.currency.name}。`;
   let studio = null, shown = -1;
   // tokens you have not been told about yet (a lesson finished since you last looked): a dot on the button, and the crab mentions it once
   const fresh = () => (DEVMODE ? 0 : Math.max(0, earned() - mine.seen));
   let told = false;
-  setInterval(() => { if (told || !fresh() || !S.introDone || S.busy || decorating || (F4 && F4.card) || S.layout !== 'wide' || document.hidden) return; told = true; f2.say(`你有 ${balance()} ${cat.currency.name}，可以拿來佈置書桌。按右下角的「佈置」。`, { hold: 5 }); }, 4000);
 
   function placeMarks() {                                // a small ring at every empty place; the one you are looking at wears its name
     const r = canvas.getBoundingClientRect(), sr = stage.getBoundingClientRect();
@@ -579,9 +584,11 @@ async function main() {
     if (own) return on ? { cls: 'placed', label: w ? '脫下來' : '收起來', act: 'take' } : { cls: 'own', label: w ? '穿上' : '擺上去', act: 'put' };
     return bal >= it.price ? { cls: 'buy', label: `兌換`, price: it.price, act: 'buy' } : { cls: 'short', label: `還差 ${it.price - bal}`, price: it.price, dis: true };
   }
+  let hold = null;                                       // while the crab is handing tokens over, the button counts up to the real number
+  function drawBtn() { const bal = hold ?? balance(); btn.innerHTML = `佈置<b>${COIN}${bal}</b>`; btn.title = `書桌佈置（${cat.currency.name} ${bal}）`; btn.classList.toggle('has-new', fresh() > 0 && !decorating); }
   function draw() {
     const bal = balance();
-    btn.innerHTML = `佈置<b>${COIN}${bal}</b>`; btn.title = `書桌佈置（${cat.currency.name} ${bal}）`; btn.classList.toggle('has-new', fresh() > 0 && !decorating);
+    drawBtn();
     if (shown < 0) shown = bal;
     if (shown !== bal && !REDUCED) { const from = shown, t0 = now(); shown = bal; (function roll() { const u = Math.min(1, (now() - t0) / 0.35); purse.innerHTML = `${COIN}<b>${Math.round(lerp(from, bal, easeOut(u)))}</b><span>${cat.currency.name}</span>`; if (u < 1) requestAnimationFrame(roll); })(); }
     else { shown = bal; purse.innerHTML = `${COIN}<b>${bal}</b><span>${cat.currency.name}</span>`; }
@@ -614,7 +621,7 @@ async function main() {
   shelf.addEventListener('focusin', (e) => { const li = e.target.closest('li'); if (li) setHot(li.dataset.id); });
 
   function decorate(on) {
-    if (on === decorating || showing) return; decorating = on;
+    if (on === decorating || showing || paying) return; decorating = on; if (on) jr.show(false, false);
     html.classList.toggle('is-decor', on); tray.inert = !on; btn.setAttribute('aria-expanded', String(on));
     if (on) {
       if (f2.skipIntro) f2.skipIntro(); if (F4 && F4.card && F4.close) F4.close();
@@ -626,7 +633,7 @@ async function main() {
   }
   btn.addEventListener('click', () => decorate(!decorating));
   tray.querySelector('.done').addEventListener('click', () => decorate(false));
-  addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; const pk = tray.querySelector('.decor-pick'); if (pk && !pk.hidden) { closePick(true); return; } if (showing) skip = true; else if (decorating) decorate(false); });   // Esc: the picture chooser first, then 佈置模式
+  addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; const pk = tray.querySelector('.decor-pick'); if (pk && !pk.hidden) { closePick(true); return; } if (showing || paying) skip = true; else if (decorating) decorate(false); });   // Esc: the picture chooser first, then 佈置模式
   shelf.addEventListener('click', async (e) => {
     const b = e.target.closest('button[data-act]'); if (!b || !b.dataset.act || showing) return;
     const it = byId[b.closest('li').dataset.id], act = b.dataset.act; setHot(null);
@@ -638,6 +645,87 @@ async function main() {
     else { delete mine.placed[it.slot]; save(); draw(); tell(cat.slots[it.slot].wear ? `${it.name}脫下來了。` : `${it.name}收起來了。`); await putAway(it.slot); }
     draw(); const again = shelf.querySelector(`li[data-id="${it.id}"] button`); if (again && decorating) again.focus({ preventScroll: true });
   });
+
+  /* ------------------------------------------------------------------ 發幣（2026-11-23）：回到首頁時，上次之後新拿到的代幣由螃蟹交給你
+     螃蟹跑到桌子右前方，代幣一枚一枚從牠那裡跳進右下角的「佈置」鈕，鈕上的數字跟著加；每一筆在鈕的上方寫是怎麼來的。
+     代幣是畫在頁面上的小圓（不是 3D、沒有燈）。點一下或 Esc 直接結束。這一筆一開始就記成「給過了」，播到一半關掉也不會再發一次。
+     本機可以用 ?payout=demo 看一次假的。 */
+  const jr = mountJournal({ ctl, stage, currency: cat.currency, tell, busy: () => showing || paying || decorating });
+  jr.btn.hidden = S.layout !== 'wide';
+  let paying = false;
+  const PAY_AT = new V3(1.15, 0, 0.95);                  // where the crab stands to hand them over: the near right of the desk, toward the button
+  const payLayer = document.createElement('div'); payLayer.className = 'decor-pay'; payLayer.setAttribute('aria-hidden', 'true'); stage.appendChild(payLayer);
+  const payList = document.createElement('ol'); payList.className = 'decor-paylist'; payList.setAttribute('aria-hidden', 'true'); stage.appendChild(payList);
+  const flights = new Set();
+  function merge(list) {                                 // many small ones (a lesson read chapter by chapter) become one line each kind
+    if (list.length <= 5) return list.map((x) => ({ label: x.label, n: x.n }));
+    const kinds = { lesson: (c) => `完成 ${c} 課`, quiz: (c) => `${c} 課測驗全對`, chapter: (c) => `讀完 ${c} 章` }, out = [], by = {};
+    list.forEach((x) => { const k = x.key.split(':')[0]; if (!kinds[k]) { out.push({ label: x.label, n: x.n }); return; } if (!by[k]) { by[k] = { c: 0, n: 0, label: x.label }; out.push(by[k]); } by[k].c++; by[k].n += x.n; by[k].label = by[k].c > 1 ? kinds[k](by[k].c) : x.label; });
+    return out;
+  }
+  function crabOnScreen(out) {
+    const r = canvas.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+    giftPos(pv).project(camera);                          // out of the gift box on its head
+    return out.set((pv.x * 0.5 + 0.5) * r.width + r.left - sr.left, (-pv.y * 0.5 + 0.5) * r.height + r.top - sr.top);
+  }
+  function fly(from, to, i) {                            // one token: up out of the crab's box, over, and into the button
+    const el = document.createElement('i'); el.innerHTML = `<span>${COIN}</span>`; payLayer.appendChild(el);
+    const dx = to.x - from.x, dy = to.y - from.y, up = Math.min(-70, dy * 0.25 - 150) - (i % 3) * 14, dur = 640 * SLOW;
+    el.style.translate = `${from.x.toFixed(1)}px ${from.y.toFixed(1)}px`;
+    const a = el.animate([{ transform: 'translateX(0)' }, { transform: `translateX(${dx.toFixed(1)}px)` }], { duration: dur, easing: 'cubic-bezier(.3, .1, .6, 1)', fill: 'forwards' });
+    const b = el.firstChild.animate([
+      { transform: 'translateY(0) scale(.35) rotateY(0deg)', opacity: 0, easing: 'cubic-bezier(.2, .7, .4, 1)' },
+      { transform: `translateY(${up.toFixed(1)}px) scale(1.15) rotateY(360deg)`, opacity: 1, offset: 0.42, easing: 'cubic-bezier(.6, 0, .85, .45)' },
+      { transform: `translateY(${dy.toFixed(1)}px) scale(.7) rotateY(720deg)`, opacity: 1 },
+    ], { duration: dur, fill: 'forwards' });
+    flights.add(a); flights.add(b);
+    return a.finished.catch(() => {}).then(() => { flights.delete(a); flights.delete(b); el.remove(); });
+  }
+  async function payout(list, { demo = false } = {}) {
+    if (paying || !list.length) return; paying = true; skip = false;
+    const total = list.reduce((n, x) => n + x.n, 0), end = balance();
+    if (!demo) { mine.paid = [...new Set(mine.paid.concat(list.map((x) => x.key)))]; save(); }
+    hold = Math.max(0, end - total); drawBtn();
+    S.busy = true; if (f2.LIFE && f2.LIFE.mode) f2.endLife(false); jr.show(false, false);
+    html.classList.add('is-pay'); payList.innerHTML = '';
+    tell(`螃蟹給你 ${total} ${cat.currency.name}：${list.map((x) => x.label).join('、')}。`);
+    const moving = !REDUCED, rows = merge(list), from = new THREE.Vector2(), to = new THREE.Vector2();
+    if (moving) { const T = f2.walkTo(PAY_AT.clone()); await wait(T + 0.2); f2.play('parcel_wiggle', { force: true }); await wait(0.35); }
+    for (const row of rows) {
+      const li = document.createElement('li'); li.innerHTML = `<span>${row.label}</span><b>+${row.n}</b>`; payList.appendChild(li);
+      while (payList.children.length > 4) payList.firstChild.remove();
+      const k = Math.min(row.n, 6), each = Math.floor(row.n / k); let left = row.n;
+      if (moving && !skip) {
+        const br = btn.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+        to.set(br.left - sr.left + br.width - 30, br.top - sr.top + br.height / 2 - 8); crabOnScreen(from);
+        const landed = [];
+        for (let i = 0; i < k; i++) {
+          const v = i === k - 1 ? left : each; left -= v;
+          landed.push(fly(from, to, i).then(() => { hold = Math.min(end, hold + v); drawBtn(); if (!skip) btn.animate([{ scale: 1 }, { scale: 1.1 }, { scale: 1 }], { duration: 200, easing: 'ease-out' }); }));
+          if (i === 0) burst(giftPos(new V3()));
+          await wait(0.09); if (skip) break;
+        }
+        if (skip) flights.forEach((f) => f.finish());
+        await Promise.all(landed); hold = Math.min(end, hold + left); drawBtn();
+        await wait(0.28);
+      } else { hold = Math.min(end, hold + row.n); drawBtn(); await wait(0.18); }
+    }
+    hold = null; draw();
+    if (moving && !skip) f2.play('hop', { force: true });
+    f2.say(`這次給你 ${total} ${cat.currency.name}，現在有 ${balance()}。按右下角的「佈置」可以換東西。`, { hold: 5 });
+    await wait(1.6);
+    html.classList.remove('is-pay'); payLayer.innerHTML = '';
+    if (moving) f2.walkTo(S.crabHome.clone()); else crabRoot.position.copy(S.crabHome);
+    S.busy = false; paying = false; skip = false;
+  }
+  const DEMO_PAY = DEV && Q.get('payout') === 'demo' ? [{ key: 'lesson:4-4', label: '完成 4-4', n: 10 }, { key: 'quiz:4-4', label: '4-4 測驗全對', n: 5 }, { key: 'chapter:4-4:0', label: '讀完 4-4 第 1 章', n: 1 }, { key: 'chapter:4-4:1', label: '讀完 4-4 第 2 章', n: 1 }, { key: 'streak:3@demo', label: '連續 3 天回來', n: 5 }] : null;
+  let demoDone = false, readyAt = 0;
+  setInterval(() => {
+    if (!S.introDone) return; if (!readyAt) readyAt = now();
+    if (now() - readyAt < 2.8 || paying || S.busy || decorating || showing || jr.open || (F4 && F4.card) || S.layout !== 'wide' || document.hidden || html.classList.contains('has-map') || html.classList.contains('pk-leaving')) return;
+    if (DEMO_PAY && !demoDone) { demoDone = true; payout(DEMO_PAY, { demo: true }); return; }
+    const list = unpaid(); if (list.length) payout(list);
+  }, 1200);
   /* ------------------------------------------------------------------ 存成圖片（2026-11-22）：書桌和螃蟹一張 1080×1920 直式圖，沒有任何按鈕，角落印帳號和網址 */
   const SHARE = { handle: '@paradigmai_tw', url: 'paradigm-study.pages.dev' };          // 網址：Cloudflare 那個（協作說明：之後正式用這個）
   /* 分享卡的兩種版面（Thomas 2026-11-23 從 8 版裡留下這兩個；其他 6 版的程式在 可刪/存圖前/decor.v3八版.js）：
@@ -775,9 +863,9 @@ async function main() {
   });
 
   if (F4 && F4.on) { F4.on('state', draw); F4.on('card:open', () => { if (decorating) decorate(false); }); }
-  addEventListener('storage', (e) => { if (e.key === 'pd-done') draw(); });
+  addEventListener('storage', (e) => { if (['pd-done', 'pd-quiz', 'pd-chapters', 'pd-awards'].includes(e.key)) draw(); });
   draw();
   Object.values(mine.placed).forEach(mount);
-  window.__decor = { snapshot, SHOT, shareText, stats, mine, balance, present, putAway, mount, decorate, live, cat, draw, showGhost };
+  window.__decor = { payout, unpaid, allSources, journal: jr, snapshot, SHOT, shareText, stats, mine, balance, present, putAway, mount, decorate, live, cat, draw, showGhost };
 }
 main().catch((e) => console.info('[decor] not started:', e && e.message));

@@ -4,7 +4,15 @@
   "currency": {
     "name": "代幣",
     "perLesson": 10,
-    "firstTask": 5
+    "firstTask": 5,
+    "perQuiz": 5,
+    "perChapter": 1,
+    "streak": {
+      "3": 5,
+      "7": 10,
+      "14": 15,
+      "30": 30
+    }
   },
   "slots": {
     "hang": {

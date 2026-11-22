@@ -113,3 +113,57 @@ html.is-decor-show .decor-skip { opacity: 1; transition: opacity 300ms ease-out 
 @media (hover: hover) and (pointer: fine) { .decor-tray .decor-pick button:hover canvas { box-shadow: 0 0 0 2px var(--coral); } }
 @keyframes decor-pick-in { from { opacity: 0; scale: .96; translate: 0 6px; } }
 @media (prefers-reduced-motion: reduce) { .decor-pick { animation: none; } }
+
+/* 發幣（2026-11-23）：代幣從螃蟹那裡一枚一枚跳進「佈置」鈕；每一筆的來由寫在鈕的上方 */
+.decor-pay { position: absolute; inset: 0; z-index: 7; pointer-events: none; overflow: hidden; }
+.decor-pay i { position: absolute; left: -15px; top: -15px; width: 30px; height: 30px; will-change: transform; }
+.decor-pay i span { display: block; width: 30px; height: 30px; filter: drop-shadow(0 2px 5px rgba(14, 10, 30, .55)); }
+.decor-pay .coin { width: 30px; height: 30px; margin: 0; vertical-align: top; }
+.decor-paylist { position: absolute; z-index: 6; right: var(--pad); bottom: calc(clamp(18px, 4.4vh, 40px) + 50px); margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; justify-items: end; pointer-events: none; opacity: 0; transition: opacity 320ms ease-out; }
+html.is-pay .decor-paylist { opacity: 1; transition-duration: 160ms; }
+.decor-paylist li { display: flex; align-items: baseline; gap: 12px; background: var(--cream); color: var(--grape); border-radius: 6px; padding: 7px 12px 7px 13px; font: 400 14px/1.3 var(--zh); letter-spacing: .04em; box-shadow: var(--card-shadow); animation: decor-pay-in 260ms var(--d-out); }
+.decor-paylist b { font-family: var(--en); font-weight: 600; font-size: 15.5px; color: var(--coral-ink); font-variant-numeric: tabular-nums; }
+@keyframes decor-pay-in { from { opacity: 0; translate: 0 8px; } }
+html.is-pay .index, html.is-pay .tag { opacity: .35; transition: opacity 240ms ease-out; }
+@media (prefers-reduced-motion: reduce) { .decor-paylist li { animation: none; } }
+
+/* 上線日誌（2026-11-23）：右下角「日誌」鈕和它上面的月曆 */
+#btn-journal b { color: var(--grape); font-family: var(--en); font-weight: 600; font-size: 13.5px; }
+#btn-journal[hidden] { display: none; }
+#btn-journal[aria-expanded="true"] { background: var(--grape); color: var(--cream); }
+#btn-journal[aria-expanded="true"] b { color: var(--sun); }
+.journal { position: absolute; z-index: 7; right: var(--pad); bottom: calc(clamp(18px, 4.4vh, 40px) + 50px); width: 308px; box-sizing: border-box; background: var(--cream); color: var(--grape); border-radius: 10px; padding: 14px 16px 14px; font-family: var(--zh); box-shadow: var(--card-shadow), 0 18px 40px rgba(14, 10, 30, .45); transform-origin: 90% 100%; animation: decor-pick-in 200ms var(--d-out); }
+.journal[hidden] { display: none; }
+.journal header { display: flex; align-items: center; justify-content: space-between; }
+.journal h2 { margin: 0; font-size: 17px; font-weight: 400; letter-spacing: .1em; }
+.journal button { appearance: none; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
+.journal .x { width: 30px; height: 30px; margin: -4px -8px -4px 0; font-size: 20px; line-height: 1; border-radius: 6px; color: var(--grape-3); }
+.journal .sum { margin: 12px 0 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.journal .sum span { display: grid; gap: 1px; font-size: 12.5px; letter-spacing: .04em; color: var(--grape-3); padding: 8px 10px 7px; border-radius: 7px; background: rgba(58, 46, 92, .06); }
+.journal .sum b { font-family: var(--en); font-size: 24px; font-weight: 600; line-height: 1.05; color: var(--grape); font-variant-numeric: tabular-nums; }
+.journal .sum span:first-child { background: var(--grape); color: rgba(255, 244, 224, .82); }
+.journal .sum span:first-child b { color: var(--sun); }
+.journal .mon { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.journal .mon h3 { margin: 0; font-size: 14.5px; font-weight: 400; letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+.journal .mon button { width: 32px; height: 30px; font-size: 19px; line-height: 1; border-radius: 6px; }
+.journal .mon button:disabled { opacity: .25; cursor: default; }
+.journal ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); justify-items: center; }
+.journal .wk li { font-size: 12px; color: var(--grape-3); padding: 4px 0 5px; }
+.journal .grid { row-gap: 3px; }
+.journal .grid button { width: 32px; height: 32px; border-radius: 50%; font-family: var(--en); font-size: 13.5px; font-variant-numeric: tabular-nums; color: var(--grape-3); transition: scale 140ms ease-out; }
+.journal .grid button:disabled { opacity: .35; cursor: default; }
+.journal .grid button.came { color: var(--grape); box-shadow: inset 0 0 0 1.5px var(--sun); background: rgba(255, 200, 87, .22); }
+.journal .grid button.study { background: var(--sun); font-weight: 600; box-shadow: none; }
+.journal .grid button.today { outline: 2px solid var(--coral); outline-offset: 1px; }
+.journal .grid button.on { scale: 1.12; }
+.journal .grid button:active:not(:disabled) { scale: .94; }
+.journal :focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
+.journal .tip { margin: 10px 0 0; min-height: 1.5em; font-size: 13px; line-height: 1.5; letter-spacing: .03em; }
+.journal .award { margin: 8px 0 0; padding-top: 9px; border-top: 1px solid rgba(58, 46, 92, .14); font-size: 13px; letter-spacing: .03em; color: var(--grape-3); }
+.journal .award b { font-family: var(--en); font-weight: 600; color: var(--coral-ink); }
+.journal .key { margin: 8px 0 0; display: flex; align-items: center; gap: 6px; font-size: 12px; letter-spacing: .04em; color: var(--grape-3); }
+.journal .key i { width: 11px; height: 11px; border-radius: 50%; box-sizing: border-box; }
+.journal .key i.came { box-shadow: inset 0 0 0 1.5px var(--sun); background: rgba(255, 200, 87, .22); }
+.journal .key i.study { background: var(--sun); margin-left: 10px; }
+html.is-decor .journal, html.has-map .journal, html.pk-leaving .journal, html.is-pay .journal { display: none; }
+@media (prefers-reduced-motion: reduce) { .journal { animation: none; } }

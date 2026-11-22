@@ -497,16 +497,16 @@
   // ── 完成本課（pd-done，跟首頁共用） ──
   const DONE = () => store.get('pd-done', [])
   const isDone = () => DONE().includes(ID)
-  const setDone = on => { const was = isDone(); let d = DONE().filter(x => x !== ID); if (on) d.push(ID); store.set('pd-done', d); paintDone(); if (on && !was) coinToast() }
+  const setDone = on => { const was = isDone(); let d = DONE().filter(x => x !== ID); if (on) d.push(ID); store.set('pd-done', d); paintDone(); if (on && !was) coinToast(`完成本課，得到 ${COINS_PER_LESSON} 代幣`) }
   // 完成一課得 10 代幣，可以回首頁佈置書桌（代幣是首頁照 pd-done 算的，這裡只是告訴你；數字要跟 crab/rooms/f4/decor/catalog.json 的 perLesson 一樣）
-  const COINS_PER_LESSON = 10
+  const COINS_PER_LESSON = 10, COINS_QUIZ = 5, COINS_CHAPTER = 1     // 測驗全對 perQuiz、讀完一章 perChapter（2026-11-23），同樣要跟 catalog.json 一樣
   let coinTimer = 0
-  function coinToast() {
+  function coinToast(title, sub = '代幣可以在首頁兌換擺飾，佈置你的書桌。', ms = 9000) {
     let t = $('#pl-coin'); if (!t) { t = document.createElement('div'); t.id = 'pl-coin'; t.className = 'pl-coin'; t.setAttribute('role', 'status'); body.appendChild(t) }
-    t.innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2"/><circle cx="8" cy="8" r="4.6"/></svg><p><b>完成本課，得到 ${COINS_PER_LESSON} 代幣</b><span>代幣可以在首頁兌換擺飾，佈置你的書桌。</span></p><a href="${HOME_URL}">回首頁佈置</a><button type="button" aria-label="關閉">×</button>`
+    t.innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2"/><circle cx="8" cy="8" r="4.6"/></svg><p><b>${title}</b><span>${sub}</span></p><a href="${HOME_URL}">回首頁佈置</a><button type="button" aria-label="關閉">×</button>`
     $('button', t).onclick = () => t.classList.remove('on')
     setTimeout(() => t.classList.add('on'), 30)       // 不用 requestAnimationFrame：分頁在背景時它不會跑
-    clearTimeout(coinTimer); coinTimer = setTimeout(() => t.classList.remove('on'), 9000)
+    clearTimeout(coinTimer); coinTimer = setTimeout(() => t.classList.remove('on'), ms)
     t.onmouseenter = () => clearTimeout(coinTimer); t.onmouseleave = () => { coinTimer = setTimeout(() => t.classList.remove('on'), 4000) }
   }
   const paintDone = () => { const on = isDone(); body.classList.toggle('pl-finished', on); $$('[data-done]').forEach(b => { b.setAttribute('aria-pressed', on); b.textContent = on ? '已完成本課（再按取消）' : '完成本課' }) }
@@ -526,17 +526,25 @@
       l.onclick = t; l.onkeydown = e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); t() } } })
     paint()
   }
+  // 課後測驗全對（沒按「直接看答案」）：記在 pd-quiz = { 課號: 1 }，首頁照它發代幣（2026-11-23）。每個 .quiz 答完時寫 data-ok，全部都是 1 才算
+  const quizOk = (q, ok, fresh) => {
+    q.dataset.ok = ok ? '1' : '0'
+    if (M.draft || !$$('.quiz', doc).every(x => x.dataset.ok === '1')) return
+    const z = store.get('pd-quiz', {}) || {}; if (z[ID]) return
+    z[ID] = 1; store.set('pd-quiz', z); if (fresh) coinToast(`測驗全對，得到 ${COINS_QUIZ} 代幣`, '回首頁時，螃蟹會把代幣交給你。', 6000)
+  }
   // 考考你（多題，答案寫「答案：1 B　2 B　3 B」，02 起）：每題各自點選項，全部答完或按「直接看答案」才顯示答案那行
   function multiQuiz(q, ans) {
     const ols = $$(':scope > ol', q), pairs = ans ? [...ans.textContent.matchAll(/(\d+)\s*([A-Z])/g)] : []
     if (!ols.length || pairs.length !== ols.length) return
     const right = pairs.map(x => x[2].charCodeAt(0) - 65), saved = store.get(K('quiz'), [])
     const picked = Array.isArray(saved) ? saved.slice() : []
+    let restoring = true
     const pick = (qi, i) => {
       const ol = ols[qi], opts = $$(':scope > li', ol); ol.classList.add('pl-qdone'); picked[qi] = i
       opts.forEach((o, k) => { o.classList.toggle('pl-right', k === right[qi]); o.classList.toggle('pl-wrong', k === i && i !== right[qi]); o.removeAttribute('tabindex') })
       store.set(K('quiz'), picked)
-      if (ols.every(o => o.classList.contains('pl-qdone'))) { q.classList.add('pl-answered'); btn.remove() }
+      if (ols.every(o => o.classList.contains('pl-qdone'))) { q.classList.add('pl-answered'); btn.remove(); quizOk(q, right.every((r, k) => picked[k] === r), !restoring) }
     }
     ols.forEach((ol, qi) => $$(':scope > li', ol).forEach((o, i) => { o.tabIndex = 0; o.setAttribute('role', 'button')
       const go = () => { if (!ol.classList.contains('pl-qdone')) pick(qi, i) }
@@ -544,6 +552,7 @@
     const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'pl-quizbtn'; btn.textContent = '直接看答案'
     btn.onclick = () => ols.forEach((ol, qi) => { if (!ol.classList.contains('pl-qdone')) pick(qi, -1) }); ans.before(btn)
     picked.forEach((v, qi) => { if (v !== null && v !== undefined && ols[qi]) pick(qi, v) })
+    restoring = false
   }
   // 考考你：點選項才看答案
   $$('.quiz', doc).forEach(q => {
@@ -554,12 +563,12 @@
     const pick = i => {
       q.classList.add('pl-answered')
       opts.forEach((o, k) => { o.classList.toggle('pl-right', k === right); o.classList.toggle('pl-wrong', k === i && i !== right); o.removeAttribute('tabindex') })
-      btn.remove(); store.set(K('quiz'), i)
+      btn.remove(); store.set(K('quiz'), i); quizOk(q, i === right, !restoring1)
     }
     opts.forEach((o, i) => { o.tabIndex = 0; o.setAttribute('role', 'button'); o.onclick = () => { if (!q.classList.contains('pl-answered')) pick(i) }; o.onkeydown = e => { if (e.key === 'Enter' && !q.classList.contains('pl-answered')) pick(i) } })
     const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'pl-quizbtn'; btn.textContent = '直接看答案'
     btn.onclick = () => pick(-1); ans.before(btn)
-    const s = store.get(K('quiz'), null); if (s !== null) pick(s)
+    let restoring1 = true; const s = store.get(K('quiz'), null); if (s !== null) pick(s); restoring1 = false
   })
   // 最後一頁：完成、下載
   const lastPg = pages[pages.length - 1], cta = $('.end-cta', lastPg)
@@ -619,6 +628,13 @@
     addEventListener('keydown', e => { if (e.key === 'Escape') closePop() })
   }
 
+  // 讀完一章（讀到章末的翻頁列）：記在 pd-chapters = { 課號: [第幾章, …] }，首頁照它發代幣（2026-11-23）
+  addEventListener('pl-chapter-read', e => {
+    if (M.draft) return
+    const c = store.get('pd-chapters', {}) || {}, a = Array.isArray(c[ID]) ? c[ID] : []; if (a.includes(e.detail.i)) return
+    a.push(e.detail.i); c[ID] = a; store.set('pd-chapters', c)
+    coinToast(`讀完第 ${e.detail.i + 1} 章，得到 ${COINS_CHAPTER} 代幣`, '回首頁時，螃蟹會把代幣交給你。', 3200)
+  })
   // ══ 一章一翻（2026-11-16 試做）══
   FL = window.PLCHAPTER.build({ doc, pages, CH, esc, $, $$, reduce, label, after: () => { placeTicks(); scan(); window.dispatchEvent(new Event('scroll')) } })
   // 目錄、索引、封面目錄的 #ch-xx／#pN 連結（在內文外面的）也交給翻頁
@@ -637,6 +653,8 @@
   const M = window.PDFLESSON; if (!M || !M.id || M.draft) return
   const KEY = 'pd-time', STEP = 15, IDLE = 120000
   let last = Date.now()
+  // 哪幾天有來（首頁的上線日誌和連續天數會讀）：pd-visits = { 'YYYY-MM-DD': 1 }，打開課程頁就算
+  try { const v = JSON.parse(localStorage.getItem('pd-visits') || '{}') || {}, d = new Date(); v[`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`] = 1; localStorage.setItem('pd-visits', JSON.stringify(v)) } catch (e) { /* private mode */ }
   ;['scroll', 'pointerdown', 'keydown', 'pointermove', 'wheel', 'touchstart'].forEach(e => addEventListener(e, () => { last = Date.now() }, { passive: true, capture: true }))
   setInterval(() => {
     if (document.hidden || Date.now() - last > IDLE) return
