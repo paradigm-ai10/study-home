@@ -33,7 +33,7 @@
         <ol class="lessons" id="stage-${i}"${on ? '' : ' hidden'}>${ls.map((l) => {
           const href = F4.lessonHref(l); const isK = known.has(l.id), isN = l.id === nextId;
           const title = href ? `<a href="${esc(href)}">${esc(l.title)}</a>` : esc(l.title);
-          return `<li class="${isK ? 'is-known' : isN ? 'is-next' : ''}"><span class="n">${esc(l.id)}</span><span class="t">${title}</span><span class="m">${l.min ? `${l.min} 分鐘` : esc(l.type || '')}</span><span class="s">${isK ? '✓ 已完成' : isN ? '<b>下一步</b>' : href ? '' : '即將上線'}</span></li>`;
+          return `<li class="${isK ? 'is-known' : isN ? 'is-next' : ''}"><span class="n">${esc(l.id)}</span><span class="t">${title}</span><span class="m">${l.min ? `${l.min} 分鐘` : esc(l.type || '')}</span><span class="s">${isK ? '✓ 已完成' : isN ? '<b>下一步</b>' : href ? '已上線' : '即將上線'}</span></li>`;
         }).join('')}${s.count > ls.length ? `<li class="soon"><span class="n"></span><span class="t">其餘 ${s.count - ls.length} 課即將推出</span></li>` : ''}</ol>
       </li>`;
     }).join('') + (R8 ? R8.roles.slice(1).map((g) => `<li class="stage-group is-later">${['', '第一階段', '第二階段', '第三階段'][g.stage] || ''}　${esc(g.name)}<span>${esc(g.line)}｜${g.topics.map((tid) => { const t = R8.topics.find((x) => x.id === tid); return t ? esc(t.no + ' ' + t.name) + (t.lessons.length ? `（首版 ${t.lessons.length} 課即將上線）` : '') : ''; }).join('、')}｜即將推出</span></li>`).join('') : '');

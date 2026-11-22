@@ -75,7 +75,7 @@
   }
 
   /* ---------- the side column ---------- */
-  const lesBtn = (l, known, nextId) => `<li><button type="button" class="mv-les" data-les="${l.id}"><span class="i">${l.id}</span><span class="t">${esc(l.title)}</span><span class="m">${esc(l.type || '')}</span>${known.has(l.id) ? '<span class="s">✓ 已完成</span>' : l.id === nextId ? '<span class="s"><b>下一步</b></span>' : pageOf(l.id) ? '' : '<span class="s">即將上線</span>'}</button></li>`;
+  const lesBtn = (l, known, nextId) => `<li><button type="button" class="mv-les" data-les="${l.id}"><span class="i">${l.id}</span><span class="t">${esc(l.title)}</span><span class="m">${esc(l.type || '')}</span>${known.has(l.id) ? '<span class="s">✓ 已完成</span>' : l.id === nextId ? '<span class="s"><b>下一步</b></span>' : pageOf(l.id) ? '<span class="s">已上線</span>' : '<span class="s">即將上線</span>'}</button></li>`;
   const openLessons = () => R8.first.map((id) => (topicOf[id] || { lessons: [] }).lessons.find((l) => l.id === id)).filter(Boolean);
   function sideOverview() {
     const st = F4.state, n = F4.nextStep(), known = new Set(st.known); const nextId = n.kind === 'lesson' ? n.lesson.id : null;

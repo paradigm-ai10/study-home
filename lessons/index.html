@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://paradigm-ai10.github.io/study-home/lessons/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Paradigm AI 學習站">
+<meta property="og:title" content="課程總覽｜Paradigm 學 AI">
+<meta property="og:description" content="Paradigm AI 學習站的全部課程：哪些已經上線可以直接上，哪些即將推出，照階段與主題排好。">
+<meta property="og:url" content="https://paradigm-ai10.github.io/study-home/lessons/">
+<meta property="og:image" content="https://paradigm-ai10.github.io/study-home/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#FFF4E0">
+<title>課程總覽｜Paradigm 學 AI</title>
+<meta name="description" content="Paradigm AI 學習站的全部課程：哪些已經上線可以直接上，哪些即將推出，照階段與主題排好。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Outfit:wght@500;600&display=swap">
+<style>
+  /* 課程總覽：全部課程一頁看完，已上線的排最前面。外觀跟資源下載頁同一套。
+     資料在 ../site.json（試算表發布出來的那一版，上線/sync.py 寫的）與 ../roadmap8.js（階段與角色的文字），這頁只負責畫。 */
+  :root {
+    --cream: #FFF4E0; --sheet: #FFFAF0; --grape: #3A2E5C;
+    --grape-2: rgba(58, 46, 92, .78); --grape-3: rgba(58, 46, 92, .74); --line: rgba(58, 46, 92, .18);
+    --coral: #FF6B57; --coral-ink: #C0351F; --sun: #FFC857;
+    --zh: "Huninn", "PingFang TC", "Noto Sans TC", system-ui, sans-serif;
+    --en: "Outfit", "Huninn", system-ui, sans-serif;
+    --pad: clamp(16px, 4vw, 56px);
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--cream); scroll-padding-top: 16px; }
+  body { margin: 0; background: var(--cream); color: var(--grape); font-family: var(--zh); font-size: 15.5px; line-height: 1.7; letter-spacing: .02em; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 3px solid var(--coral-ink); outline-offset: 3px; border-radius: 4px; }
+  a { color: inherit; }
+  h1, h2, h3, p, ul, ol { margin: 0; }
+  h1, h2, h3 { font-weight: 400; }
+  ul, ol { list-style: none; padding: 0; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 var(--pad); }
+
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-top: 18px; }
+  .wordmark { font: 600 13px/1 var(--en); letter-spacing: .26em; text-decoration: none; padding: 8px 0; }
+  .home { text-decoration: none; font-size: 14px; padding: 7px 13px 8px; border-radius: 8px; box-shadow: inset 0 0 0 1.5px var(--grape-3); line-height: 1.2; white-space: nowrap; }
+  .home:hover { box-shadow: inset 0 0 0 1.5px var(--grape); background: var(--sheet); }
+
+  .head { padding: clamp(28px, 6vh, 56px) 0 clamp(20px, 4vh, 28px); }
+  .head h1 { font-size: clamp(30px, 2.7vw, 38px); line-height: 1.36; letter-spacing: .03em; }
+  .head p { margin-top: 10px; font-size: 16px; color: var(--grape-2); max-width: 38em; }
+  .head a { text-underline-offset: 4px; text-decoration-color: var(--coral); text-decoration-thickness: 1.5px; }
+
+  /* 一課一格的長條：填滿的是已上線。方的是必修、圓的是選修 */
+  .strip { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 4px 5px; align-items: center; }
+  .strip i { width: 13px; height: 13px; border-radius: 3px; box-shadow: inset 0 0 0 1.5px rgba(58, 46, 92, .45); }
+  .strip i.ele { border-radius: 50%; }
+  .strip i.on { background: var(--grape); box-shadow: none; }
+  .strip i.gap { width: 10px; height: 1px; box-shadow: none; }
+  .key { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 14px; color: var(--grape-2); }
+  .key span { display: inline-flex; align-items: center; gap: 7px; }
+  .key i { width: 13px; height: 13px; border-radius: 3px; box-shadow: inset 0 0 0 1.5px rgba(58, 46, 92, .45); }
+  .key i.on { background: var(--grape); box-shadow: none; } .key i.ele { border-radius: 50%; }
+
+  .live-tag { display: inline-block; font-size: 12.5px; line-height: 1.5; padding: 1px 9px 2px; border-radius: 99px; background: var(--grape); color: var(--cream); white-space: nowrap; }
+  .soon { font-size: 13px; color: var(--grape-3); white-space: nowrap; }
+  .opt { font-size: 12.5px; padding: 1px 7px 2px; border-radius: 99px; box-shadow: inset 0 0 0 1px var(--line); color: var(--grape-2); white-space: nowrap; }
+  .num { font: 600 15px/1.6 var(--en); color: var(--coral-ink); white-space: nowrap; }
+
+  section { margin-top: 40px; }
+  section > h2 { font-size: 23px; letter-spacing: .03em; }
+  section > .sub { margin-top: 4px; font-size: 14.5px; color: var(--grape-2); }
+
+  /* 現在可以上的課 */
+  .now { margin-top: 16px; display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
+  .now li { display: grid; }
+  .now a.card { display: grid; grid-template-rows: auto 1fr auto; gap: 6px; text-decoration: none; background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px 16px;
+    box-shadow: 0 3px 0 rgba(58, 46, 92, .16); transition: translate 90ms ease-out, box-shadow 90ms ease-out; }
+  .now a.card:hover { translate: 0 -2px; box-shadow: 0 5px 0 rgba(58, 46, 92, .2); }
+  .now .num { font-size: 22px; line-height: 1.2; }
+  .now h3 { font-size: 17.5px; line-height: 1.5; }
+  .now .of { font-size: 13.5px; color: var(--grape-2); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
+  .now .go { justify-self: start; margin-top: 6px; background: var(--sun); padding: 6px 14px 7px; border-radius: 8px; font-size: 14.5px; line-height: 1.3; box-shadow: 0 2px 0 #c9942a; }
+  .now .vid { font-size: 13.5px; text-underline-offset: 4px; text-decoration-color: var(--coral); margin: 6px 4px 0; }
+
+  /* 全部課程 */
+  .jump { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .jump a { text-decoration: none; padding: 7px 14px; border-radius: 99px; box-shadow: inset 0 0 0 1.5px var(--grape-3); font-size: 14.5px; line-height: 1.3; }
+  .jump a:hover { background: var(--sheet); }
+  .stage { margin-top: 28px; }
+  .stage > h3 { font-size: 19px; display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; }
+  .stage > h3 small { font-size: 14.5px; color: var(--grape-2); }
+  details.topic { margin-top: 12px; background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; }
+  details.topic summary { cursor: pointer; list-style: none; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 0 10px; align-items: baseline; padding: 14px 20px; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary b { font: 600 16px/1 var(--en); color: var(--grape-3); }
+  details.topic summary h4 { margin: 0; font-size: 17.5px; font-weight: 400; letter-spacing: .03em; }
+  details.topic summary .cnt { font-size: 13.5px; color: var(--grape-2); white-space: nowrap; }
+  details.topic summary .cnt::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 10px; border: solid var(--grape-3); border-width: 0 1.8px 1.8px 0; rotate: 45deg; translate: 0 -3px; transition: rotate 120ms ease-out; }
+  details.topic[open] summary .cnt::after { rotate: -135deg; translate: 0 1px; }
+  .topic .aim { padding: 0 20px 6px 64px; font-size: 14.5px; color: var(--grape-2); }
+  .topic ul { padding: 0 20px 8px; }
+  .topic li { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; gap: 4px 10px; padding: 9px 0; border-top: 1px dashed var(--line); align-items: baseline; }
+  .topic li .t { font-size: 15.5px; line-height: 1.5; }
+  .topic li .t a { text-underline-offset: 4px; text-decoration-color: var(--coral); text-decoration-thickness: 1.5px; }
+  .topic li .t .opt { margin-left: 8px; }
+  .foot { margin: 40px 0 56px; font-size: 14px; color: var(--grape-2); }
+  .foot a { text-underline-offset: 4px; text-decoration-color: var(--coral); }
+
+  @media (max-width: 640px) {
+    details.topic summary { padding: 12px 14px; grid-template-columns: 28px minmax(0, 1fr); }
+    details.topic summary .cnt { grid-column: 2; }
+    .topic .aim { padding: 0 14px 6px 14px; }
+    .topic ul { padding: 0 14px 6px; }
+    .topic li { grid-template-columns: 46px minmax(0, 1fr); }
+    .topic li .s { grid-column: 2; }
+  }
+  @media (prefers-reduced-motion: reduce) { .now a.card, details.topic summary .cnt::after { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="wordmark" href="../crab/rooms/f4/index.html">PARADIGM</a>
+    <a class="home" href="../crab/rooms/f4/index.html">← 回首頁</a>
+  </header>
+  <main>
+    <section class="head" style="margin-top:0">
+      <h1>課程總覽</h1>
+      <p id="lead">全部課程都列在這一頁，已經上線的排在最前面，可以直接點進去上課。</p>
+      <div class="strip" id="strip" aria-hidden="true"></div>
+      <p class="key" id="key" hidden><span><i class="on"></i>已上線</span><span><i></i>即將推出</span><span><i></i>方的是必修</span><span><i class="ele"></i>圓的是選修</span></p>
+    </section>
+
+    <section id="now-box" style="margin-top:8px" hidden>
+      <h2>現在可以上的課</h2>
+      <ul class="now" id="now"></ul>
+    </section>
+
+    <section id="all-box" hidden>
+      <h2>全部課程</h2>
+      <p class="sub">照階段與主題排。點主題可以展開，看裡面有哪些課。</p>
+      <nav class="jump" id="jump" aria-label="跳到哪個階段"></nav>
+      <div id="all"></div>
+    </section>
+    <noscript><p style="margin-top:24px">這一頁需要開啟 JavaScript 才看得到課程清單。</p></noscript>
+    <p class="foot">想照順序學，可以看<a href="../crab/rooms/f4/map.html">學習地圖</a>；有想學但這裡沒有的主題，<a href="../ask/index.html">寫信告訴我們</a>。</p>
+  </main>
+</div>
+<script src="../roadmap8.js"></script>
+<script>
+const $ = s => document.querySelector(s)
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+const R = window.ROADMAP8 || { stages: [], roles: [] }
+const okUrl = u => /^https?:\/\//.test(u || '')
+fetch('../site.json').then(r => r.json()).then(draw).catch(() => { $('#lead').textContent = '課程清單暫時讀不到，重新整理再試一次。' })
+
+function draw(S) {
+  const L = S.lessons, live = L.filter(l => l.live), topics = [...S.topics].sort((a, b) => a.no - b.no)
+  const of = no => L.filter(l => l.topic === no), tname = {}; topics.forEach(t => { tname[t.no] = t.name })
+  $('#lead').textContent = `共 ${L.length} 課，已經上線 ${live.length} 課，其餘陸續推出。已上線的排在最前面，可以直接點進去上課。`
+  $('#strip').innerHTML = topics.map(t => of(t.no).map(l => `<i class="${l.live ? 'on' : ''}${l.type === '選修' ? ' ele' : ''}"></i>`).join('')).join('<i class="gap"></i>')
+  $('#key').hidden = false
+
+  if (live.length) {
+    $('#now-box').hidden = false
+    $('#now').innerHTML = live.map(l => `<li><a class="card" href="${esc(l.id)}.html"><span class="num">${esc(l.id)}</span><h3>${esc(l.title)}</h3>
+      <span class="of"><span>${esc(tname[l.topic] || '')}</span>${l.type === '選修' ? '<span class="opt">選修</span>' : ''}</span><span class="go">去上課</span></a>
+      ${okUrl(l.video) ? `<a class="vid" href="${esc(l.video)}" target="_blank" rel="noopener">看這一課的影片</a>` : ''}</li>`).join('')
+  }
+
+  const stages = [...new Set(topics.map(t => t.stage))].sort()
+  const info = no => R.stages.find(s => s.no === no) || { name: `第 ${no} 階段`, tagline: '' }
+  $('#jump').innerHTML = stages.map(s => `<a href="#stage-${s}">${esc(info(s).name)}</a>`).join('')
+  $('#all').innerHTML = stages.map((s, si) => `<div class="stage" id="stage-${s}"><h3>${esc(info(s).name)}<small>${esc(info(s).tagline)}</small></h3>
+    ${topics.filter(t => t.stage === s).map(t => {
+      const ls = of(t.no), n = ls.filter(l => l.live).length
+      return `<details class="topic"${si === 0 && n ? ' open' : ''}><summary><b>${t.no}</b><h4>${esc(t.name)}</h4><span class="cnt">${n ? `已上線 ${n}／${ls.length} 課` : `${ls.length} 課，即將推出`}</span></summary>
+        ${t.outcome ? `<p class="aim">學完做得出：${esc(t.outcome)}</p>` : ''}
+        <ul>${ls.map(l => `<li><span class="num">${esc(l.id)}</span><span class="t">${l.live ? `<a href="${esc(l.id)}.html">${esc(l.title)}</a>` : esc(l.title)}${l.type === '選修' ? '<span class="opt">選修</span>' : ''}</span>
+          <span class="s">${l.live ? '<span class="live-tag">已上線</span>' : '<span class="soon">即將推出</span>'}</span></li>`).join('')}</ul></details>`
+    }).join('')}</div>`).join('')
+  $('#all-box').hidden = false
+}
+</script>
+</body>
+</html>

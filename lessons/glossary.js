@@ -1,4 +1,4 @@
-// AI 名詞小字典：由 研究/2026-11-11_AI學習總地圖/data/glossary.json（v8）產生，不要手改；正本改了就跑 python3 tools/make_glossary.py
+// AI 名詞小字典：由 上線/sync.py 從試算表「名詞」分頁發布出來的資料產生，不要手改；要改請改試算表再發布。
 window.GLOSSARY = [
  {
   "term": "人工智慧",
@@ -855,7 +855,7 @@ window.GLOSSARY = [
   "term": "信任的資料夾",
   "en": "Trusted folders",
   "plain": "你授權 Claude 桌面 app 讀寫的本機資料夾清單，只有清單裡的它碰得到。",
-  "lesson": "5-4",
+  "lesson": "5-3",
   "topic": "T5"
  },
  {
@@ -1524,7 +1524,7 @@ window.GLOSSARY = [
   "term": "代理瀏覽器",
   "en": "Browser agent / Agentic browser",
   "plain": "內建 AI 代理、能替你點網頁、填表、比價的瀏覽器或擴充功能，例如 Claude in Chrome（見「Claude in Chrome」）。讀到的網頁可能夾帶提示詞注入，權限要設好。",
-  "lesson": "5-4",
+  "lesson": "5-3",
   "topic": "T5"
  },
  {
@@ -1545,7 +1545,7 @@ window.GLOSSARY = [
   "term": "Claude in Chrome",
   "en": "Claude in Chrome",
   "plain": "Anthropic 的 Chrome 擴充功能，讓 Claude 在瀏覽器中讀取頁面、點擊、瀏覽與填寫表單；可從 Chrome 側邊欄、Cowork 或 Claude Code 啟動。限付費方案（Pro、Max、Ultra、Team、Enterprise；Enterprise 須由管理員開啟），只支援電腦版 Google Chrome。讀取的網頁可能夾帶提示詞注入，敏感操作前要先確認。",
-  "lesson": "5-4",
+  "lesson": "5-3",
   "topic": "T5",
   "alias": [
    "Claude for Chrome"

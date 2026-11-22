@@ -114,6 +114,20 @@
   .pencil.rest i { rotate: 62deg; }
   .pencil svg { display: block; width: 100%; height: 100%; overflow: visible; }
 
+  /* 目錄：照主題分組，點了跳到那個案例。資料在 cases.js（試算表「課程」分頁的案例標題） */
+  .toc { margin-top: 26px; background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 16px 24px 10px; }
+  .toc h2 { font-size: 19px; letter-spacing: .03em; }
+  .toc h3 { margin-top: 12px; font-size: 14px; color: var(--grape-2); }
+  .toc ol { list-style: none; margin: 4px 0 0; padding: 0; }
+  .toc li { border-top: 1px dashed var(--line); }
+  .toc a { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; gap: 4px 10px; align-items: baseline; padding: 9px 0; text-decoration: none; }
+  .toc a:hover .t { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--coral); text-decoration-thickness: 1.5px; }
+  .toc .n { font: 600 15px/1.6 var(--en); color: var(--coral-ink); }
+  .toc .t { font-size: 16px; line-height: 1.5; }
+  .toc .s { font-size: 12.5px; line-height: 1.5; padding: 1px 9px 2px; border-radius: 99px; white-space: nowrap; background: var(--grape); color: var(--cream); }
+  .toc .s.soon { background: none; color: var(--grape-3); padding: 0; font-size: 13px; }
+  .go.off { background: none; box-shadow: inset 0 0 0 1.5px var(--line); color: var(--grape-2); cursor: default; }
+
   .more { padding: 44px 0 64px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; }
   .more p { font-size: 17px; }
   .more small { display: block; font-size: 14px; color: var(--grape-2); }
@@ -146,8 +160,9 @@
       <h1>實作案例</h1>
       <p>帶一件麻煩事來，看 AI 怎麼一步步把它做掉。每個案例都對應一堂課，可以照著做。</p>
     </section>
+    <nav class="toc" id="toc" aria-label="案例目錄" hidden></nav>
 
-    <article class="case" id="6-1">
+    <article class="case" id="6-1" data-code="L032">
       <div class="side">
         <div class="note" data-tick>
           <p class="label">今天的麻煩事</p>
@@ -190,11 +205,11 @@
           </div>
           <figure class="shot"><img src="../lessons/media/6-1/img/d4_found_draft.png" alt="Claude 找到教授的信，列出時間地點，並擬好回信草稿的畫面" loading="lazy"><figcaption>它先說找到哪封信，再給回信草稿</figcaption></figure>
         </div>
-        <div class="acts"><a class="go" href="../lessons/6-1.html">照著做：6-1 Connectors 入門</a><button type="button" class="again">再看一次怎麼做掉</button></div>
+        <div class="acts"><a class="go" data-go href="../lessons/index.html">照著做這一課</a><button type="button" class="again">再看一次怎麼做掉</button></div>
       </div>
     </article>
 
-    <article class="case" id="6-E4">
+    <article class="case" id="6-E4" data-code="L038">
       <div class="side">
         <div class="note" data-tick>
           <p class="label">今天的麻煩事</p>
@@ -236,7 +251,7 @@
           </div>
           <figure class="shot"><img src="../lessons/media/6-E4/img/s4_table.jpg" alt="店家審閱表：每家店有讚數、貼文日期和一句摘錄，可以勾選和打星" loading="lazy"><figcaption>整理好的店家表，可以勾選、打星</figcaption></figure>
         </div>
-        <div class="acts"><a class="go" href="../lessons/6-E4.html">照著做：6-E4 Threads 找好店</a><button type="button" class="again">再看一次怎麼做掉</button></div>
+        <div class="acts"><a class="go" data-go href="../lessons/index.html">照著做這一課</a><button type="button" class="again">再看一次怎麼做掉</button></div>
       </div>
     </article>
 
@@ -247,7 +262,29 @@
     <p class="credit">圖中的 logo 屬於各公司，這裡只用來標示是哪個服務。</p>
   </main>
 </div>
+<script src="cases.js"></script>
 <script>
+/* 哪些案例要列、照什麼順序、課號和課名是什麼，都看 cases.js（試算表發布出來的）。
+   這個檔裡每個案例的 article（data-code 寫那一課的代號）只放內文；表裡沒填案例標題的不顯示，課號在表裡改了這裡會跟著變。 */
+{
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+  const body = {}; document.querySelectorAll('.case[data-code]').forEach(a => { body[a.dataset.code] = a; a.remove() })
+  const more = document.querySelector('.more'), shown = (window.CASES || []).filter(c => body[c.code])
+  shown.forEach(c => {
+    const a = body[c.code], go = a.querySelector('[data-go]')
+    a.id = c.id; a.querySelector('.no').textContent = c.id; a.querySelector('h2').textContent = c.title
+    if (c.live) { go.href = `../lessons/${c.id}.html`; go.textContent = `照著做：${c.id} ${c.lesson_title.split('：')[0]}` }
+    else { const s = document.createElement('span'); s.className = 'go off'; s.textContent = `${c.id} 這一課即將推出`; go.replaceWith(s) }
+    more.before(a)
+  })
+  const groups = []; shown.forEach(c => { let g = groups.find(x => x.no === c.topic); if (!g) groups.push(g = { no: c.topic, name: c.topic_name, items: [] }); g.items.push(c) })
+  const toc = document.getElementById('toc')
+  if (shown.length) {
+    toc.hidden = false
+    toc.innerHTML = `<h2>目錄</h2>` + groups.map(g => `<h3>${esc(g.name)}</h3><ol>${g.items.map(c =>
+      `<li><a href="#${esc(c.id)}"><span class="n">${esc(c.id)}</span><span class="t">${esc(c.title)}</span><span class="s${c.live ? '' : ' soon'}">${c.live ? '課程已上線' : '課程即將推出'}</span></a></li>`).join('')}</ol>`).join('')
+  }
+}
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches
 const wait = ms => new Promise(r => setTimeout(r, ms))
 const PENCIL = `<i><svg viewBox="-10 -100 96 110"><g transform="rotate(-50)">

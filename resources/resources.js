@@ -1,4 +1,4 @@
-// 由 make_resources.py 產生，不要手改。
+// 由 上線/sync.py 從試算表「資源」分頁發布出來的資料產生，不要手改。
 window.RESOURCES = [
  {
   "no": "4-4",
@@ -12,7 +12,8 @@ window.RESOURCES = [
   "lesson": {
    "id": "4-4",
    "href": "../lessons/4-4.html",
-   "title": "Skills 入門：呼叫、更新、自己做一個"
+   "title": "Skills 入門：呼叫、更新、自己做一個",
+   "live": true
   },
   "keyword": "skills",
   "updated": "2026-11-14",
@@ -41,7 +42,8 @@ window.RESOURCES = [
   "lesson": {
    "id": "6-1",
    "href": "../lessons/6-1.html",
-   "title": "Connectors 入門：連接 Gmail、日曆與雲端硬碟"
+   "title": "Connectors 入門：連接 Gmail、日曆與雲端硬碟",
+   "live": true
   },
   "keyword": null,
   "updated": "2026-11-20",
@@ -65,7 +67,8 @@ window.RESOURCES = [
   "lesson": {
    "id": "6-E4",
    "href": "../lessons/6-E4.html",
-   "title": "Apify Connector：從 Threads 找餐廳，存進 Google Maps 清單"
+   "title": "Apify Connector：從 Threads 找餐廳，存進 Google Maps 清單",
+   "live": true
   },
   "keyword": null,
   "updated": "2026-11-19",

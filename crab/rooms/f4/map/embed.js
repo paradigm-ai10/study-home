@@ -29,7 +29,7 @@
       const idEl = li.querySelector(':scope > .id'); if (!idEl) return;
       const id = idEl.textContent.trim(); if (!/^\d+-/.test(id)) return;
       li.querySelectorAll('.pg').forEach((x) => x.remove());
-      const note = done.has(id) ? ['done', '✓ 已完成'] : id === prog.next ? ['next', '下一步'] : null;
+      const note = done.has(id) ? ['done', '✓ 已完成'] : id === prog.next ? ['next', '下一步'] : prog.pages && prog.pages[id] ? ['live', '已上線'] : null;   // 有課程頁的課標「已上線」，跟其他頁同一個說法
       if (note) { const s = document.createElement('span'); s.className = 'pg ' + note[0]; s.textContent = note[1]; if (!li.querySelector('.f')) s.style.marginLeft = 'auto'; li.appendChild(s); }
       const href = prog.pages && prog.pages[id], title = idEl.nextElementSibling;
       if (href && title && title.tagName === 'SPAN' && !title.querySelector('a.go')) {

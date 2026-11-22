@@ -24,7 +24,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Outfit:wght@500;600&display=swap">
 <style>
   /* 外觀照首頁簡潔版（crab/rooms/f4/simple.html）：奶油底、葡萄色字、陽光黃主按鈕。
-     資料在 resources.js（由 make_resources.py 從各課私訊回覆稿產生），這頁只負責畫。 */
+     資料在 resources.js（試算表「資源」分頁發布出來的，上線/sync.py 產生），這頁只負責畫。 */
   :root {
     --cream: #FFF4E0; --sheet: #FFFAF0; --grape: #3A2E5C;
     --grape-2: rgba(58, 46, 92, .78); --grape-3: rgba(58, 46, 92, .74); --line: rgba(58, 46, 92, .18);
@@ -111,7 +111,7 @@ document.getElementById('packs').innerHTML = window.RESOURCES.map(p => `<li clas
     <div class="files">${p.files.map(f => `<a class="dl" href="${esc(f.href)}" target="_blank" rel="noopener"><span class="kind">${esc(f.kind)}</span><span>${esc(f.label)}</span></a>`).join('')}</div>
     <ul class="notes">${p.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>
     <dl class="meta">
-      <dt>對應課程</dt><dd><a href="${esc(p.lesson.href)}"><span class="num">${esc(p.lesson.id)}</span>${esc(p.lesson.title)}</a></dd>
+      ${p.lesson.id ? `<dt>對應課程</dt><dd>${p.lesson.live === false ? `<span class="num">${esc(p.lesson.id)}</span>${esc(p.lesson.title)}（即將推出）` : `<a href="${esc(p.lesson.href)}"><span class="num">${esc(p.lesson.id)}</span>${esc(p.lesson.title)}</a>`}</dd>` : ''}
       ${p.keyword ? `<dt>IG 領取</dt><dd>在 <a href="${IG}" target="_blank" rel="noopener">IG @paradigmai_tw</a> 的 Reel 留言「${esc(p.keyword)}」，我們會私訊下載連結給你。</dd>` : ''}
       <dt>更新日期</dt><dd>${esc(p.updated)}</dd>
     </dl>
