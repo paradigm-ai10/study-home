@@ -97,6 +97,11 @@
   .note-box li::before { content: "・"; }
   .note-box details summary { cursor: pointer; }
   .note-box .grp { margin-top: 8px; font-size: 13.5px; color: var(--grape-3); }
+  .out .what a { text-underline-offset: 4px; text-decoration-color: var(--coral); text-decoration-thickness: 1.5px; }
+  .out .bar { display: block; margin-top: 10px; height: 6px; max-width: 360px; border-radius: 9px; background: rgba(58, 46, 92, .12); overflow: hidden; }
+  .out .bar b { display: block; height: 100%; width: 100%; border-radius: 9px; background: var(--sun); transform-origin: left; animation: going 55s cubic-bezier(.2, .7, .3, 1) forwards; }
+  @keyframes going { from { scale: .04 1; } to { scale: .96 1; } }
+  @media (prefers-reduced-motion: reduce) { .out .bar b { animation: none; scale: .5 1; } }
   .size { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 13.5px; color: var(--grape-3); }
   .size i { flex: 0 0 160px; height: 8px; border-radius: 9px; background: rgba(58, 46, 92, .12); overflow: hidden; }
   .size i b { display: block; height: 100%; background: var(--grape); border-radius: 9px; }
@@ -307,7 +312,9 @@ const store = {
   set: (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k) } catch {} },
 }
 let me = store.get('paradigm.team.me'), key = store.get('paradigm.team.key')
-let D = null, busy = false, tab = 'overview', view = 'page', filter = 'first', peek = '', hit = '', q = '', wfilter = 'all', sent = '', ask = null, size = null, epOpen = ''
+let D = null, busy = false, tab = 'overview', view = 'page', filter = 'first', peek = '', hit = '', q = '', wfilter = 'all', ask = null, size = null, epOpen = ''
+let cloud = 0, syncing = false, pub = null   // cloud＝還有幾個改動在送；syncing＝正在讀最新的清單；pub＝剛按了發布，正在等上線
+const PUBLIC = 'https://paradigm-study.pages.dev/'   // 發布完最快換成新版的那個網址（Cloudflare）
 const ERR = { key: '通關碼不對。按右邊的眼睛看一下，注意大小寫和全形半形。', locked: '猜錯太多次，後台先鎖住了，10 分鐘後再試。', setup: '後台的通關碼還沒設，或少於 12 個字（Apps Script 的指令碼屬性 TEAM_KEY）。', net: '連不上試算表，等一下再試。', taken: '這一課剛被別人拿走了。', bad: '後台沒有收下這次修改，重新整理再試一次。', server: '後台出錯了，等一下再試。' }
 const PAGE = ['未開始', '製作中', '待審', '已上線', '下架'], VPLAN = ['未定', '要', '不要'], VSTAGE = ['未開始', '寫腳本', '拍攝剪輯', '已發布']
 const STAGE_NAME = ['', '第一階段', '第二階段', '第三階段']
@@ -333,16 +340,18 @@ function renderOut() {
   const p = D.pending, probs = D.problems, parts = [['lessons', '課程'], ['topics', '主題'], ['glossary', '名詞'], ['resources', '資源']]
   const diff = parts.filter(([k]) => p.parts[k]).map(([k, n]) => `<b>${n} ${p.parts[k]} 處</b>`).join('')
   let title, what
-  if (sent) { title = '已經送出，網站大約 1–2 分鐘後更新'; what = '過一下按「重新整理」，這裡變成「網站跟試算表一樣」就代表上線了。' }
+  if (pub && pub.done) { title = `已經上線，花了 ${pub.secs} 秒`; what = `<a href="${PUBLIC}lessons/" target="_blank" rel="noopener">開網站看一下</a>。github.io 那個網址會晚一兩分鐘，瀏覽器還可能留著舊的，要按 Ctrl+F5。` }
+  else if (pub && pub.late) { title = '超過 3 分鐘還沒看到變化'; what = '多半是那一次上線失敗了。<a href="https://github.com/paradigm-ai10/study-site/actions" target="_blank" rel="noopener">到 Actions 看是哪一步</a>，或把紀錄給 AI 看。' }
+  else if (pub) { title = `正在上線，已經過 <span id="pubsec">${Math.round((Date.now() - pub.t0) / 1000)}</span> 秒`; what = '通常 40 到 60 秒。這一頁會自己更新，不用按重新整理，也可以先去做別的。<i class="bar"><b></b></i>' }
   else if (!p.published) { title = '還讀不到網站上的那一版'; what = '網站還沒從試算表發布過，或暫時連不上。可以直接發布。' }
   else if (!p.count) { title = '網站跟試算表一樣'; what = '現在沒有還沒發布的改動。' }
   else { title = `試算表有 ${p.count} 處改動還沒上線`; what = diff }
-  const can = !sent && !probs.length && (!p.published || p.count > 0)
-  const ch = sent ? [] : (D.changes || []), list = k => ch.filter(c => (c.kind === 'map') === k).map(c => `<li>${esc(c.text)}</li>`).join('')
-  $('#out').className = 'out' + (p.published && !p.count && !sent ? ' same' : '')
+  const can = !pub && !busy && !probs.length && (!p.published || p.count > 0)
+  const ch = pub ? [] : (D.changes || []), list = k => ch.filter(c => (c.kind === 'map') === k).map(c => `<li>${esc(c.text)}</li>`).join('')
+  $('#out').className = 'out' + ((pub && pub.done) || (!pub && p.published && !p.count) ? ' same' : '') + (pub && !pub.done && !pub.late ? ' going' : '')
   $('#out').innerHTML = `<div class="out-in">
     <div><h2>${title}</h2><p class="what">${what}</p></div>
-    <div class="acts">${ask ? '' : `<button type="button" class="go" id="publish" ${can ? '' : 'disabled'}>發布到網站</button>`}</div>
+    <div class="acts">${ask ? '' : pub && (pub.done || pub.late) ? '<button type="button" class="go" id="pub-ok">好</button>' : `<button type="button" class="go" id="publish" ${can ? '' : 'disabled'}>${busy ? '送出中…' : '發布到網站'}</button>`}</div>
     <div class="notes">
       ${ask ? `<div class="note-box"><h3>發布前請確認</h3><ul>${ask.map(c => `<li>${esc(c)}</li>`).join('')}</ul><p style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="go" id="publish-yes">確定，照這樣發布</button><button type="button" class="plain" id="publish-no">先不要</button></p></div>` : ''}
       ${ch.length ? `<div class="note-box warn"><h3>按發布之前看一眼：這次會改這些</h3>
@@ -510,22 +519,32 @@ function panelMails() {
 const PANELS = { overview: panelOverview, lessons: panelLessons, projects: panelProjects, cases: panelCases, resources: panelResources, glossary: panelGlossary, mails: panelMails }
 
 function render() {
-  $('#hello').textContent = `${me}，你好。`
+  $('#hello').textContent = `${me}，你好。${syncing ? '正在讀最新的資料…' : cloud ? '儲存中…' : ''}`
   $('#sheet').href = D.sheet ? D.sheet.url : '#'
   renderOut(); renderTabs()
   $('#panel').innerHTML = PANELS[tab]()
 }
 
 /* ---------------------------------------------------------------- 讀資料、進門 */
-async function load() {
-  $('#amsg').textContent = ''
-  const d = await call({ action: 'list' })
+// 上次讀到的清單留一份在這台瀏覽器，下次打開先顯示它，同時在背景讀最新的（後台讀一次要四五秒，不要讓人對著空白等）
+const cache = {
+  load() { try { const c = JSON.parse(localStorage.getItem('paradigm.team.cache') || 'null'); return c && c.me === me ? c.D : null } catch { return null } },
+  save() { try { localStorage.setItem('paradigm.team.cache', JSON.stringify({ me, D })) } catch {} },
+  clear() { try { localStorage.removeItem('paradigm.team.cache') } catch {} },
+}
+function show() { $('#gate').hidden = true; $('#app').hidden = false; render() }
+async function load(fresh) {
+  $('#amsg').textContent = ''; syncing = true; if (D) render()
+  const d = await call({ action: 'list', fresh: !!fresh })
+  syncing = false
   if (!d.ok) {
-    if (d.error === 'key' || d.error === 'setup') { key = ''; store.set('paradigm.team.key', ''); showGate(ERR[d.error]); return false }
-    if (d.error === 'locked') { showGate(ERR.locked); return false }
-    $('#amsg').textContent = ERR[d.error] || ERR.net; return false
+    if (d.error === 'key' || d.error === 'setup') { key = ''; D = null; store.set('paradigm.team.key', ''); cache.clear(); showGate(ERR[d.error]); return false }
+    if (d.error === 'locked') { D = null; showGate(ERR.locked); return false }
+    if (D) { $('#amsg').textContent = ERR[d.error] || ERR.net; render() }
+    return false
   }
-  D = d; $('#gate').hidden = true; $('#app').hidden = false; render(); return true
+  if (cloud) { render(); return true }   // 這段時間使用者又改了東西，那些改動還在路上：不要拿舊清單蓋掉畫面
+  D = d; cache.save(); show(); return true
 }
 function showGate(msg) {
   $('#app').hidden = true; $('#gate').hidden = false; $('#me').value = me; $('#key').value = ''; peekKey(false)
@@ -549,31 +568,63 @@ $('#gate').addEventListener('submit', async e => {
     return
   }
   store.set('paradigm.team.me', me); store.set('paradigm.team.key', key)
-  D = d; $('#gate').hidden = true; $('#app').hidden = false; render()
+  D = d; cache.save(); show()
 })
 
 /* ---------------------------------------------------------------- 動作 */
-async function act(body) {
-  if (busy) return
-  busy = true; $('#amsg').textContent = ''; render()
-  const d = await call(body)
-  busy = false
-  if (d.lessons) D = d                      // 被別人拿走時後台也會回最新的清單
-  if (!d.ok) $('#amsg').textContent = ERR[d.error] || ERR.net
-  render()
+/* 改一格：畫面先改，再送出去。後台只回那一列，不用整份重讀，所以不會每按一下就等好幾秒。
+   沒送成功就重新讀一次清單，畫面回到真的狀態。一次送一個，照按的順序。 */
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` }
+const rowOf = (kind, code) => kind === 'lesson' ? D.lessons.find(l => l.code === code) : kind === 'project' ? projects().find(x => x.code === code) : projects().flatMap(x => x.episodes).find(x => x.code === code)
+let chain = Promise.resolve(), later = 0
+function quick(kind, body, patch) {
+  const row = rowOf(kind, body.code); if (!row) return
+  patch(row); cloud++; $('#amsg').textContent = ''; render()
+  chain = chain.then(async () => {
+    const d = await call({ ...body, quick: true })
+    cloud--
+    const now = D && rowOf(kind, body.code)
+    if (d.row && now) Object.assign(now, d.row)
+    if (!d.ok) { $('#amsg').textContent = ERR[d.error] || ERR.net; if (!d.row && !cloud) { await load(); return } }
+    if (D) { cache.save(); render() }
+    // 發布列的「還有幾處沒上線」要後台算：停手幾秒後在背景更新一次
+    clearTimeout(later); later = setTimeout(() => { if (!cloud && !pub && D) load() }, 5000)
+  })
 }
+const setLesson = (code, field, value) => quick('lesson', { action: 'set', code, field, value }, l => { l[field] = value; if (field === 'page_stage') { l.ready = value === '已上線'; l.stage = value } })
+const setThing = (kind, code, field, value) => quick(kind, { action: 'pset', kind, code, field, value }, x => { x[field] = value; x.updated = today() })
+
 async function publish(confirm) {
-  if (busy) return
-  busy = true; $('#amsg').textContent = ''
+  if (busy || pub) return
+  busy = true; $('#amsg').textContent = ''; renderOut()
+  await chain                                   // 等還在路上的改動送完，才不會發布到一半的狀態
   const d = await call({ action: 'publish', confirm })
   busy = false; ask = null
-  if (d.ok) sent = '1'
+  if (d.ok) watch()
   else if (d.error === 'confirm') ask = d.confirms
   else if (d.error === 'problems') { D.problems = d.problems; $('#amsg').textContent = '表格還有問題，先修好再發布。' }
   else if (d.error === 'token') $('#amsg').textContent = 'GitHub 權杖還沒設，或已經過期。到 Apps Script 的指令碼屬性換一組 GH_TOKEN，再按一次發布。'
-  else if (d.error === 'github') $('#amsg').textContent = `GitHub 沒有收下這次發布（狀態 ${d.status}）。過幾分鐘再試一次。`
+  else if (d.error === 'github') $('#amsg').textContent = d.status ? `GitHub 沒有收下這次發布（狀態 ${d.status}）。過幾分鐘再試一次。` : '後台連不出去：它少了「連到外部」的授權。到 Apps Script 補授權（協作說明第 8 節）。'
   else $('#amsg').textContent = ERR[d.error] || ERR.net
   render()
+}
+// 按了發布之後：每秒跳一次秒數，每幾秒問後台一次「網站換成新的了沒」，換了就自己顯示上線了
+function watch() {
+  pub = { t0: Date.now(), done: false, late: false, secs: 0 }
+  const tick = setInterval(() => { const el = $('#pubsec'); if (el && pub) el.textContent = Math.round((Date.now() - pub.t0) / 1000) }, 1000)
+  const stop = () => { clearInterval(tick); if (D) render() }
+  const ask1 = async () => {
+    if (!pub || pub.done) return stop()
+    const waited = Date.now() - pub.t0
+    if (waited > 180000) { pub.late = true; return stop() }
+    const d = await call({ action: 'list', fresh: true })
+    if (!pub) return stop()
+    if (d.ok && !cloud) { D = d; cache.save() }
+    if (d.ok && d.pending.published && !d.pending.count && waited > 15000) { pub.done = true; pub.secs = Math.round((Date.now() - pub.t0) / 1000); return stop() }
+    if (D) { const t = $('#panel'); if (!t.contains(document.activeElement)) render(); else renderOut() }   // 人正在打字就只更新上面那條
+    setTimeout(ask1, 6000)
+  }
+  setTimeout(ask1, 20000)
 }
 $('#app').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return
@@ -585,9 +636,10 @@ $('#app').addEventListener('click', e => {
   else if (d.peek) { peek = d.peek; document.querySelectorAll('.sq.on').forEach(x => x.classList.remove('on')); b.classList.add('on'); $('#peek').className = 'peek'; $('#peek').innerHTML = peekHtml() }
   else if (d.goto) { tab = 'lessons'; hit = d.goto; render(); const el = document.getElementById('les-' + d.goto); if (el) el.scrollIntoView({ block: 'center' }) }
   else if (d.ep) { epOpen = epOpen === d.ep ? '' : d.ep; render() }
-  else if (d.pown) act({ action: 'pset', kind: d.pown, code: d.code, field: 'owner', value: d.v ? me : '' })
-  else if (d.claim) act({ action: 'claim', code: d.claim })
-  else if (d.release) act({ action: 'release', code: d.release })
+  else if (d.pown) setThing(d.pown, d.code, 'owner', d.v ? me : '')
+  else if (d.claim) quick('lesson', { action: 'claim', code: d.claim }, l => { l.owner = me; l.since = today() })
+  else if (d.release) quick('lesson', { action: 'release', code: d.release }, l => { l.owner = ''; l.since = '' })
+  else if (b.id === 'pub-ok') { pub = null; render() }
   else if (b.id === 'publish') publish(false)
   else if (b.id === 'publish-yes') publish(true)
   else if (b.id === 'publish-no') { ask = null; render() }
@@ -595,19 +647,21 @@ $('#app').addEventListener('click', e => {
 $('#app').addEventListener('mouseover', e => { const b = e.target.closest('.sq[data-peek]'); if (b && b.dataset.peek !== peek && !document.querySelector('.sq.on')) { const keep = peek; peek = b.dataset.peek; $('#peek').className = 'peek'; $('#peek').innerHTML = peekHtml(); peek = keep } })
 $('#app').addEventListener('change', e => {
   const s = e.target.closest('select[data-set]'), ps = e.target.closest('select[data-pset]'), nx = e.target.closest('input[data-pnext]')
-  if (s) act({ action: 'set', code: s.dataset.code, field: s.dataset.set, value: s.value })
-  else if (ps) act({ action: 'pset', kind: ps.dataset.pset, code: ps.dataset.code, field: 'stage', value: ps.value })
-  else if (nx) act({ action: 'pset', kind: 'project', code: nx.dataset.pnext, field: 'next', value: nx.value.trim() })
+  if (s) setLesson(s.dataset.code, s.dataset.set, s.value)
+  else if (ps) setThing(ps.dataset.pset, ps.dataset.code, 'stage', ps.value)
+  else if (nx) setThing('project', nx.dataset.pnext, 'next', nx.value.trim())
 })
 $('#app').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input[data-pnext]')) e.target.blur() })
 $('#app').addEventListener('input', e => { if (e.target.id !== 'q') return; q = e.target.value; const at = e.target.selectionStart; $('#panel').innerHTML = panelGlossary(); const i = $('#q'); i.focus(); i.setSelectionRange(at, at) })
-$('#reload').addEventListener('click', () => { sent = ''; ask = null; load() })
-$('#leave').addEventListener('click', () => { key = ''; D = null; store.set('paradigm.team.key', ''); showGate('') })
+$('#reload').addEventListener('click', () => { ask = null; if (pub && (pub.done || pub.late)) pub = null; load(true) })
+$('#leave').addEventListener('click', () => { key = ''; D = null; pub = null; store.set('paradigm.team.key', ''); cache.clear(); showGate('') })
 
 // 網站目前多大（build.py 每次產生網站時寫的 size.json）；在自己電腦上沒有這個檔就不顯示
 fetch('../size.json').then(r => r.ok ? r.json() : null).then(s => { size = s; if (D) renderOut() }).catch(() => {})
-if (API && me && key) load().then(ok => { if (!ok && !$('#gmsg').textContent) showGate('') })
-else showGate('')
+if (API && me && key) {
+  D = cache.load(); if (D) show()                 // 先顯示上次的，背景讀最新的
+  load().then(ok => { if (!ok && !D && !$('#gmsg').textContent) showGate('') })
+} else showGate('')
 </script>
 </body>
 </html>
