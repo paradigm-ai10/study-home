@@ -22,6 +22,8 @@
 <meta name="description" content="想學什麼 AI 主題，寫一封信告訴 Paradigm，我們會拿這些信來排之後的課。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=LXGW+WenKai+TC&family=Outfit:wght@500;600&display=swap">
+<!-- 拆信、寄信的動畫用 GSAP 排。async：載不到也不會卡住這一頁，只是信紙直接攤開、不播動畫 -->
+<script async src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" crossorigin="anonymous"></script>
 <style>
   /* 外觀跟資源下載頁同一套：奶油底、葡萄色字、陽光黃主按鈕。
      這頁的主角是首頁書桌上那封航空信和鋼筆：點信封、信紙攤開、打字時筆跟著寫。 */
@@ -57,55 +59,59 @@
 
   /* ---- 舞台：信封分三層（背面、口袋、封口蓋），信紙夾在背面和口袋中間 */
   .stage { position: relative; width: min(620px, 100%); margin: 44px auto 64px; container-type: inline-size; }
-  .env-b, .env-f, .env-flap { position: absolute; left: 17cqw; top: var(--et); width: 66cqw; height: 44cqw;
-    translate: var(--ex, 0) var(--ey, 0); opacity: var(--eo, 1);
-    transition: translate .6s cubic-bezier(.3, .7, .2, 1), opacity .45s ease-out; pointer-events: none; }
+  /* 這裡只寫每個狀態「停下來」的樣子（信封關著、信紙攤開、寄出後）。中間怎麼動由下面的 GSAP 時間軸排，
+     所以信封、信紙、折頁都不掛 transition，不然兩邊會搶 */
+  .env-b, .env-f, .env-flap { position: absolute; left: 17cqw; top: var(--et); width: 66cqw; height: 44cqw; pointer-events: none; }
   .env-b svg, .env-f svg, .env-flap svg { display: block; width: 100%; height: 100%; overflow: visible; }
   .env-b { z-index: 1; filter: drop-shadow(0 14px 18px rgba(58, 46, 92, .16)); }
   .env-f { z-index: 3; }
-  .env-flap { z-index: 4; transform-origin: 50% 0; transform: perspective(900px) rotateX(0deg);
-    transition: transform .5s cubic-bezier(.5, 0, .3, 1), translate .6s cubic-bezier(.3, .7, .2, 1), opacity .45s ease-out; }
-  .s-flap .env-flap { transform: perspective(900px) rotateX(178deg); }
-  .flap-under .env-flap { z-index: 1; }
+  .env-flap { z-index: 4; transform-origin: 50% 0; }
   .seal { position: absolute; z-index: 5; left: 50cqw; top: calc(var(--et) + 24.6cqw); width: 46px; height: 46px; margin: -23px 0 0 -23px;
     border-radius: 50%; background: radial-gradient(circle at 36% 30%, #ff8a78, var(--coral) 46%, #d9412d);
     box-shadow: 0 2px 0 #b9321f, 0 5px 10px rgba(58, 46, 92, .25); display: grid; place-items: center;
-    font: 600 19px/1 var(--en); color: #fff4e0; translate: var(--ex, 0) var(--ey, 0); opacity: var(--eo, 1);
-    transition: scale .28s cubic-bezier(.3, 1.6, .5, 1) .46s, opacity .2s .46s, translate .6s cubic-bezier(.3, .7, .2, 1); pointer-events: none; }   /* 寄信時等蓋子蓋好才蓋章 */
-  .s-flap .seal { scale: 1.5; opacity: 0; transition-delay: 0s; }
-  .s-out { --ey: 70px; --eo: 0; }
-  .s-fly { --ex: 46cqw; --ey: -150px; --eo: 0; }
-  .s-fly .letter { visibility: hidden; }   /* 信已經在信封裡，跟著一起走 */
+    font: 600 19px/1 var(--en); color: #fff4e0; transition: scale .2s ease-out; pointer-events: none; }
+  .s-out .env-b, .s-out .env-f, .s-out .env-flap, .s-out .seal { opacity: 0; visibility: hidden; }   /* 信紙攤開後信封不在桌上 */
 
   .open-btn { position: absolute; z-index: 6; left: 17cqw; top: var(--et); width: 66cqw; height: 44cqw; border: 0; background: none; cursor: pointer; border-radius: 6px; }
   .open-btn:hover ~ .seal { scale: 1.08; }
   .hint { position: absolute; left: 0; right: 0; top: calc(var(--et) + 44cqw + 22px); text-align: center; font-size: 16px; color: var(--grape-2); transition: opacity .3s; }
   .s-flap .open-btn, .s-flap .hint, .sending .open-btn, .sending .hint { opacity: 0; pointer-events: none; }
 
-  /* ---- 信紙：三折。f2 掛在 f1 底下、f3 掛在 f2 底下，折起來時一正一反疊成一疊 */
+  /* ---- 信紙：三折。f2 掛在 f1 底下、f3 掛在 f2 底下。折起來時 f2 往後折到 f1 背後、f3 再折回來墊在最後面，
+     所以整疊朝外的那一面是信的開頭（給 Paradigm、郵票），攤開時下面兩片從後面一路放下來，不會擋到字 */
   .letter { position: relative; z-index: 2; perspective: 1500px; transform-origin: 50% 0;
-    transform: translateY(calc(var(--et) + 7cqw)) scale(var(--fs, .6));
-    transition: transform .55s cubic-bezier(.3, .7, .2, 1); }
-  .s-rise .letter { transform: translateY(calc(var(--et) - 10cqw)) scale(var(--fs, .6)); }
-  .s-out .letter { transform: none; transition-duration: .6s; }
+    transform: translateY(calc(var(--et) + 7cqw)) scale(var(--fs, .6)); }
+  .over .letter { z-index: 7; }   /* 抽出信封之後，信紙在信封前面 */
+  .s-out .letter { transform: none; }
   /* 三片是同一張紙：同一個紙色和纖維紋，攤平後只留一道淡淡的折痕，不要像三張卡片 */
   .fold { position: absolute; left: 0; right: 0; transform-style: preserve-3d; background-color: var(--paper);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .36 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
-    box-shadow: 0 14px 22px -12px rgba(58, 46, 92, .3); transition: transform .55s cubic-bezier(.45, 0, .2, 1), box-shadow .5s; }
-  .f1 { top: 0; height: 33.34%; border-radius: 2px 2px 0 0; }
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .36 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  /* 折頁高度用整數像素（JS 算好放在 --fh），折頁上的字才會跟攤開後的字對在同一個位置 */
+  .f1 { top: 0; height: var(--fh, 33.34%); border-radius: 2px 2px 0 0; box-shadow: 0 14px 22px -12px rgba(58, 46, 92, .3); }   /* 這道影子攤平後剛好被 f2 蓋住 */
   .f2, .f3 { top: 100%; height: 100%; transform-origin: 50% 0; }
-  .f2 { transform: rotateX(176deg); }
-  .f3 { transform: rotateX(-176deg); border-radius: 0 0 2px 2px; }
+  .f2 { transform: rotateX(-176deg); }
+  .f3 { height: var(--fh3, 100%); transform: rotateX(176deg); border-radius: 0 0 2px 2px; }
   .s-b .f2, .s-c .f3 { transform: rotateX(0deg); }
-  .f2::before, .f3::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 14px; opacity: 0; transition: opacity .4s;
+  .f2::before, .f3::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 14px;   /* 折痕一直都在紙上 */
     background: linear-gradient(rgba(58, 46, 92, .1), rgba(58, 46, 92, .03) 2px, rgba(255, 255, 255, .5) 3px, transparent 14px); }
-  .s-open .fold { box-shadow: none; }
-  .s-open .f2::before, .s-open .f3::before { opacity: 1; }
+  /* 折頁正面印著信紙的內容（.sheet 的複本，各露出自己那三分之一），飛出來、折回去的時候字是跟著紙走的。背面是白的 */
+  .face { position: absolute; inset: 0; overflow: hidden; backface-visibility: hidden; transform: translateZ(.5px); }
+  .s-open .face { visibility: hidden; }
+  /* 折頁斜著的時候暗一點：正反面各一片，只調透明度 */
+  .shade { position: absolute; inset: 0; opacity: 0; pointer-events: none; transform: translateZ(.8px);
+    background: linear-gradient(rgba(104, 74, 44, .55), rgb(104, 74, 44)); }   /* 暖的棕色，紙暗下去才不會發灰 */
+  .shade.bk { transform: translateZ(-.8px); }
+  /* 桌上的影子兩片，都只動 transform 和 opacity。.lsh 是放在桌上時的影子；.ash 是飛在半空時的，離桌面越高越往下、越淡 */
+  .lsh, .ash { position: absolute; top: 0; height: 100%; transform-origin: 50% 0; opacity: 0; pointer-events: none; }
+  .lsh { left: 0; right: 0; border-radius: 2px; box-shadow: 0 0 0 1px rgba(58, 46, 92, .08), 0 2px 3px rgba(58, 46, 92, .08), 0 30px 46px -22px rgba(58, 46, 92, .38); }
+  .ash { left: 3%; right: 3%; background: rgba(58, 46, 92, .34); filter: blur(16px); }
+  .s-open .lsh { opacity: 1; }
 
   .sheet { position: relative; transform: translateZ(1px);   /* 墊高 1px，不然攤平的折頁會蓋到字 */
-    padding: 44px clamp(22px, 7cqw, 48px) 34px; opacity: 0; visibility: hidden; transition: opacity .45s ease-out, visibility 0s .45s;
-    border-radius: 2px; box-shadow: 0 0 0 1px rgba(58, 46, 92, .08), 0 2px 3px rgba(58, 46, 92, .08), 0 30px 46px -22px rgba(58, 46, 92, .38); }
-  .s-open .sheet { opacity: 1; visibility: visible; transition-delay: 0s; }
+    padding: 44px clamp(22px, 7cqw, 48px) 34px; border-radius: 2px; }
+  .letter > .sheet { opacity: 0; visibility: hidden; }   /* 正本：攤平落定才換上來，在那之前看到的是折頁上的複本 */
+  .s-open .letter > .sheet { opacity: 1; visibility: visible; }
+  .sheet.ghost { position: absolute; left: 0; right: 0; transform: none; }
   /* 信紙上緣一條航空信斜紋，跟信封同一套 */
   .sheet::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 7px; border-radius: 2px 2px 0 0;
     background: repeating-linear-gradient(-45deg, var(--coral) 0 9px, var(--paper) 9px 18px, var(--grape) 18px 27px, var(--paper) 27px 36px); }
@@ -154,6 +160,7 @@
   .pen { position: absolute; z-index: 4; left: 0; top: 0; width: 124px; height: 166px; pointer-events: none; opacity: 0;
     translate: calc(100cqw + 29px) -62px; transition: translate .3s cubic-bezier(.2, .8, .3, 1), opacity .35s; }
   .s-open .pen { opacity: 1; }
+  .sending .pen, .sending .ink { transition-duration: .12s; }   /* 信紙要折起來了，筆和墨水瓶先收掉 */
   .pen i { display: block; width: 100%; height: 100%; transform-origin: 14px 152px; transition: rotate .35s ease-out, translate .35s ease-out; filter: drop-shadow(6px 9px 4px rgba(58, 46, 92, .2)); }
   .pen.lift i { translate: -3px -10px; filter: drop-shadow(12px 18px 6px rgba(58, 46, 92, .14)); animation: sway 2.6s ease-in-out infinite alternate; }
   .pen.rest i { rotate: 16deg; }
@@ -204,7 +211,12 @@
       <div class="env-b"><svg viewBox="0 0 300 200" preserveAspectRatio="none" aria-hidden="true"><rect width="300" height="200" rx="3" fill="#F1E2C4"/></svg></div>
 
       <form class="letter" id="letter" novalidate>
-        <div class="fold f1"><div class="fold f2"><div class="fold f3"></div></div></div>
+        <div class="lsh"></div><div class="ash"></div>
+        <div class="fold f1"><div class="face"></div>
+          <div class="fold f2"><div class="face"></div><i class="shade"></i><i class="shade bk"></i>
+            <div class="fold f3"><div class="face"></div><i class="shade"></i><i class="shade bk"></i></div>
+          </div>
+        </div>
         <div class="sheet">
           <div class="row1">
             <p class="to">給 Paradigm：</p>
@@ -290,20 +302,38 @@
 const ENDPOINT = window.PARADIGM_API || ''
 
 const $ = s => document.querySelector(s)
-const stage = $('#stage'), letter = $('#letter'), pen = $('#pen'), penIn = pen.firstElementChild
+const stage = $('#stage'), letter = $('#letter'), sheet = $('.sheet'), go = $('.go'), pen = $('#pen'), penIn = pen.firstElementChild
 const fields = [$('#topic'), $('#use'), $('#other'), $('#name')]
 const whoBox = document.querySelector('.who'), other = $('#other')
-const calm = matchMedia('(prefers-reduced-motion: reduce)').matches
-const wait = ms => new Promise(r => setTimeout(r, calm ? 0 : ms))
+let calm = matchMedia('(prefers-reduced-motion: reduce)').matches
 const d = new Date()
 $('#date').textContent = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 
-// 折起來的信要塞得進信封：手機上信紙比較長，縮小一點
-function fitFold() {
-  const envH = stage.clientWidth * .44, third = letter.offsetHeight / 3
-  stage.style.setProperty('--fs', Math.min(.6, envH * .7 / third).toFixed(3))
+// 量尺寸，動畫要用的數字都放 geo。
+// 折起來的信要塞得進信封：手機上信紙比較長，縮小一點。折頁高度取整數像素，折頁上那份字才對得準
+const faces = [...document.querySelectorAll('.face')], geo = {}
+function layout() {
+  const H = letter.offsetHeight, W = stage.clientWidth, fh = Math.round(H / 3)
+  if (!H) return   // 寄出後信紙收起來了，沒東西可量
+  const fs = +Math.min(.6, W * .44 * .7 / fh).toFixed(3), et = parseFloat(getComputedStyle(stage).getPropertyValue('--et')) || 26
+  stage.style.setProperty('--fs', fs); stage.style.setProperty('--fh', fh + 'px'); stage.style.setProperty('--fh3', H - 2 * fh + 'px')
+  faces.forEach((f, k) => { if (f.firstChild) f.firstChild.style.top = -k * fh + 'px' })
+  Object.assign(geo, { W, fh, fs, et, S: et + W * .07 })   // S：折好的信在信封裡時，上緣離舞台頂端多遠
 }
-fitFold(); addEventListener('resize', fitFold)
+
+// 把信紙現在的樣子（含已經寫的字）印到三片折頁上。複本點不到、不佔 Tab 順序、不會跟著表單送出
+function ghosts() {
+  const from = sheet.querySelectorAll('textarea, input')
+  faces.forEach(face => {
+    const g = sheet.cloneNode(true)
+    g.classList.add('ghost'); g.inert = true; g.setAttribute('aria-hidden', 'true')
+    g.querySelectorAll('[id], [name], [for]').forEach(el => ['id', 'name', 'for', 'required'].forEach(a => el.removeAttribute(a)))
+    g.querySelectorAll('textarea, input').forEach((el, i) => { el.value = from[i].value; el.tabIndex = -1 })
+    g.querySelectorAll('button').forEach(b => { b.type = 'button'; b.tabIndex = -1 })
+    face.replaceChildren(g)
+  })
+  layout()
+}
 
 // textarea 跟著內容長高，橫線才不會跑掉
 // 空的時候固定兩行：Chrome 會把換行的 placeholder 也算進 scrollHeight
@@ -357,29 +387,112 @@ chips.forEach(c => c.addEventListener('click', () => {
   }
 }))
 
+// ---- 拆信、寄信的動畫
 const on = (...c) => stage.classList.add(...c), off = (...c) => stage.classList.remove(...c)
+const flap = $('.env-flap'), seal = $('.seal'), env = [$('.env-b'), $('.env-f'), flap]
+const f2 = $('.f2'), f3 = $('.f3'), lsh = $('.lsh'), ash = $('.ash')
+const shade2 = f2.querySelectorAll(':scope > .shade'), shade3 = f3.querySelectorAll(':scope > .shade')
+const moved = [letter, f2, f3, seal, lsh, ash, ...env, ...shade2, ...shade3]   // 動畫會碰的東西，播完要把行內樣式清掉
+const OPEN = ['s-flap', 's-out', 's-b', 's-c', 'over', 's-open']             // 信紙攤在桌上時掛的 class
+const RAD = Math.PI / 180
+const fly = { p: 0 }   // 信紙在路上的哪裡：0＝折好在信封裡，1＝攤在桌上
+let tl, mm, put, path
 
-// 拆信：封蠟彈開、掀蓋、抽出信、信封退場、信紙兩段攤開
-async function openUp() {
-  on('s-flap'); await wait(260); on('flap-under'); await wait(260)
-  on('s-rise'); await wait(520)
-  on('s-out'); await wait(560)
-  on('s-b'); await wait(480)
-  on('s-c'); await wait(560)
-  on('s-open'); fields[0].focus({ preventScroll: true }); follow(fields[0], false)
+// 要不要播動畫：GSAP 沒載到，或使用者設定「減少動態效果」，就不播，信紙直接攤開
+function moving() {
+  if (!window.gsap) return false
+  if (!mm) { mm = gsap.matchMedia(); mm.add('(prefers-reduced-motion: reduce)', () => { calm = true; return () => { calm = false } }) }
+  if (!put) {
+    const q = (el, prop, unit) => gsap.quickSetter(el, prop, unit)
+    put = { x: q(letter, 'x', 'px'), y: q(letter, 'y', 'px'), s2: q(shade2, 'opacity'), s3: q(shade3, 'opacity'),
+      ashY: q(ash, 'y', 'px'), ashS: q(ash, 'scaleY'), ashO: q(ash, 'opacity'), lshS: q(lsh, 'scaleY'), lshO: q(lsh, 'opacity') }
+  }
+  return !calm
+}
+
+// 信紙上緣中點走的路（一條貝茲曲線）：從信封裡往右上抽出來，最高點時整疊剛好離開信封口，再落回定位。
+// top 是最高點要到多高、sway 是往右擺多遠（占舞台寬度的比例）。數字都照舞台寬度和折起來的大小算，桌機和手機走的是同一條路
+function route(top, sway) {
+  const { W, S } = geo
+  const y2 = top * .35, y1 = (top - .2383 * S - .2686 * y2) / .4382, x1 = W * sway, x2 = x1 * .45
+  return p => { const q = 1 - p, a = 3 * q * q * p, b = 3 * q * p * p; return [a * x1 + b * x2, q * q * q * S + a * y1 + b * y2] }
+}
+
+// 時間軸每走一格跑一次：照 fly.p 放位置，再照折頁現在的角度算明暗和影子。只寫 transform 和 opacity
+function paint() {
+  const [x, y] = path(fly.p); put.x(x); put.y(y)
+  const a2 = gsap.getProperty(f2, 'rotationX'), a3 = a2 + gsap.getProperty(f3, 'rotationX')
+  const c2 = Math.cos(a2 * RAD), c3 = Math.cos(a3 * RAD)
+  put.s2(Math.abs(Math.sin(a2 * RAD)) * .24 + (c2 < 0 ? .05 : 0))   // 越斜越暗，背面朝外再暗一點
+  put.s3(Math.abs(Math.sin(a3 * RAD)) * .24 + (c3 < 0 ? .05 : 0))
+  const foot = Math.max(1, 1 + c2, 1 + c2 + c3) / 3                 // 現在攤開到多長（占整張的幾分之幾），影子跟著長
+  const high = Math.sin(Math.PI * fly.p)                            // 離桌面多高：中途最高
+  const land = Math.min(1, Math.max(0, (fly.p - .7) / .3))          // 快落定時，半空的影子換成桌上的影子
+  put.ashY(high * geo.W * .07); put.ashS(foot); put.ashO(Math.min(1, high * 1.5) * (1 - land))
+  put.lshS(foot); put.lshO(land * land * (3 - 2 * land))
+}
+
+// 信紙攤在桌上、可以寫的樣子。拆信播完、不播動畫、再寫一封，最後都落在這裡
+function showOpen() {
+  if (window.gsap) gsap.set(moved, { clearProps: 'transform,opacity,visibility,zIndex' })
+  on(...OPEN)
+  if (!fields.includes(document.activeElement)) fields[0].focus({ preventScroll: true })   // 已經點到別格就不搶
+  follow(fields.includes(document.activeElement) ? document.activeElement : fields[0], false)
+}
+
+// 拆信：封蠟一彈、蓋子一掀，信紙就從信封口抽出來，一邊飛一邊放大、轉正、攤開，信封同時往下退掉。
+// 全部排在同一條時間軸上互相重疊，中間沒有等待
+const launch = t => 1 - Math.pow(1 - Math.pow(t, 1.6), 2.6)   // 抽出來那一下快，後半段慢慢落定
+function openUp() {
+  on('s-flap')
+  if (!moving()) return showOpen()
+  const { W, fh, fs, et } = geo
+  path = route(et + W * .03 - fh * (fs + (1 - fs) * .14), .11); fly.p = 0   // 信封同時在往下退，所以不用抽到那麼高
+  gsap.set(flap, { transformPerspective: 900 })
+  tl = gsap.timeline({ defaults: { ease: 'power2.out' }, onUpdate: paint, onComplete: showOpen })
+    .to(seal, { scale: 1.5, autoAlpha: 0, duration: .16 }, 0)
+    .to(flap, { rotationX: 178, duration: .3 }, 0)
+    .set(flap, { zIndex: 1 }, .09)                                   // 蓋子掀過 90 度，退到信紙後面
+    .to(fly, { p: 1, duration: .8, ease: launch }, .07)
+    .to(letter, { keyframes: [{ rotation: 5, duration: .26, ease: 'sine.out' }, { rotation: 0, duration: .56, ease: 'back.out(2.4)' }] }, .07)
+    .to(letter, { scale: 1, duration: .68, ease: 'power2.inOut' }, .13)
+    .to(env, { y: W * .11, autoAlpha: 0, duration: .28, ease: 'power2.in' }, .1)
+    .set(letter, { zIndex: 7 }, .375)                                // 整疊離開信封口、信封也淡掉了，換到信封前面
+    .to(f2, { rotationX: 0, duration: .52, ease: 'power2.inOut' }, .13)   // 還在往上抽就開始攤，飛到最高點時剛好往下放
+    .to(f3, { rotationX: 0, duration: .54, ease: 'power2.inOut' }, .18)   // 最下面那片晚半拍，像被帶著甩下來
+    .call(() => { on('s-open'); fields[0].focus({ preventScroll: true }); follow(fields[0], false) }, null, .74)   // 攤平了就可以寫，不等最後那一下晃完
 }
 $('#open').addEventListener('click', openUp, { once: true })
 
-// 寄信：照拆信的順序倒著做，最後蓋封蠟、飛走
-async function sendOff() {
-  on('sending'); penRest(); off('s-open'); await wait(380)
-  fitFold(); scrollTo({ top: Math.max(0, stage.getBoundingClientRect().top + scrollY - 120), behavior: calm ? 'auto' : 'smooth' })
-  off('s-c'); await wait(460); off('s-b'); await wait(520)
-  off('s-out'); await wait(600)
-  off('s-rise'); await wait(500)
-  off('flap-under'); off('s-flap'); await wait(1150)   // 蓋好、蓋章、停一下再飛
-  on('s-fly'); await wait(650)
-  on('s-done'); $('#thanks').focus({ preventScroll: true })
+// 寄信：信紙一邊折一邊縮小飛回信封上方，落進信封、蓋上蓋子、蓋封蠟，停一下再飛走
+function sendOff() {
+  on('sending'); penRest()
+  if (tl) tl.progress(1)   // 拆信最後那一下還沒晃完就按寄出：先讓它落定
+  scrollTo({ top: Math.max(0, stage.getBoundingClientRect().top + scrollY - 120), behavior: calm ? 'auto' : 'smooth' })
+  if (!moving()) return done()
+  ghosts(); fly.p = 1
+  const { W, fh, fs, et } = geo
+  path = route(et - W * .02 - fh * fs, .05)   // 信封這時已經擺好不動，折好的信要整疊高過信封口才落進去
+  gsap.set(letter, { x: 0, y: 0, scale: 1, rotation: 0, zIndex: 7 }); gsap.set([f2, f3], { rotationX: 0 }); gsap.set(lsh, { opacity: 1 })
+  gsap.set(flap, { transformPerspective: 900, rotationX: 178, zIndex: 1 }); gsap.set(env, { y: W * .11, autoAlpha: 0 }); gsap.set(seal, { scale: 1.5, autoAlpha: 0 })
+  off(...OPEN)   // 這一刻起看到的是折頁上那份字
+  tl = gsap.timeline({ defaults: { ease: 'power2.inOut' }, onUpdate: paint, onComplete: done })
+    .to(f3, { rotationX: 176, duration: .44 }, 0)
+    .to(f2, { rotationX: -176, duration: .46 }, .12)
+    .to(fly, { p: 0, duration: .86, ease: 'sine.inOut' }, .1)
+    .to(letter, { scale: fs, duration: .5 }, .1)
+    .to(letter, { keyframes: [{ rotation: 2.5, duration: .38, ease: 'sine.inOut' }, { rotation: 0, duration: .4, ease: 'sine.inOut' }] }, .1)
+    .to(env, { y: 0, autoAlpha: 1, duration: .36, ease: 'power2.out' }, .2)
+    .set(letter, { zIndex: 2 }, .61)                                 // 折好的信在信封口正上方，換回信封裡面那一層
+    .to(flap, { rotationX: 0, duration: .3 }, .88)
+    .set(flap, { zIndex: 4 }, 1.03)
+    .to(seal, { scale: 1, autoAlpha: 1, duration: .22, ease: 'back.out(2.6)' }, 1.16)   // 蓋子蓋好才蓋章
+    .set(letter, { autoAlpha: 0 }, 1.4)                              // 信已經在信封裡，跟著一起走
+    .to([...env, seal], { x: W * .46, y: -150, autoAlpha: 0, duration: .5, ease: 'power2.in' }, 1.72)
+}
+function done() {
+  if (window.gsap) gsap.set(moved, { clearProps: 'transform,opacity,visibility,zIndex' })
+  off(...OPEN); on('s-done'); $('#thanks').focus({ preventScroll: true })
 }
 
 letter.addEventListener('submit', async e => {
@@ -390,11 +503,11 @@ letter.addEventListener('submit', async e => {
   const who = chips.find(c => c.getAttribute('aria-pressed') === 'true')
   const otherText = other.value.trim()
   const data = { topic, use: (f.get('use') || '').trim(), who: who ? who.textContent + (who.textContent === '其他' && otherText ? '：' + otherText : '') : '', name: (f.get('name') || '').trim() }
-  letter.querySelector('.go').disabled = true
+  go.disabled = true
   if (ENDPOINT) {
     // text/plain 才不會多一次預檢請求，Apps Script 接不了預檢
     try { const r = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(data) }); if (!(await r.json()).ok) throw 0 }
-    catch { letter.querySelector('.go').disabled = false; $('#err').textContent = '沒有寄出去。檢查一下網路，再按一次寄出。'; return }
+    catch { go.disabled = false; $('#err').textContent = '沒有寄出去。檢查一下網路，再按一次寄出。'; return }
   } else { $('#demo').hidden = false }
   sendOff()
 })
@@ -402,10 +515,13 @@ letter.addEventListener('submit', async e => {
 // 再寫一封：清空，直接回到攤開的信紙
 $('#again').addEventListener('click', () => {
   letter.reset(); fields.forEach(grow); chips.forEach(x => x.setAttribute('aria-pressed', 'false')); whoBox.classList.remove('has-other')
-  letter.querySelector('.go').disabled = false
-  off('s-done', 's-fly', 'sending'); on('s-flap', 'flap-under', 's-rise', 's-out', 's-b', 's-c', 's-open')
+  go.disabled = false
+  off('s-done', 'sending'); showOpen(); ghosts()
   fields[0].focus(); setTimeout(() => follow(fields[0], false), 120)
 })
+
+ghosts()
+new ResizeObserver(layout).observe(letter); addEventListener('resize', layout)
 </script>
 </body>
 </html>
