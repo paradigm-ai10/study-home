@@ -24,50 +24,50 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=LXGW+WenKai+TC&family=Outfit:wght@500;600&display=swap">
 <style>
-  /* 開發人員自己看的頁：誰在做哪一課、訪客寄來的主題提案。外觀跟資源下載頁同一套。
-     資料都在 Google 試算表，這頁不存任何名字或提案；通關碼只留在自己的瀏覽器。 */
+  /* 開發人員自己看的頁：公司試算表「Paradigm 學習站後台」的圖像版。
+     課程、案例、資源、名詞、提案都即時讀試算表（要通關碼）；這頁不存任何資料，通關碼只留在自己的瀏覽器。
+     常用的幾格（認領、網頁進度、影片）可以直接在這裡改；課號、課名、加課刪課回試算表改，改完按「發布到網站」。 */
   :root {
     --cream: #FFF4E0; --sheet: #FFFAF0; --grape: #3A2E5C;
     --grape-2: rgba(58, 46, 92, .78); --grape-3: rgba(58, 46, 92, .74); --line: rgba(58, 46, 92, .18);
-    --coral: #FF6B57; --coral-ink: #C0351F; --sun: #FFC857;
+    --coral: #FF6B57; --coral-ink: #C0351F; --sun: #FFC857; --leaf: #2F7D5B;
     --zh: "Huninn", "PingFang TC", "Noto Sans TC", system-ui, sans-serif;
     --en: "Outfit", "Huninn", system-ui, sans-serif;
     --hand: "LXGW WenKai TC", "BiauKai", "DFKai-SB", "Huninn", serif;
     --pad: clamp(16px, 4vw, 56px);
   }
   * { box-sizing: border-box; }
-  html { background: var(--cream); }
+  html { background: var(--cream); scroll-padding-top: 70px; }
   body { margin: 0; background: var(--cream); color: var(--grape); font-family: var(--zh); font-size: 15.5px; line-height: 1.7; letter-spacing: .02em; -webkit-font-smoothing: antialiased; }
   :focus-visible { outline: 3px solid var(--coral-ink); outline-offset: 3px; border-radius: 4px; }
   a { color: inherit; }
-  h1, h2, h3, p, ul { margin: 0; }
+  h1, h2, h3, p, ul, ol { margin: 0; }
   h1, h2, h3 { font-weight: 400; }
-  ul { list-style: none; padding: 0; }
-  button, input { font: inherit; color: inherit; letter-spacing: inherit; }
+  ul, ol { list-style: none; padding: 0; }
+  button, input, select { font: inherit; color: inherit; letter-spacing: inherit; }
   [hidden] { display: none !important; }
-  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 var(--pad) 72px; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--pad) 72px; }
 
   .top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-top: 18px; }
   .wordmark { font: 600 13px/1 var(--en); letter-spacing: .26em; text-decoration: none; padding: 8px 0; }
   .home { text-decoration: none; font-size: 14px; padding: 7px 13px 8px; border-radius: 8px; box-shadow: inset 0 0 0 1.5px var(--grape-3); line-height: 1.2; white-space: nowrap; }
   .home:hover { box-shadow: inset 0 0 0 1.5px var(--grape); background: var(--sheet); }
-  .head { padding: clamp(28px, 6vh, 56px) 0 clamp(20px, 4vh, 32px); border-bottom: 1px solid var(--line); }
+  .head { padding: clamp(24px, 5vh, 44px) 0 clamp(16px, 3vh, 24px); }
   .head h1 { font-size: clamp(30px, 2.7vw, 38px); line-height: 1.36; letter-spacing: .03em; }
-  .head p { margin-top: 10px; font-size: 16px; color: var(--grape-2); max-width: 42em; }
+  .head p { margin-top: 8px; font-size: 16px; color: var(--grape-2); max-width: 44em; }
 
   .go { border: 0; cursor: pointer; background: var(--sun); color: var(--grape); font-size: 16px; line-height: 1.3; padding: 12px 20px; border-radius: 10px; box-shadow: 0 2px 0 #c9942a;
     transition: translate 90ms ease-out, box-shadow 90ms ease-out, background-color 120ms ease-out; }
   .go:hover { background: #ffd373; }
   .go:active { translate: 0 2px; box-shadow: 0 0 0 #c9942a; }
   .plain { border: 0; background: none; padding: 6px 0; cursor: pointer; font-size: 14.5px; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--coral); text-decoration-thickness: 1.5px; }
-  button:disabled { opacity: .5; cursor: default; }
+  button:disabled, select:disabled { opacity: .5; cursor: default; }
 
   /* ---- 進門 */
-  .gate { margin-top: 32px; max-width: 420px; background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 26px 28px 24px; display: grid; gap: 16px; }
+  .gate { margin-top: 12px; max-width: 420px; background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 26px 28px 24px; display: grid; gap: 16px; }
   .gate label { display: grid; gap: 4px; font-size: 14.5px; color: var(--grape-2); }
   .gate input { padding: 10px 12px; border: 0; border-radius: 8px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--grape-3); font-size: 16px; color: var(--grape); }
   .gate small { font-size: 13px; color: var(--grape-3); }
-  /* 通關碼右邊的眼睛：按了看得到自己打了什麼 */
   .pw { position: relative; display: grid; }
   .pw input { padding-right: 48px; }
   .pw button { position: absolute; right: 4px; top: 50%; translate: 0 -50%; width: 38px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 8px; background: none; color: var(--grape-3); cursor: pointer; }
@@ -77,64 +77,186 @@
   .pw svg { width: 22px; height: 22px; display: block; }
   .msg { font-size: 14.5px; color: var(--coral-ink); min-height: 1.7em; }
 
-  .bar { margin-top: 22px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 20px; font-size: 14.5px; color: var(--grape-2); }
-  .bar div { display: flex; gap: 18px; }
-  section { margin-top: 40px; }
-  section > h2 { font-size: 23px; letter-spacing: .03em; }
-  section > .sub { margin-top: 4px; font-size: 14.5px; color: var(--grape-2); }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 20px; font-size: 14.5px; color: var(--grape-2); }
+  .bar div { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+
+  /* ---- 發布列：試算表跟網站差多少。做成一張要寄出去的單子 */
+  .out { margin-top: 10px; background: var(--sheet); border-radius: 4px 4px 14px 14px; box-shadow: 0 0 0 1px var(--line), 0 16px 22px -18px rgba(58, 46, 92, .5); overflow: hidden; }
+  .out::before { content: ""; display: block; height: 6px; background: repeating-linear-gradient(-45deg, var(--coral) 0 10px, var(--sheet) 10px 20px, var(--grape) 20px 30px, var(--sheet) 30px 40px); }
+  .out-in { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 24px; align-items: center; padding: 16px 22px 18px; }
+  .out h2 { font: 400 23px/1.4 var(--hand); letter-spacing: .05em; }
+  .out .what { font-size: 14.5px; color: var(--grape-2); }
+  .out .what b { font-weight: 400; color: var(--grape); background: rgba(255, 200, 87, .5); padding: 1px 7px 2px; border-radius: 5px; margin-right: 4px; white-space: nowrap; }
+  .out.same h2::before { content: ""; display: inline-block; width: .62em; height: .34em; border: solid var(--leaf); border-width: 0 0 3px 3px; rotate: -45deg; translate: 0 -.28em; margin-right: .5em; }
+  .out .acts { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+  .notes { grid-column: 1 / -1; display: grid; gap: 10px; }
+  .note-box { border-left: 4px solid var(--coral); background: #fff; border-radius: 0 8px 8px 0; padding: 10px 14px 12px; font-size: 14.5px; }
+  .note-box.warn { border-left-color: var(--sun); }
+  .note-box h3 { font-size: 15.5px; }
+  .note-box li { margin-top: 4px; padding-left: 1em; text-indent: -1em; color: var(--grape-2); overflow-wrap: anywhere; }
+  .note-box li::before { content: "・"; }
+  .note-box details summary { cursor: pointer; }
+  .size { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 13.5px; color: var(--grape-3); }
+  .size i { flex: 0 0 160px; height: 8px; border-radius: 9px; background: rgba(58, 46, 92, .12); overflow: hidden; }
+  .size i b { display: block; height: 100%; background: var(--grape); border-radius: 9px; }
+  .size.over i b { background: var(--coral); }
+
+  /* ---- 分頁 */
+  .tabs { position: sticky; top: 0; z-index: 5; margin: 26px calc(var(--pad) * -1) 0; padding: 10px var(--pad); display: flex; gap: 6px; overflow-x: auto; background: linear-gradient(var(--cream) 82%, rgba(255, 244, 224, 0)); scrollbar-width: none; }
+  .tabs button { flex: none; border: 0; cursor: pointer; padding: 8px 15px 9px; border-radius: 99px; background: none; box-shadow: inset 0 0 0 1.5px var(--grape-3); font-size: 15px; line-height: 1.3; white-space: nowrap; }
+  .tabs button[aria-selected=true] { background: var(--grape); color: var(--cream); box-shadow: none; }
+  .tabs small { font: 600 12.5px/1 var(--en); margin-left: 6px; opacity: .8; }
+  .tabs .flag { color: var(--coral-ink); } .tabs [aria-selected=true] .flag { color: var(--sun); }
+  .panel { margin-top: 14px; }
+  .panel > h2 { font-size: 23px; letter-spacing: .03em; }
+  .sub { margin-top: 4px; font-size: 14.5px; color: var(--grape-2); max-width: 46em; }
+  .sub a { text-underline-offset: 4px; text-decoration-color: var(--coral); text-decoration-thickness: 1.5px; white-space: nowrap; }
+  .none { margin-top: 14px; color: var(--grape-2); }
+
+  /* ---- 總覽：一課一格，格子裡寫課號；顏色看上面選的是網頁、影片還是負責人 */
+  .views, .filters { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .views button, .filters button { border: 0; cursor: pointer; padding: 7px 14px; border-radius: 99px; background: none; box-shadow: inset 0 0 0 1.5px var(--grape-3); font-size: 14.5px; line-height: 1.3; }
+  .views button[aria-pressed=true], .filters button[aria-pressed=true] { background: var(--grape); color: var(--cream); box-shadow: none; }
+  .how { margin-top: 16px; font-size: 15.5px; }
+  .how b { font-weight: 400; background: rgba(255, 200, 87, .5); padding: 1px 7px 2px; border-radius: 5px; white-space: nowrap; }
+  .legend { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px 10px; font-size: 14.5px; }
+  .legend li { display: flex; align-items: center; gap: 8px; padding: 5px 12px 5px 6px; border-radius: 99px; background: var(--sheet); box-shadow: inset 0 0 0 1px var(--line); }
+  .legend b { font: 600 15px/1 var(--en); margin: 0 -3px 0 2px; }
+  .legend .sq { cursor: default; min-width: 26px; }
+  .legend .sq:hover { outline: 0; }
+  .board { margin-top: 14px; background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 6px 22px 16px; }
+  .board h3 { margin-top: 14px; font-size: 14.5px; color: var(--grape-2); display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; }
+  .board h3 b { font-weight: 400; font-size: 17px; color: var(--grape); }
+  .trow { display: grid; grid-template-columns: minmax(150px, 230px) minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; padding: 8px 0; border-top: 1px dashed var(--line); }
+  .trow .tsum { font-size: 13px; color: var(--grape-3); white-space: nowrap; }
+  .trow .tsum b { font: 600 14px/1 var(--en); color: var(--grape); }
+  .trow .tn { font-size: 15px; line-height: 1.4; }
+  .trow .tn b { font: 600 14px/1 var(--en); color: var(--grape-3); display: inline-block; min-width: 1.6em; }
+  .sqs { display: flex; flex-wrap: wrap; gap: 6px; }
+  /* 一格＝一堂課：裡面寫課號，底色是狀態；首版的課右上角有一顆紅點 */
+  .sq { --c: #fff; --b: var(--line); --t: var(--grape-2); position: relative; min-width: 44px; height: 27px; padding: 0 7px; border: 0; border-radius: 7px; cursor: pointer; background: var(--c); color: var(--t);
+    box-shadow: inset 0 0 0 1.5px var(--b); font: 600 13px/27px var(--en); letter-spacing: 0; white-space: nowrap; }
+  .sq.first::after { content: ""; position: absolute; right: -3px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 0 2px var(--sheet); }
+  .sq:hover, .sq.on { outline: 2.5px solid var(--grape); outline-offset: 2px; }
+  .k-idle { --c: #fff; }
+  .k-sun { --c: var(--sun); --b: #c9942a; --t: var(--grape); }
+  .k-coral { --c: var(--coral); --b: var(--coral-ink); --t: #fff; }
+  .k-grape { --c: var(--grape); --b: var(--grape); --t: var(--cream); }
+  .k-off { --c: repeating-linear-gradient(-45deg, rgba(58, 46, 92, .16) 0 2px, #fff 2px 6px); --b: rgba(58, 46, 92, .4); --t: var(--grape-3); text-decoration: line-through; }
+  .k-half { --c: #FFF1CC; --b: #c9942a; --t: var(--grape); }
+  .p0 { --c: #FFC857; --b: #c9942a; --t: var(--grape); } .p1 { --c: #FF6B57; --b: #C0351F; --t: #fff; } .p2 { --c: #3A2E5C; --b: #3A2E5C; --t: var(--cream); }
+  .p3 { --c: #2F7D5B; --b: #1f5a40; --t: #fff; } .p4 { --c: #7FB7E6; --b: #3d7fb5; --t: var(--grape); } .p5 { --c: #C9A0DC; --b: #8a5aa6; --t: var(--grape); }
+  .peek { margin-top: 12px; min-height: 58px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; padding: 10px 16px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); font-size: 14.5px; }
+  .peek .t { font-size: 16px; } .peek .t b { font: 600 15px/1 var(--en); color: var(--coral-ink); margin-right: 8px; }
+  .peek .m { color: var(--grape-2); }
+  .peek.empty { color: var(--grape-3); display: block; }
 
   /* ---- 誰手上有什麼：一人一張便條 */
   .hands { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 18px; }
-  .hand { flex: 1 1 260px; max-width: 420px; padding: 18px 20px 20px; background: linear-gradient(168deg, #FFDC7E, #FFCB5C 70%); border-radius: 2px 2px 20px 2px / 2px 2px 14px 2px; box-shadow: 0 14px 18px -12px rgba(58, 46, 92, .36), 0 2px 3px rgba(58, 46, 92, .1); }
+  .hand { flex: 1 1 280px; max-width: 460px; padding: 18px 20px 20px; background: linear-gradient(168deg, #FFDC7E, #FFCB5C 70%); border-radius: 2px 2px 20px 2px / 2px 2px 14px 2px; box-shadow: 0 14px 18px -12px rgba(58, 46, 92, .36), 0 2px 3px rgba(58, 46, 92, .1); }
   .hand:nth-child(odd) { rotate: -.8deg; } .hand:nth-child(even) { rotate: .7deg; }
   .hand h3 { font: 400 22px/1.3 var(--hand); letter-spacing: .06em; }
-  .hand li { margin-top: 8px; display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 8px; font-size: 15px; line-height: 1.5; }
-  .hand .id, .les .id { font: 600 14.5px/1.6 var(--en); color: var(--coral-ink); }
-  .none { margin-top: 14px; color: var(--grape-2); }
-  /* 地圖改過、對不上的認領 */
-  .stale { margin-top: 16px; display: grid; gap: 12px; }
-  .stale li { background: var(--sheet); border: 1px solid var(--line); border-left: 4px solid var(--coral); border-radius: 10px; padding: 14px 18px 16px; }
-  .stale .was { font-size: 16px; }
-  .stale .was b { font: 400 18px/1 var(--hand); padding: 2px 9px 3px; border-radius: 6px; background: rgba(255, 200, 87, .55); margin-right: 6px; }
-  .stale .now { margin-top: 4px; font-size: 14.5px; color: var(--grape-2); }
-  .stale .acts { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px; }
-  .stale button { border: 0; cursor: pointer; padding: 7px 14px; border-radius: 8px; font-size: 14.5px; line-height: 1.3; background: var(--sun); box-shadow: 0 2px 0 #c9942a; }
-  .stale button + button { background: none; box-shadow: inset 0 0 0 1.5px var(--grape-3); }
+  .hand h3 small { font: 400 14px/1 var(--zh); margin-left: 8px; color: var(--grape-2); letter-spacing: .02em; }
+  .hand li { margin-top: 8px; display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 8px; font-size: 15px; line-height: 1.5; align-items: baseline; }
+  .id { font: 600 14.5px/1.6 var(--en); color: var(--coral-ink); white-space: nowrap; }
+  .hand .st { font-size: 13px; padding: 1px 8px 2px; border-radius: 99px; background: rgba(255, 250, 240, .8); white-space: nowrap; }
 
   /* ---- 課程清單 */
-  .filters { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
-  .filters button { border: 0; cursor: pointer; padding: 7px 14px; border-radius: 99px; background: none; box-shadow: inset 0 0 0 1.5px var(--grape-3); font-size: 14.5px; line-height: 1.3; }
-  .filters button[aria-pressed=true] { background: var(--grape); color: var(--cream); box-shadow: none; }
-  .topic { margin-top: 22px; background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 16px 22px 10px; }
-  .topic h3 { font-size: 17.5px; letter-spacing: .03em; padding-bottom: 8px; }
-  .topic h3 b { font: 600 15px/1 var(--en); color: var(--grape-3); margin-right: 8px; }
-  .les { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto 92px; align-items: center; gap: 4px 14px; padding: 9px 0; border-top: 1px dashed var(--line); }
+  .topic { margin-top: 18px; background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 14px 22px 8px; }
+  .topic > h3 { font-size: 17.5px; letter-spacing: .03em; padding-bottom: 8px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
+  .topic > h3 b { font: 600 15px/1 var(--en); color: var(--grape-3); }
+  .topic > h3 small { font-size: 13.5px; color: var(--grape-3); }
+  .les { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 4px 14px; padding: 10px 0 11px; border-top: 1px dashed var(--line); align-items: start; }
+  .les.hit { background: linear-gradient(90deg, rgba(255, 200, 87, .45), rgba(255, 200, 87, 0) 80%); margin: 0 -10px; padding-left: 10px; padding-right: 10px; border-radius: 8px; }
   .les .ti { font-size: 15.5px; line-height: 1.5; }
-  .les .ti em { font-style: normal; font-size: 12.5px; color: var(--grape-3); margin-left: 8px; white-space: nowrap; }
+  .les .ti em { font-style: normal; font-size: 12.5px; margin-left: 8px; white-space: nowrap; padding: 1px 7px 2px; border-radius: 99px; box-shadow: inset 0 0 0 1px var(--line); color: var(--grape-2); }
+  .les .ti em.live { background: var(--grape); color: var(--cream); box-shadow: none; }
+  .les .ti em.wait { background: rgba(255, 107, 87, .16); color: var(--coral-ink); box-shadow: none; }
   .les .ti a { text-underline-offset: 4px; text-decoration-color: var(--coral); text-decoration-thickness: 1.5px; }
-  .les .by { font-size: 14px; color: var(--grape-2); white-space: nowrap; text-align: right; }
-  .les.mine .by, .les.taken .by { color: var(--grape); }
-  .les .by b { font: 400 17px/1 var(--hand); padding: 2px 9px 3px; border-radius: 6px; background: rgba(255, 200, 87, .55); margin-right: 6px; }
-  .les.taken .by b { background: rgba(58, 46, 92, .1); }
-  .les button { justify-self: end; border: 0; cursor: pointer; padding: 6px 12px; border-radius: 8px; font-size: 14px; line-height: 1.3; white-space: nowrap; background: var(--sun); box-shadow: 0 2px 0 #c9942a; }
-  .les button:hover { background: #ffd373; }
-  .les.mine button { background: none; box-shadow: inset 0 0 0 1.5px var(--grape-3); }
-  .les.mine button:hover { background: #fff; }
+  .les .who { display: flex; align-items: center; gap: 8px; justify-content: flex-end; font-size: 14px; color: var(--grape-2); white-space: nowrap; }
+  .les .who b { font: 400 17px/1 var(--hand); padding: 2px 9px 3px; border-radius: 6px; background: rgba(58, 46, 92, .1); color: var(--grape); }
+  .les.mine .who b { background: rgba(255, 200, 87, .6); }
+  .les .who button { border: 0; cursor: pointer; padding: 6px 12px; border-radius: 8px; font-size: 14px; line-height: 1.3; background: var(--sun); box-shadow: 0 2px 0 #c9942a; }
+  .les .who button:hover { background: #ffd373; }
+  .les.mine .who button { background: none; box-shadow: inset 0 0 0 1.5px var(--grape-3); }
+  .les .ctl { grid-column: 2 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 13.5px; color: var(--grape-3); }
+  .les .ctl label { display: inline-flex; align-items: center; gap: 6px; }
+  .les select { padding: 4px 26px 5px 10px; border: 0; border-radius: 8px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%233A2E5C' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 9px center / 10px; box-shadow: inset 0 0 0 1.5px var(--line); font-size: 14px; color: var(--grape); appearance: none; cursor: pointer; }
+  .les select:hover { box-shadow: inset 0 0 0 1.5px var(--grape-3); }
+  .les .ctl a { margin-left: auto; text-underline-offset: 4px; text-decoration-color: var(--line); }
+
+  /* ---- 專案：課程以外的事。一張卡一個專案，系列裡的每一集是卡片裡的一塊牌子 */
+  .pgroup { margin-top: 26px; font-size: 19px; display: flex; align-items: baseline; gap: 10px; }
+  .pgroup small { font: 600 14px/1 var(--en); color: var(--grape-3); }
+  .pcards { margin-top: 12px; display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(330px, 100%), 1fr)); align-items: start; }
+  .pcard { background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px 14px; display: grid; gap: 10px; overflow-wrap: anywhere; }
+  .pcard.stale { border-left: 4px solid var(--coral); }
+  .pcard .ptop { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--grape-3); }
+  .pcard .ptop .ago { margin-left: auto; }
+  .pcard h3 { font-size: 19px; line-height: 1.45; }
+  .pcard .next { display: grid; gap: 3px; font-size: 13px; color: var(--grape-3); }
+  .pcard .next input { width: 100%; padding: 7px 10px; border: 0; border-radius: 8px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--line); font-size: 15px; color: var(--grape); }
+  .pcard .next input:hover, .pcard .next input:focus { box-shadow: inset 0 0 0 1.5px var(--grape-3); }
+  .pcard .eps { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pcard .eps .sq { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  .epbox { background: #fff; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); padding: 10px 14px 12px; display: grid; gap: 6px; font-size: 14.5px; }
+  .epbox .t b { font: 600 14.5px/1 var(--en); color: var(--coral-ink); margin-right: 8px; }
+  .pctl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 13.5px; color: var(--grape-3); padding-top: 8px; border-top: 1px dashed var(--line); }
+  .pctl label { display: inline-flex; align-items: center; gap: 6px; }
+  .pctl b, .epbox .o b { font: 400 17px/1 var(--hand); padding: 2px 9px 3px; border-radius: 6px; background: rgba(58, 46, 92, .1); color: var(--grape); }
+  .pctl b.me, .epbox .o b.me { background: rgba(255, 200, 87, .6); }
+  .pcard select { padding: 4px 26px 5px 10px; border: 0; border-radius: 8px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%233A2E5C' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 9px center / 10px; box-shadow: inset 0 0 0 1.5px var(--line); font-size: 14px; color: var(--grape); appearance: none; cursor: pointer; }
+  .pcard .mini { border: 0; cursor: pointer; padding: 5px 11px; border-radius: 8px; font-size: 13.5px; line-height: 1.3; background: var(--sun); box-shadow: 0 2px 0 #c9942a; }
+  .pcard .mini.off { background: none; box-shadow: inset 0 0 0 1.5px var(--grape-3); }
+  .pcard a { text-underline-offset: 4px; text-decoration-color: var(--coral); }
+  .pctl a:last-child { margin-left: auto; text-decoration-color: var(--line); }
+
+  /* ---- 案例、資源、名詞 */
+  .cards { margin-top: 16px; display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); }
+  .card { background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px 18px; overflow-wrap: anywhere; }
+  .card h3 { font-size: 17.5px; line-height: 1.5; }
+  .card .of { margin-top: 2px; font-size: 14.5px; color: var(--grape-2); }
+  .card .of .id { margin-right: 6px; }
+  .card .state { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+  .tag { padding: 1px 9px 2px; border-radius: 99px; box-shadow: inset 0 0 0 1px var(--line); color: var(--grape-2); white-space: nowrap; }
+  .tag.ok { background: var(--grape); color: var(--cream); box-shadow: none; }
+  .tag.bad { background: rgba(255, 107, 87, .16); color: var(--coral-ink); box-shadow: none; }
+  .card .files { margin-top: 10px; display: grid; gap: 4px; font-size: 14.5px; }
+  .card .files li { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 8px; }
+  .card .files span:first-child { font: 600 12.5px/1.9 var(--en); color: var(--grape-3); }
+  .card .files a { text-underline-offset: 4px; text-decoration-color: var(--coral); }
+  .find { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .find input { flex: 1 1 220px; max-width: 340px; padding: 9px 12px; border: 0; border-radius: 8px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--grape-3); font-size: 15.5px; }
+  .words { margin-top: 14px; background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 4px 22px; }
+  .word { display: grid; grid-template-columns: minmax(120px, 220px) minmax(0, 1fr) auto; gap: 4px 18px; padding: 10px 0; border-top: 1px dashed var(--line); align-items: baseline; }
+  .word:first-child { border-top: 0; }
+  .word .w { font-size: 15.5px; } .word .w small { display: block; font: 500 12.5px/1.5 var(--en); color: var(--grape-3); letter-spacing: 0; }
+  .word .d { font-size: 14.5px; color: var(--grape-2); }
+  .word .l { font-size: 13.5px; white-space: nowrap; }
 
   /* ---- 提案信 */
-  .mails { margin-top: 18px; display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
+  .mails { margin-top: 18px; display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr)); }
   .mail { position: relative; background: #FFFCF4; border-radius: 2px; padding: 22px 22px 18px; box-shadow: 0 0 0 1px rgba(58, 46, 92, .08), 0 14px 20px -14px rgba(58, 46, 92, .35); overflow-wrap: anywhere; }
   .mail::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 5px; background: repeating-linear-gradient(-45deg, var(--coral) 0 9px, #FFFCF4 9px 18px, var(--grape) 18px 27px, #FFFCF4 27px 36px); }
   .mail .t { font: 400 20px/1.55 var(--hand); letter-spacing: .04em; color: #2b2560; white-space: pre-wrap; }
   .mail .u { margin-top: 8px; font-size: 14.5px; color: var(--grape-2); white-space: pre-wrap; }
   .mail .m { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line); display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 13.5px; color: var(--grape-3); }
 
-  @media (max-width: 640px) {
-    .les { grid-template-columns: 46px minmax(0, 1fr) auto; }
-    .les .by { grid-column: 2; text-align: left; }
-    .les button { grid-column: 3; grid-row: 1; }
-    .topic { padding: 14px 16px 8px; }
+  @media (max-width: 700px) {
+    .out-in { grid-template-columns: minmax(0, 1fr); padding: 14px 16px 16px; }
+    .out .acts { justify-content: flex-start; }
+    .board { padding: 4px 14px 14px; }
+    .trow { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; }
+    .trow .sqs { grid-column: 1 / -1; grid-row: 2; }
+    .peek { grid-template-columns: minmax(0, 1fr); }
+    .topic { padding: 12px 14px 6px; }
+    .les { grid-template-columns: 44px minmax(0, 1fr); }
+    .les .who { grid-column: 2; justify-content: flex-start; }
+    .les .ctl a { margin-left: 0; }
+    .words { padding: 4px 14px; }
+    .word { grid-template-columns: minmax(0, 1fr); }
   }
+  @media (prefers-reduced-motion: reduce) { .go { transition: none; } }
 </style>
 </head>
 <body>
@@ -144,9 +266,9 @@
     <a class="home" href="../crab/rooms/f4/index.html">← 回首頁</a>
   </header>
   <main>
-    <section class="head" style="margin-top:0">
+    <section class="head">
       <h1>內版</h1>
-      <p>開發人員自己看的：誰在做哪一課，還有訪客寄來的主題提案。</p>
+      <p>試算表的圖像版：每一課誰在做、網頁和影片做到哪。課程在試算表改，改完在這裡發布到網站。</p>
     </section>
 
     <form class="gate" id="gate" hidden>
@@ -163,40 +285,17 @@
     </form>
 
     <div id="app" hidden>
-      <div class="bar"><p id="hello"></p><div><button type="button" class="plain" id="reload">重新整理</button><button type="button" class="plain" id="leave">登出</button></div></div>
+      <div class="bar"><p id="hello"></p><div><a class="plain" id="sheet" target="_blank" rel="noopener">開試算表</a><button type="button" class="plain" id="reload">重新整理</button><button type="button" class="plain" id="leave">登出</button></div></div>
       <p class="msg" id="amsg" role="alert"></p>
-
-      <section style="margin-top:8px">
-        <h2>現在誰在做什麼</h2>
-        <div id="hands"></div>
-      </section>
-
-      <section id="stalebox" hidden>
-        <h2>學習地圖改過，這幾筆認領要確認</h2>
-        <p class="sub">認領當時的課名，在現在的學習地圖上找不到了。課號只是換了位置的，已經自動跟過去，不會出現在這裡。</p>
-        <ul class="stale" id="stale"></ul>
-      </section>
-
-      <section>
-        <h2>課程認領</h2>
-        <p class="sub">要做哪一課就按「我來做」，對方打開這頁就看得到。一課只能一個人拿。</p>
-        <div class="filters" id="filters"></div>
-        <div id="topics"></div>
-      </section>
-
-      <section>
-        <h2>主題提案</h2>
-        <p class="sub" id="pcount"></p>
-        <ul class="mails" id="mails"></ul>
-      </section>
+      <section class="out" id="out" aria-live="polite"></section>
+      <nav class="tabs" id="tabs" role="tablist" aria-label="內版的分頁"></nav>
+      <section class="panel" id="panel"></section>
     </div>
   </main>
 </div>
 <script src="../ask/endpoint.js"></script>
-<script src="../roadmap8.js"></script>
-<script src="../crab/routes.js"></script>
 <script>
-const API = window.PARADIGM_API || '', R = window.ROADMAP8, PAGES = window.LESSON_PAGES || {}
+const API = window.PARADIGM_API || ''
 const $ = s => document.querySelector(s)
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
 const store = {
@@ -204,11 +303,13 @@ const store = {
   set: (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k) } catch {} },
 }
 let me = store.get('paradigm.team.me'), key = store.get('paradigm.team.key')
-let claims = [], proposals = [], filter = 'first', busy = false
-// 課程清單直接讀 roadmap8.js，跟首頁同一份；Thomas 重產學習地圖推上來，這頁就跟著變
-const FIRST = new Set(R.first), TITLE = {}, IDOF = {}
-R.topics.forEach(t => t.all.forEach(([id, ti]) => { TITLE[id] = ti; IDOF[ti] = ti in IDOF ? '' : id }))   // 課名 → 課號；同名的不拿來對
-const ERR = { key: '通關碼不對。按右邊的眼睛看一下，注意大小寫和全形半形。', locked: '猜錯太多次，後台先鎖住了，10 分鐘後再試。', setup: '後台的通關碼還沒設，或少於 12 個字（Apps Script 的指令碼屬性 TEAM_KEY）。', net: '連不上試算表，等一下再試。' }
+let D = null, busy = false, tab = 'overview', view = 'page', filter = 'first', peek = '', hit = '', q = '', wfilter = 'all', sent = '', ask = null, size = null, epOpen = ''
+const ERR = { key: '通關碼不對。按右邊的眼睛看一下，注意大小寫和全形半形。', locked: '猜錯太多次，後台先鎖住了，10 分鐘後再試。', setup: '後台的通關碼還沒設，或少於 12 個字（Apps Script 的指令碼屬性 TEAM_KEY）。', net: '連不上試算表，等一下再試。', taken: '這一課剛被別人拿走了。', bad: '後台沒有收下這次修改，重新整理再試一次。', server: '後台出錯了，等一下再試。' }
+const PAGE = ['未開始', '製作中', '待審', '已上線', '下架'], VPLAN = ['未定', '要', '不要'], VSTAGE = ['未開始', '寫腳本', '拍攝剪輯', '已發布']
+const STAGE_NAME = ['', '第一階段', '第二階段', '第三階段']
+const PSTAGE = ['進行中', '待審', '構想中', '暫停', '完成'], PSTAGE_ALL = ['構想中', '進行中', '待審', '完成', '暫停'], ESTAGE = ['構想中', '寫腳本', '製作中', '待審', '已發布']
+const EKIND = { 構想中: 'k-idle', 寫腳本: 'k-half', 製作中: 'k-sun', 待審: 'k-coral', 已發布: 'k-grape' }
+const projects = () => (D.projects && D.projects.list) || []
 
 async function call(body) {
   try {
@@ -216,93 +317,217 @@ async function call(body) {
     return await r.json()
   } catch { return { ok: false, error: 'net' } }
 }
-const take = d => { if (d.claims) claims = d.claims; if (d.proposals) proposals = d.proposals }
-
-/* 認領是用「課號＋當時的課名」記的。學習地圖改過之後：
-   課名還在、只是課號換了 → 請後台把課號改過去；課名找不到了 → 放進 stale，列出來請人確認。 */
-let stale = []
-function sortClaims() {
-  const ops = []; stale = []
-  claims.forEach(c => {
-    const now = TITLE[c.lesson]
-    if (!c.title) { if (now) ops.push({ lesson: c.lesson, title: '', to: c.lesson, toTitle: now }); else stale.push(c); return }   // 早期的認領沒記課名，補上
-    if (now === c.title) return
-    if (IDOF[c.title]) ops.push({ lesson: c.lesson, title: c.title, to: IDOF[c.title], toTitle: c.title }); else stale.push(c)
-  })
-  return ops
-}
-async function settle() {
-  let ops = sortClaims()
-  if (!ops.length) return
-  const d = await call({ action: 'sync', ops }); if (d.ok) take(d)
-  // 要換課號但後台沒照做的（例如新課號已經有人認領），一樣列出來；只是補課名沒補成的不用吵人
-  sortClaims().forEach(o => { const c = o.to !== o.lesson && claims.find(x => x.lesson === o.lesson && x.title === o.title); if (c && !stale.includes(c)) stale.push(c) })
-}
 const day = s => { const m = /^\d+-(\d+)-(\d+)/.exec(s || ''); return m ? `${+m[1]}/${+m[2]}` : s }
+const rowLink = (tabKey, row) => D.sheet ? `${D.sheet.url}#gid=${D.sheet.gids[tabKey]}${row ? `&range=A${row}` : ''}` : '#'
+const hasPage = l => !D.files || D.files.pages.includes(l.code)   // 上次發布時網站上有沒有這課的課程頁
+const isLive = l => l.ready && hasPage(l)
+const pageUrl = l => '../lessons/' + l.id + '.html'
+const byId = () => { const m = {}; D.lessons.forEach(l => { m[l.id] = l }); return m }
+
+/* ---------------------------------------------------------------- 發布列 */
+function renderOut() {
+  const p = D.pending, probs = D.problems, parts = [['lessons', '課程'], ['topics', '主題'], ['glossary', '名詞'], ['resources', '資源']]
+  const diff = parts.filter(([k]) => p.parts[k]).map(([k, n]) => `<b>${n} ${p.parts[k]} 處</b>`).join('')
+  let title, what
+  if (sent) { title = '已經送出，網站大約 1–2 分鐘後更新'; what = '過一下按「重新整理」，這裡變成「網站跟試算表一樣」就代表上線了。' }
+  else if (!p.published) { title = '還讀不到網站上的那一版'; what = '網站還沒從試算表發布過，或暫時連不上。可以直接發布。' }
+  else if (!p.count) { title = '網站跟試算表一樣'; what = '現在沒有還沒發布的改動。' }
+  else { title = `試算表有 ${p.count} 處改動還沒上線`; what = diff }
+  const can = !sent && !probs.length && (!p.published || p.count > 0)
+  $('#out').className = 'out' + (p.published && !p.count && !sent ? ' same' : '')
+  $('#out').innerHTML = `<div class="out-in">
+    <div><h2>${title}</h2><p class="what">${what}</p></div>
+    <div class="acts">${ask ? '' : `<button type="button" class="go" id="publish" ${can ? '' : 'disabled'}>發布到網站</button>`}</div>
+    <div class="notes">
+      ${ask ? `<div class="note-box"><h3>發布前請確認</h3><ul>${ask.map(c => `<li>${esc(c)}</li>`).join('')}</ul><p style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="go" id="publish-yes">確定，照這樣發布</button><button type="button" class="plain" id="publish-no">先不要</button></p></div>` : ''}
+      ${probs.length ? `<div class="note-box"><h3>要先在試算表修好才能發布（${probs.length} 項）</h3><ul>${probs.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+      ${D.warnings.length ? `<div class="note-box warn"><details${D.warnings.length <= 3 ? ' open' : ''}><summary>提醒 ${D.warnings.length} 項（不擋發布）</summary><ul>${D.warnings.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details></div>` : ''}
+    </div>
+    ${size ? `<p class="size${size.total_mb > size.warn_total_mb ? ' over' : ''}"><span>網站目前 ${size.total_mb} MB</span><i><b style="width:${Math.min(100, size.total_mb / 10)}%"></b></i><span>主機上限 1,000 MB，到 ${size.warn_total_mb} MB 會提醒搬素材</span></p>` : ''}
+  </div>`
+}
+
+/* ---------------------------------------------------------------- 分頁 */
+function renderTabs() {
+  const L = D.lessons, ids = byId(), cases = L.filter(l => l.case), flagG = D.glossary.filter(g => g.lesson && !ids[g.lesson]).length
+  const T = [['overview', '總覽', ''], ['lessons', '課程', L.length], ['projects', '專案', projects().length], ['cases', '案例', cases.length], ['resources', '資源', D.resources.length], ['glossary', '名詞', D.glossary.length], ['mails', '提案信', D.proposals.length]]
+  $('#tabs').innerHTML = T.map(([id, name, n]) => `<button type="button" role="tab" data-tab="${id}" aria-selected="${tab === id}">${name}${n === '' ? '' : `<small>${n}</small>`}${id === 'glossary' && flagG ? `<small class="flag">${flagG} 個對應課不存在</small>` : ''}</button>`).join('')
+}
+
+/* ---------------------------------------------------------------- 總覽 */
+const KIND = {
+  page: l => ({ 未開始: 'k-idle', 製作中: 'k-sun', 待審: 'k-coral', 已上線: 'k-grape', 下架: 'k-off' }[l.page_stage] || 'k-idle'),
+  video: l => l.video_plan === '不要' ? 'k-off' : l.video_plan !== '要' ? 'k-idle' : ({ 寫腳本: 'k-sun', 拍攝剪輯: 'k-coral', 已發布: 'k-grape' }[l.video_stage] || 'k-half'),
+}
+function owners() { const o = []; D.lessons.forEach(l => { if (l.owner && !o.includes(l.owner)) o.push(l.owner) }); return o.sort((a, b) => (b === me) - (a === me)) }
+function kind(l) { if (view !== 'owner') return KIND[view](l); const i = owners().indexOf(l.owner); return i < 0 ? 'k-idle' : 'p' + (i % 6) }
+function legend() {
+  const L = D.lessons, n = f => L.filter(f).length, sq = (k, t, c) => `<li><span class="sq ${k}" aria-hidden="true">課號</span>＝ ${t}<b>${c}</b>課</li>`
+  if (view === 'page') return PAGE.map(s => [KIND.page({ page_stage: s }), s, n(l => (l.page_stage || '未開始') === s)]).filter(x => x[2] || x[1] !== '下架').map(x => sq(...x)).join('')
+  if (view === 'video') return [['k-grape', '影片已發布', l => l.video_plan === '要' && l.video_stage === '已發布'], ['k-coral', '拍攝剪輯', l => l.video_plan === '要' && l.video_stage === '拍攝剪輯'], ['k-sun', '寫腳本', l => l.video_plan === '要' && l.video_stage === '寫腳本'],
+    ['k-half', '要拍、還沒開始', l => l.video_plan === '要' && !['寫腳本', '拍攝剪輯', '已發布'].includes(l.video_stage)], ['k-idle', '還沒決定', l => l.video_plan !== '要' && l.video_plan !== '不要'], ['k-off', '不拍', l => l.video_plan === '不要']].map(([k, t, f]) => sq(k, t, n(f))).join('')
+  return owners().map((o, i) => sq('p' + (i % 6), esc(o), n(l => l.owner === o))).join('') + sq('k-idle', '還沒有人', n(l => !l.owner))
+}
+// 每個主題那一列最右邊的一句話：照現在看的是網頁、影片還是負責人來數
+function rowSum(ls) {
+  if (view === 'page') return `已上線 <b>${ls.filter(l => l.page_stage === '已上線').length}</b>／${ls.length}`
+  if (view === 'video') return `已發布 <b>${ls.filter(l => l.video_plan === '要' && l.video_stage === '已發布').length}</b>／要拍 ${ls.filter(l => l.video_plan === '要').length}`
+  return `有人做 <b>${ls.filter(l => l.owner).length}</b>／${ls.length}`
+}
+function peekHtml() {
+  const l = D.lessons.find(x => x.code === peek)
+  if (!l) return '<p>滑過或點任何一格，這裡會顯示那一課的課名、進度和負責人。</p>'
+  const v = l.video_plan === '要' ? `影片：${l.video_stage || '未開始'}` : l.video_plan === '不要' ? '不拍影片' : '影片還沒決定'
+  return `<div><p class="t"><b>${esc(l.id)}</b>${esc(l.title)}</p><p class="m">網頁：${esc(l.page_stage || '未開始')}${l.ready && !hasPage(l) ? '（還沒有課程頁檔）' : ''}　${v}　${l.owner ? `負責人：${esc(l.owner)}` : '還沒有人認領'}</p></div>
+    <button type="button" class="plain" data-goto="${esc(l.code)}">到課程清單改</button>`
+}
+function panelOverview() {
+  const stages = [...new Set(D.topics.map(t => t.stage))].sort()
+  const people = {}, side = {}; D.lessons.forEach(l => { if (l.owner) (people[l.owner] = people[l.owner] || []).push(l) })
+  // 每個人手上除了課，還有專案和集數（做完的不列）
+  const hold = (who, row) => { if (who) { people[who] = people[who] || []; (side[who] = side[who] || []).push(row) } }
+  projects().forEach(p => { if (p.stage !== '完成') hold(p.owner, ['專案', p.name, p.stage || '構想中']); p.episodes.forEach(x => { if (x.stage !== '已發布') hold(x.owner, [x.no || '集', `${p.name}　${x.title}`, x.stage || '構想中']) }) })
+  const names = Object.keys(people).sort((a, b) => (b === me) - (a === me))
+  return `<h2>現在做到哪</h2>
+    <div class="views" role="group" aria-label="格子的顏色代表什麼">${[['page', '看網頁進度'], ['video', '看影片進度'], ['owner', '看誰在做']].map(([id, t]) => `<button type="button" data-view="${id}" aria-pressed="${view === id}">${t}</button>`).join('')}</div>
+    <p class="how">下面每一格是一堂課，格子裡寫的是課號。格子的顏色代表<b>${{ page: '網頁做到哪', video: '影片拍到哪', owner: '誰在做' }[view]}</b>：</p>
+    <ul class="legend">${legend()}<li><span class="sq k-idle first" aria-hidden="true">課號</span>＝ 右上有紅點的是首版要上的課</li></ul>
+    <div class="board">${stages.map(s => `<h3><b>${STAGE_NAME[s] || `第 ${s} 階段`}</b>${[...new Set(D.topics.filter(t => t.stage === s).map(t => esc(t.role)))].join('、')}</h3>
+      ${D.topics.filter(t => t.stage === s).map(t => { const ls = D.lessons.filter(l => l.topic === t.no); return `<div class="trow"><p class="tn"><b>${t.no}</b>${esc(t.name)}</p><div class="sqs">${ls.map(l =>
+        `<button type="button" class="sq ${kind(l)}${l.first ? ' first' : ''}${peek === l.code ? ' on' : ''}" data-peek="${esc(l.code)}" title="${esc(l.title)}" aria-label="${esc(l.id + ' ' + l.title)}">${esc(l.id)}</button>`).join('')}</div>
+        <p class="tsum">${rowSum(ls)}</p></div>` }).join('')}`).join('')}
+      <div class="peek${peek ? '' : ' empty'}" id="peek">${peekHtml()}</div>
+    </div>
+    <h2 style="margin-top:40px">每個人手上的事</h2>
+    ${names.length ? `<ul class="hands">${names.map(n => `<li class="hand"><h3>${esc(n)}<small>${[people[n].length ? `${people[n].length} 課` : '', (side[n] || []).length ? `${side[n].length} 件專案的事` : ''].filter(Boolean).join('、')}</small></h3><ul>${people[n].map(l => `<li><span class="id">${esc(l.id)}</span><span>${esc(l.title)}</span><span class="st">${esc(l.page_stage || '未開始')}</span></li>`).join('')}${(side[n] || []).map(r => `<li><span class="id">${esc(r[0])}</span><span>${esc(r[1])}</span><span class="st">${esc(r[2])}</span></li>`).join('')}</ul></li>`).join('')}</ul>`
+      : '<p class="none">還沒有人認領。到「課程」分頁挑一課，按「我來做」。</p>'}`
+}
+
+/* ---------------------------------------------------------------- 課程 */
+const sel = (l, field, opts, cur) => `<select data-set="${field}" data-code="${esc(l.code)}" ${busy ? 'disabled' : ''} aria-label="${esc(l.id)}">${(opts.includes(cur) || !cur ? opts : [cur, ...opts]).map(o => `<option${o === cur ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select>`
+function panelLessons() {
+  const L = D.lessons, n = f => L.filter(f).length
+  const F = [['first', `首版 ${n(l => l.first)} 課`, l => l.first], ['mine', `我的 ${n(l => l.owner === me)} 課`, l => l.owner === me], ['taken', `有人在做 ${n(l => l.owner)} 課`, l => l.owner], ['doing', `製作中與待審 ${n(l => l.page_stage === '製作中' || l.page_stage === '待審')} 課`, l => l.page_stage === '製作中' || l.page_stage === '待審'], ['live', `已上線 ${n(l => l.ready)} 課`, l => l.ready], ['all', `全部 ${L.length} 課`, () => true]]
+  const keep = F.find(f => f[0] === filter)[2]
+  const body = D.topics.map(t => {
+    const rows = L.filter(l => l.topic === t.no && (keep(l) || l.code === hit))
+    if (!rows.length) return ''
+    return `<div class="topic"><h3><b>${t.no}</b>${esc(t.name)}<small>${STAGE_NAME[t.stage] || ''}・${esc(t.role)}</small></h3><ul>${rows.map(l => {
+      const mine = l.owner === me, live = isLive(l)
+      const tags = [l.type === '選修' ? '<em>選修</em>' : '', l.first ? '<em>首版</em>' : '', live ? '<em class="live">已上線</em>' : l.ready ? '<em class="wait">標了已上線，還沒有課程頁</em>' : '', l.case ? '<em>有案例</em>' : ''].join('')
+      return `<li class="les${mine ? ' mine' : ''}${l.code === hit ? ' hit' : ''}" id="les-${esc(l.code)}"><span class="id">${esc(l.id)}</span>
+        <span class="ti">${live ? `<a href="${esc(pageUrl(l))}">${esc(l.title)}</a>` : esc(l.title)}${tags}</span>
+        <span class="who">${l.owner ? `<b>${esc(l.owner)}</b>${l.since ? esc(day(l.since)) + ' 起' : ''}` : ''}${mine ? `<button type="button" data-release="${esc(l.code)}" ${busy ? 'disabled' : ''}>放掉</button>` : l.owner ? '' : `<button type="button" data-claim="${esc(l.code)}" ${busy ? 'disabled' : ''}>我來做</button>`}</span>
+        <span class="ctl"><label>網頁${sel(l, 'page_stage', PAGE, l.page_stage || '未開始')}</label><label>影片${sel(l, 'video_plan', VPLAN, l.video_plan || '未定')}</label>${l.video_plan === '要' ? `<label>拍到哪${sel(l, 'video_stage', VSTAGE, l.video_stage || '未開始')}</label>` : ''}
+          <a href="${esc(rowLink('lessons', l.row))}" target="_blank" rel="noopener">到試算表改這一列</a></span></li>`
+    }).join('')}</ul></div>`
+  }).join('')
+  return `<h2>課程</h2>
+    <p class="sub">認領、網頁進度、影片可以直接在這裡改，改了立刻寫進試算表。課號、課名、主題、加課刪課要到試算表改。訪客看到的只有「已上線」和「即將推出」，其他進度只有這裡看得到。</p>
+    <div class="filters">${F.map(([id, label]) => `<button type="button" data-f="${id}" aria-pressed="${filter === id}">${label}</button>`).join('')}</div>
+    ${body || '<p class="none">這個篩選下沒有課。</p>'}`
+}
+
+/* ---------------------------------------------------------------- 專案 */
+const ago = d => { const t = Date.parse(d); if (!t) return null; return Math.max(0, Math.floor((Date.now() - t) / 864e5)) }
+const psel = (kind, code, opts, cur, label) => `<select data-pset="${kind}" data-code="${esc(code)}" ${busy ? 'disabled' : ''} aria-label="${esc(label)}">${(opts.includes(cur) || !cur ? opts : [cur, ...opts]).map(o => `<option${o === cur ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select>`
+const who = (kind, code, owner) => owner ? `<b class="${owner === me ? 'me' : ''}">${esc(owner)}</b>${owner === me ? `<button type="button" class="mini off" data-pown="${kind}" data-code="${esc(code)}" data-v="" ${busy ? 'disabled' : ''}>放掉</button>` : ''}`
+  : `<button type="button" class="mini" data-pown="${kind}" data-code="${esc(code)}" data-v="1" ${busy ? 'disabled' : ''}>我來做</button>`
+function pcard(p) {
+  const days = ago(p.updated), stale = p.stage === '進行中' && days != null && days > 14, ep = p.episodes.find(x => x.code === epOpen)
+  return `<li class="pcard${stale ? ' stale' : ''}">
+    <p class="ptop"><span class="tag">${esc(p.type || '其他')}</span>${p.public ? '<span class="tag">之後要對外公開</span>' : ''}${p.episodes.length ? `<span class="tag">${p.episodes.filter(x => x.stage === '已發布').length}／${p.episodes.length} 集已發布</span>` : ''}
+      <span class="ago">${stale ? `<span class="tag bad">${days} 天沒更新</span>` : days == null ? '' : days ? `${days} 天前更新` : '今天更新'}</span></p>
+    <h3>${p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">${esc(p.name)}</a>` : esc(p.name)}</h3>
+    <label class="next">下一步<input data-pnext="${esc(p.code)}" value="${esc(p.next)}" maxlength="200" placeholder="接下來要做什麼、卡在哪" ${busy ? 'disabled' : ''}></label>
+    ${p.episodes.length ? `<div class="eps">${p.episodes.map(x => `<button type="button" class="sq ${EKIND[x.stage] || 'k-idle'}${x.code === epOpen ? ' on' : ''}" data-ep="${esc(x.code)}" title="${esc(x.title)}">${esc(x.no || x.title || '集')}</button>`).join('')}</div>` : ''}
+    ${ep ? `<div class="epbox"><p class="t"><b>${esc(ep.no)}</b>${esc(ep.title)}</p>
+      <p class="pctl" style="border:0;padding:0"><label>進度${psel('episode', ep.code, ESTAGE, ep.stage || '構想中', ep.title)}</label><span class="o">${who('episode', ep.code, ep.owner)}</span>${ep.date ? `<span>${esc(ep.date)} 發布</span>` : ''}
+      ${ep.video ? `<a href="${esc(ep.video)}" target="_blank" rel="noopener">影片</a>` : ''}${ep.page ? `<a href="${esc(ep.page)}" target="_blank" rel="noopener">網頁</a>` : ''}<a href="${esc(rowLink('episodes', ep.row))}" target="_blank" rel="noopener">到試算表改這一集</a></p></div>` : ''}
+    <p class="pctl">${who('project', p.code, p.owner)}<label>狀態${psel('project', p.code, PSTAGE_ALL, p.stage || '構想中', p.name)}</label><a href="${esc(rowLink('projects', p.row))}" target="_blank" rel="noopener">到試算表改</a></p></li>`
+}
+function panelProjects() {
+  const P = projects(), lost = (D.projects && D.projects.lost) || [], n = s => P.filter(p => (p.stage || '構想中') === s)
+  return `<h2>專案</h2>
+    <p class="sub">課程以外的事。一張卡是一個專案；如果是一系列（例如每週一集），每一集是卡片裡的一塊牌子，點牌子可以改那一集的進度。這一頁只有團隊看得到，改了立刻寫進試算表，不用按發布。
+      要加新的，<a href="${esc(rowLink('projects'))}" target="_blank" rel="noopener">到試算表加專案</a>或<a href="${esc(rowLink('episodes'))}" target="_blank" rel="noopener">加一集</a>。</p>
+    ${P.some(p => p.episodes.length) ? `<p class="how">牌子的顏色代表<b>那一集做到哪</b>：</p><ul class="legend">${ESTAGE.map(s => `<li><span class="sq ${EKIND[s]}" aria-hidden="true">集</span>＝ ${s}</li>`).join('')}</ul>` : ''}
+    ${lost.length ? `<div class="note-box warn" style="margin-top:16px"><h3>這幾集的「所屬專案」對不到任何專案</h3><ul>${lost.map(x => `<li>${esc(x.project)}　${esc(x.no)} ${esc(x.title)}</li>`).join('')}</ul></div>` : ''}
+    ${P.length ? PSTAGE.map(s => n(s).length ? `<h3 class="pgroup">${s}<small>${n(s).length}</small></h3><ul class="pcards">${n(s).map(pcard).join('')}</ul>` : '').join('')
+      : '<p class="none">還沒有專案。到試算表的「專案」分頁加一列，這裡就會出現。</p>'}`
+}
+
+/* ---------------------------------------------------------------- 案例、資源、名詞、提案信 */
+function panelCases() {
+  const cs = D.lessons.filter(l => l.case), topic = {}; D.topics.forEach(t => { topic[t.no] = t })
+  return `<h2>實作案例</h2>
+    <p class="sub">課程表的「案例標題」有填，那一課就算有案例，案例頁的目錄照這裡排。便條、步驟、截圖這些內文寫在網站的檔案裡。<a href="${esc(rowLink('lessons'))}" target="_blank" rel="noopener">到試算表改</a></p>
+    ${cs.length ? `<ul class="cards">${cs.map(l => {
+      const body = !D.files || D.files.cases.includes(l.code)
+      return `<li class="card"><h3>${esc(l.case)}</h3><p class="of"><span class="id">${esc(l.id)}</span>${esc(l.title)}</p>
+        <p class="state"><span class="tag">${esc((topic[l.topic] || {}).name || '')}</span>${body ? '<span class="tag ok">內文已寫好</span>' : '<span class="tag bad">還沒有內文，目錄不會列出來</span>'}${isLive(l) ? '<span class="tag ok">課程已上線</span>' : '<span class="tag">課程還沒上線</span>'}</p></li>`
+    }).join('')}</ul>` : '<p class="none">還沒有案例。在課程表某一課的「案例標題」填上標題就會出現在這裡。</p>'}`
+}
+function panelResources() {
+  const ids = byId()
+  return `<h2>資源下載</h2>
+    <p class="sub">試算表「資源」分頁，一個檔一列，同一包的列放一起。<a href="${esc(rowLink('resources'))}" target="_blank" rel="noopener">到試算表改</a></p>
+    ${D.resources.length ? `<ul class="cards">${D.resources.map(p => {
+      const l = ids[p.lesson], miss = p.files.filter(f => !f.href).length
+      return `<li class="card"><h3>${esc(p.title)}</h3><p class="of">${l ? `<span class="id">${esc(l.id)}</span>${esc(l.title)}` : p.lesson ? `對應課 ${esc(p.lesson)} 不在課程表裡` : '沒有對應的課'}</p>
+        <ul class="files">${p.files.map(f => `<li><span>${esc(f.kind)}</span>${f.href ? `<a href="${esc(f.href)}" target="_blank" rel="noopener">${esc(f.label)}</a>` : `<span>${esc(f.label)}</span>`}</li>`).join('')}</ul>
+        <p class="state">${p.updated ? `<span class="tag">${esc(p.updated)} 更新</span>` : ''}${p.keyword ? `<span class="tag">IG 關鍵字「${esc(p.keyword)}」</span>` : ''}${miss ? `<span class="tag bad">${miss} 個檔還沒有連結</span>` : ''}${l && !isLive(l) ? '<span class="tag">課程還沒上線</span>' : ''}${!l && p.lesson ? '<span class="tag bad">對應課對不上</span>' : ''}</p></li>`
+    }).join('')}</ul>` : '<p class="none">還沒有資源。</p>'}`
+}
+function panelGlossary() {
+  const ids = byId(), topic = {}; D.topics.forEach(t => { topic[t.no] = t })
+  const loose = g => !g.lesson && !g.topic, bad = g => g.lesson && !ids[g.lesson]
+  const F = [['all', `全部 ${D.glossary.length} 個`, () => true], ['none', `沒對到課 ${D.glossary.filter(g => !g.lesson).length} 個`, g => !g.lesson], ['bad', `對應課不存在 ${D.glossary.filter(bad).length} 個`, bad]]
+  const keep = F.find(f => f[0] === wfilter)[2], k = q.trim().toLowerCase()
+  const rows = D.glossary.filter(g => keep(g) && (!k || [g.term, g.en, g.plain, g.lesson, ...g.alias].join(' ').toLowerCase().includes(k)))
+  return `<h2>名詞辭典</h2>
+    <p class="sub">試算表「名詞」分頁。課號改了，這裡的對應課會自己跟過去。<a href="${esc(rowLink('glossary'))}" target="_blank" rel="noopener">到試算表改</a></p>
+    <div class="find"><input id="q" type="search" placeholder="找名詞、英文或課號" value="${esc(q)}" aria-label="找名詞"><div class="filters" style="margin-top:0">${F.map(([id, t]) => `<button type="button" data-w="${id}" aria-pressed="${wfilter === id}">${t}</button>`).join('')}</div></div>
+    ${rows.length ? `<ul class="words">${rows.slice(0, 80).map(g => `<li class="word"><p class="w">${esc(g.term)}<small>${esc(g.en)}</small></p><p class="d">${esc(g.plain)}</p>
+      <p class="l">${g.lesson ? (ids[g.lesson] ? `<span class="id">${esc(g.lesson)}</span>` : `<span class="tag bad">${esc(g.lesson)} 不存在</span>`) : g.topic ? `<span class="tag">主題 ${g.topic}</span>` : '<span class="tag bad">沒有課也沒有主題</span>'}</p></li>`).join('')}</ul>
+      ${rows.length > 80 ? `<p class="none">先列出前 80 個，共 ${rows.length} 個。打字可以縮小範圍。</p>` : ''}` : '<p class="none">找不到符合的名詞。</p>'}`
+}
+function panelMails() {
+  const P = D.proposals
+  return `<h2>主題提案</h2><p class="sub">${P.length ? `共 ${P.length} 封，新的在前面。` : '還沒有人寄信來。'}<a href="${esc(rowLink('proposals'))}" target="_blank" rel="noopener">在試算表看</a></p>
+    <ul class="mails">${P.map(p => `<li class="mail"><p class="t">${esc(p.topic)}</p>${p.use ? `<p class="u">想拿來：${esc(p.use)}</p>` : ''}
+      <p class="m"><span>${esc(p.at)}</span>${p.who ? `<span>${esc(p.who)}</span>` : ''}${p.name ? `<span>${esc(p.name)}</span>` : ''}</p></li>`).join('')}</ul>`
+}
+const PANELS = { overview: panelOverview, lessons: panelLessons, projects: panelProjects, cases: panelCases, resources: panelResources, glossary: panelGlossary, mails: panelMails }
 
 function render() {
   $('#hello').textContent = `${me}，你好。`
-  const good = claims.filter(c => !stale.includes(c))
-  const by = {}; good.forEach(c => { by[c.lesson] = c })
-  // 誰手上有什麼
-  const people = {}; good.forEach(c => (people[c.who] = people[c.who] || []).push(c))
-  const names = Object.keys(people).sort((a, b) => (b === me) - (a === me))
-  $('#hands').innerHTML = names.length
-    ? `<ul class="hands">${names.map(n => `<li class="hand"><h3>${esc(n)}</h3><ul>${people[n].map(c => `<li><span class="id">${esc(c.lesson)}</span><span>${esc(TITLE[c.lesson] || '')}</span></li>`).join('')}</ul></li>`).join('')}</ul>`
-    : '<p class="none">還沒有人認領。到下面挑一課，按「我來做」。</p>'
-  // 地圖改過、對不上的認領
-  $('#stalebox').hidden = !stale.length
-  $('#stale').innerHTML = stale.map(c => {
-    const now = TITLE[c.lesson], mine = c.who === me
-    return `<li><p class="was"><b>${esc(c.who)}</b>認領的是「${esc(c.title || '沒記到課名')}」，當時課號 ${esc(c.lesson)}</p>
-      <p class="now">${now ? `現在的 ${esc(c.lesson)} 是「${esc(now)}」。` : `現在的學習地圖上沒有 ${esc(c.lesson)} 了。`}${mine ? '' : `請 ${esc(c.who)} 進來處理，或直接改試算表的「認領」分頁。`}</p>
-      ${mine ? `<div class="acts">${now ? `<button type="button" data-keep="${esc(c.lesson)}">我做的就是現在這一課</button>` : ''}<button type="button" data-release="${esc(c.lesson)}">放掉</button></div>` : ''}</li>`
-  }).join('')
-  // 課程清單
-  const total = R.topics.reduce((n, t) => n + t.all.length, 0)
-  const F = [['first', `首版 ${R.first.length} 課`], ['taken', `有人在做 ${good.length} 課`], ['all', `全部 ${total} 課`]]
-  $('#filters').innerHTML = F.map(([id, label]) => `<button type="button" data-f="${id}" aria-pressed="${filter === id}">${label}</button>`).join('')
-  $('#topics').innerHTML = R.topics.map(t => {
-    const rows = t.all.filter(([id]) => filter === 'all' || (filter === 'first' ? FIRST.has(id) : by[id]))
-    if (!rows.length) return ''
-    return `<div class="topic"><h3><b>${t.no}</b>${esc(t.name)}</h3><ul>${rows.map(([id, ti, ty]) => {
-      const c = by[id], mine = c && c.who === me, page = PAGES[id]
-      const title = page ? `<a href="${esc(page.replace('../../../', '../'))}">${esc(ti)}</a>` : esc(ti)
-      const tags = [ty === '選修' ? '選修' : '', page ? '已上線' : ''].filter(Boolean).map(x => `<em>${x}</em>`).join('')
-      return `<li class="les${mine ? ' mine' : c ? ' taken' : ''}"><span class="id">${esc(id)}</span><span class="ti">${title}${tags}</span>
-        <span class="by">${c ? `<b>${esc(c.who)}</b>${esc(day(c.since))} 起` : ''}</span>
-        ${mine ? `<button type="button" data-release="${esc(id)}">放掉</button>` : c ? '<span></span>' : `<button type="button" data-claim="${esc(id)}">我來做</button>`}</li>`
-    }).join('')}</ul></div>`
-  }).join('') || '<p class="none">目前沒有人在做任何一課。</p>'
-  // 提案
-  $('#pcount').textContent = proposals.length ? `共 ${proposals.length} 封，新的在前面。原始資料在 Google 試算表的「提案」分頁。` : '還沒有人寄信來。'
-  $('#mails').innerHTML = proposals.map(p => `<li class="mail"><p class="t">${esc(p.topic)}</p>${p.use ? `<p class="u">想拿來：${esc(p.use)}</p>` : ''}
-    <p class="m"><span>${esc(p.at)}</span>${p.who ? `<span>${esc(p.who)}</span>` : ''}${p.name ? `<span>${esc(p.name)}</span>` : ''}</p></li>`).join('')
+  $('#sheet').href = D.sheet ? D.sheet.url : '#'
+  renderOut(); renderTabs()
+  $('#panel').innerHTML = PANELS[tab]()
 }
 
+/* ---------------------------------------------------------------- 讀資料、進門 */
 async function load() {
   $('#amsg').textContent = ''
   const d = await call({ action: 'list' })
   if (!d.ok) {
     if (d.error === 'key' || d.error === 'setup') { key = ''; store.set('paradigm.team.key', ''); showGate(ERR[d.error]); return false }
     if (d.error === 'locked') { showGate(ERR.locked); return false }
-    $('#amsg').textContent = ERR.net; return false
+    $('#amsg').textContent = ERR[d.error] || ERR.net; return false
   }
-  take(d); await settle(); $('#gate').hidden = true; $('#app').hidden = false; render(); return true
+  D = d; $('#gate').hidden = true; $('#app').hidden = false; render(); return true
 }
 function showGate(msg) {
-  $('#app').hidden = true; $('#gate').hidden = false; $('#me').value = me; $('#key').value = ''; peek(false)
+  $('#app').hidden = true; $('#gate').hidden = false; $('#me').value = me; $('#key').value = ''; peekKey(false)
   $('#gmsg').textContent = msg || (API ? '' : '還沒接上試算表：ask/endpoint.js 裡的網址是空的。')
 }
-
-// 眼睛：切換通關碼看得到／看不到
-function peek(on) {
+function peekKey(on) {
   const eye = $('#eye'), label = on ? '隱藏通關碼' : '顯示通關碼'
   $('#key').type = on ? 'text' : 'password'
   eye.setAttribute('aria-pressed', on); eye.setAttribute('aria-label', label); eye.title = label
 }
-$('#eye').addEventListener('click', e => { e.preventDefault(); peek($('#key').type === 'password'); $('#key').focus() })
-
+$('#eye').addEventListener('click', e => { e.preventDefault(); peekKey($('#key').type === 'password'); $('#key').focus() })
 $('#gate').addEventListener('submit', async e => {
   e.preventDefault(); if (!API) return
   me = $('#me').value.trim(); key = $('#key').value
@@ -315,30 +540,65 @@ $('#gate').addEventListener('submit', async e => {
     return
   }
   store.set('paradigm.team.me', me); store.set('paradigm.team.key', key)
-  take(d); await settle(); $('#gate').hidden = true; $('#app').hidden = false; render()
+  D = d; $('#gate').hidden = true; $('#app').hidden = false; render()
 })
 
-$('#app').addEventListener('click', async e => {
-  const b = e.target.closest('button'); if (!b || busy) return
-  if (b.dataset.f) { filter = b.dataset.f; render(); return }
-  if (b.id === 'reload') { busy = true; b.disabled = true; await load(); b.disabled = false; busy = false; return }
-  if (b.id === 'leave') { key = ''; store.set('paradigm.team.key', ''); showGate(); return }
-  const lesson = b.dataset.claim || b.dataset.release || b.dataset.keep; if (!lesson) return
-  busy = true; b.disabled = true; $('#amsg').textContent = ''
-  const old = stale.find(c => c.lesson === lesson && c.who === me)
-  const d = b.dataset.keep
-    ? await call({ action: 'sync', ops: [{ lesson, title: old ? old.title : '', to: lesson, toTitle: TITLE[lesson] }] })   // 課名改過但還是同一課：把記的課名換成現在的
-    : await call({ action: b.dataset.claim ? 'claim' : 'release', lesson, title: TITLE[lesson] })
-  take(d); await settle(); busy = false
-  if (!d.ok) $('#amsg').textContent = d.error === 'taken' ? `${lesson} 剛剛被 ${d.by} 拿走了。` : (ERR[d.error] || ERR.net)
+/* ---------------------------------------------------------------- 動作 */
+async function act(body) {
+  if (busy) return
+  busy = true; $('#amsg').textContent = ''; render()
+  const d = await call(body)
+  busy = false
+  if (d.lessons) D = d                      // 被別人拿走時後台也會回最新的清單
+  if (!d.ok) $('#amsg').textContent = ERR[d.error] || ERR.net
   render()
+}
+async function publish(confirm) {
+  if (busy) return
+  busy = true; $('#amsg').textContent = ''
+  const d = await call({ action: 'publish', confirm })
+  busy = false; ask = null
+  if (d.ok) sent = '1'
+  else if (d.error === 'confirm') ask = d.confirms
+  else if (d.error === 'problems') { D.problems = d.problems; $('#amsg').textContent = '表格還有問題，先修好再發布。' }
+  else if (d.error === 'token') $('#amsg').textContent = 'GitHub 權杖還沒設，或已經過期。到 Apps Script 的指令碼屬性換一組 GH_TOKEN，再按一次發布。'
+  else if (d.error === 'github') $('#amsg').textContent = `GitHub 沒有收下這次發布（狀態 ${d.status}）。過幾分鐘再試一次。`
+  else $('#amsg').textContent = ERR[d.error] || ERR.net
+  render()
+}
+$('#app').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return
+  const d = b.dataset
+  if (d.tab) { tab = d.tab; hit = ''; render(); scrollTo({ top: $('#tabs').offsetTop - 4 }) }
+  else if (d.view) { view = d.view; render() }
+  else if (d.f) { filter = d.f; hit = ''; render() }
+  else if (d.w) { wfilter = d.w; render() }
+  else if (d.peek) { peek = d.peek; document.querySelectorAll('.sq.on').forEach(x => x.classList.remove('on')); b.classList.add('on'); $('#peek').className = 'peek'; $('#peek').innerHTML = peekHtml() }
+  else if (d.goto) { tab = 'lessons'; hit = d.goto; render(); const el = document.getElementById('les-' + d.goto); if (el) el.scrollIntoView({ block: 'center' }) }
+  else if (d.ep) { epOpen = epOpen === d.ep ? '' : d.ep; render() }
+  else if (d.pown) act({ action: 'pset', kind: d.pown, code: d.code, field: 'owner', value: d.v ? me : '' })
+  else if (d.claim) act({ action: 'claim', code: d.claim })
+  else if (d.release) act({ action: 'release', code: d.release })
+  else if (b.id === 'publish') publish(false)
+  else if (b.id === 'publish-yes') publish(true)
+  else if (b.id === 'publish-no') { ask = null; render() }
 })
+$('#app').addEventListener('mouseover', e => { const b = e.target.closest('.sq[data-peek]'); if (b && b.dataset.peek !== peek && !document.querySelector('.sq.on')) { const keep = peek; peek = b.dataset.peek; $('#peek').className = 'peek'; $('#peek').innerHTML = peekHtml(); peek = keep } })
+$('#app').addEventListener('change', e => {
+  const s = e.target.closest('select[data-set]'), ps = e.target.closest('select[data-pset]'), nx = e.target.closest('input[data-pnext]')
+  if (s) act({ action: 'set', code: s.dataset.code, field: s.dataset.set, value: s.value })
+  else if (ps) act({ action: 'pset', kind: ps.dataset.pset, code: ps.dataset.code, field: 'stage', value: ps.value })
+  else if (nx) act({ action: 'pset', kind: 'project', code: nx.dataset.pnext, field: 'next', value: nx.value.trim() })
+})
+$('#app').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input[data-pnext]')) e.target.blur() })
+$('#app').addEventListener('input', e => { if (e.target.id !== 'q') return; q = e.target.value; const at = e.target.selectionStart; $('#panel').innerHTML = panelGlossary(); const i = $('#q'); i.focus(); i.setSelectionRange(at, at) })
+$('#reload').addEventListener('click', () => { sent = ''; ask = null; load() })
+$('#leave').addEventListener('click', () => { key = ''; D = null; store.set('paradigm.team.key', ''); showGate('') })
 
-// 切回這個分頁就重抓一次，對方剛認領的才看得到
-document.addEventListener('visibilitychange', () => { if (!document.hidden && key && !busy && !$('#app').hidden) load() })
-
-if (API && me && key) load().then(ok => { if (!ok && $('#app').hidden) showGate($('#gmsg').textContent) })
-else showGate()
+// 網站目前多大（build.py 每次產生網站時寫的 size.json）；在自己電腦上沒有這個檔就不顯示
+fetch('../size.json').then(r => r.ok ? r.json() : null).then(s => { size = s; if (D) renderOut() }).catch(() => {})
+if (API && me && key) load().then(ok => { if (!ok && !$('#gmsg').textContent) showGate('') })
+else showGate('')
 </script>
 </body>
 </html>
