@@ -96,6 +96,7 @@
   .note-box li { margin-top: 4px; padding-left: 1em; text-indent: -1em; color: var(--grape-2); overflow-wrap: anywhere; }
   .note-box li::before { content: "・"; }
   .note-box details summary { cursor: pointer; }
+  .note-box .grp { margin-top: 8px; font-size: 13.5px; color: var(--grape-3); }
   .size { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 13.5px; color: var(--grape-3); }
   .size i { flex: 0 0 160px; height: 8px; border-radius: 9px; background: rgba(58, 46, 92, .12); overflow: hidden; }
   .size i b { display: block; height: 100%; background: var(--grape); border-radius: 9px; }
@@ -334,12 +335,16 @@ function renderOut() {
   else if (!p.count) { title = '網站跟試算表一樣'; what = '現在沒有還沒發布的改動。' }
   else { title = `試算表有 ${p.count} 處改動還沒上線`; what = diff }
   const can = !sent && !probs.length && (!p.published || p.count > 0)
+  const ch = sent ? [] : (D.changes || []), list = k => ch.filter(c => (c.kind === 'map') === k).map(c => `<li>${esc(c.text)}</li>`).join('')
   $('#out').className = 'out' + (p.published && !p.count && !sent ? ' same' : '')
   $('#out').innerHTML = `<div class="out-in">
     <div><h2>${title}</h2><p class="what">${what}</p></div>
     <div class="acts">${ask ? '' : `<button type="button" class="go" id="publish" ${can ? '' : 'disabled'}>發布到網站</button>`}</div>
     <div class="notes">
       ${ask ? `<div class="note-box"><h3>發布前請確認</h3><ul>${ask.map(c => `<li>${esc(c)}</li>`).join('')}</ul><p style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="go" id="publish-yes">確定，照這樣發布</button><button type="button" class="plain" id="publish-no">先不要</button></p></div>` : ''}
+      ${ch.length ? `<div class="note-box warn"><h3>按發布之前看一眼：這次會改這些</h3>
+        ${list(true) ? `<p class="grp">課程地圖（課名、課號、加課刪課、主題）</p><ul>${list(true)}</ul>` : ''}${list(false) ? `<p class="grp">上線狀態與首版</p><ul>${list(false)}</ul>` : ''}
+        <p class="grp">名詞、資源、影片連結、案例的改動只算在上面的處數裡，沒有逐條列。</p></div>` : ''}
       ${probs.length ? `<div class="note-box"><h3>要先在試算表修好才能發布（${probs.length} 項）</h3><ul>${probs.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
       ${D.warnings.length ? `<div class="note-box warn"><details${D.warnings.length <= 3 ? ' open' : ''}><summary>提醒 ${D.warnings.length} 項（不擋發布）</summary><ul>${D.warnings.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details></div>` : ''}
     </div>
