@@ -2,6 +2,8 @@
 
 主導者：Thomas（GitHub：ThomasChenTheButt）
 
+> **2026-11-22 起這個 repo 是自動產生的，不要在這裡改網站。** 原稿在私人 repo [paradigm-ai10/study-site](https://github.com/paradigm-ai10/study-site)，推上那邊的 main 就會自動更新這裡並上線。這裡只有 AGENTS.md、CLAUDE.md、README.md 可以手改。
+
 Paradigm 學習站首頁（f4 雨夜書桌）的預覽版，用 GitHub Pages 放上網，方便在手機和別台電腦看。
 
 - 網址：https://paradigm-ai10.github.io/study-home/

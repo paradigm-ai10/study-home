@@ -4,7 +4,7 @@
 團隊規則正本在 `paradigm-ai10/handbook` 的 `GITHUB_RULES.md`（v3.1，2026-11-15），下面是其中給 AI 的硬規則。
 
 ## 專案是什麼
-Paradigm 學習站首頁的預覽版，純靜態網頁，用 GitHub Pages 放上網：https://paradigm-ai10.github.io/study-home/
+Paradigm 學習站的上線檔（由 `paradigm-ai10/study-site` 自動產生），純靜態網頁，用 GitHub Pages 放上網：https://paradigm-ai10.github.io/study-home/
 主導者：Thomas（GitHub：ThomasChenTheButt）；意思是這個 repo 有問題找他
 
 ## 環境與指令
@@ -38,5 +38,5 @@ Paradigm 學習站首頁的預覽版，純靜態網頁，用 GitHub Pages 放上
 ## 常見雷
 - main 一推就上線：GitHub Pages 從 main 的根目錄發布，沒有預覽站，訪客會馬上看到。
 - 這個 repo 是公開的，而且根目錄有 `.nojekyll`，放進來的每個檔（包括這份）都會被發布到網站上。金鑰、個資、還不想公開的東西絕對不要放進來。
-- 正本在 Thomas 電腦的 `網站/學習站/`，這個 repo 是複製出來的（README 有寫）。改了正本要重新複製上來；直接在這裡改的東西，下次從正本複製時可能被蓋掉，改之前先問使用者要改哪一邊。
-- 複製上來時，路徑和檔名要改成英文。
+- **這個 repo 是自動產生的，不要在這裡改網站。** 原稿在私人 repo `paradigm-ai10/study-site`，推上那邊的 main，GitHub Actions 會整份重新產生這裡的檔（除了 AGENTS.md、CLAUDE.md、README.md、.nojekyll、CNAME）。直接改這裡的網站檔，下一次自動產生就會被蓋掉。
+- 使用者要改網站：請他到 study-site 改；只有這幾個說明檔可以在這裡改。
