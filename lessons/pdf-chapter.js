@@ -629,3 +629,23 @@
   if (t0) setTimeout(() => FL.showEl(t0, { quick: true }), 60)
   document.fonts && document.fonts.ready.then(() => { placeTicks(); scan() })
 })()
+
+/* 學習時間（2026-11-22，首頁的分享圖和之後的上線日誌會讀）：只在課程頁計時。
+   頁面看得到、而且 2 分鐘內有動過（捲動、點、打字）才算；每 15 秒記一次。
+   localStorage['pd-time'] = { total: 秒, days: { 'YYYY-MM-DD': 秒 }, lessons: { 課號: 秒 } }。這段在 pdf-chapter.js 和 pdf-lesson.js 各有一份，要一起改。 */
+;(() => {
+  const M = window.PDFLESSON; if (!M || !M.id || M.draft) return
+  const KEY = 'pd-time', STEP = 15, IDLE = 120000
+  let last = Date.now()
+  ;['scroll', 'pointerdown', 'keydown', 'pointermove', 'wheel', 'touchstart'].forEach(e => addEventListener(e, () => { last = Date.now() }, { passive: true, capture: true }))
+  setInterval(() => {
+    if (document.hidden || Date.now() - last > IDLE) return
+    try {
+      const t = JSON.parse(localStorage.getItem(KEY) || '{}') || {}, d = new Date()
+      const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+      t.total = (+t.total || 0) + STEP; t.days = t.days || {}; t.days[day] = (+t.days[day] || 0) + STEP
+      t.lessons = t.lessons || {}; t.lessons[M.id] = (+t.lessons[M.id] || 0) + STEP
+      localStorage.setItem(KEY, JSON.stringify(t))
+    } catch (e) { /* private mode */ }
+  }, STEP * 1000)
+})()

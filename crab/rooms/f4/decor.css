@@ -93,3 +93,23 @@ html.has-map .decor-tray, html.pk-leaving .decor-tray, html.has-map .decor-marks
 html.is-decor-show .decor-skip { opacity: 1; transition: opacity 300ms ease-out 1s; }
 /* less motion, not none: things still fade, nothing slides */
 @media (prefers-reduced-motion: reduce) { .decor-tray, html.is-decor .decor-tray, html.is-decor-show .decor-tray { translate: none; transition: opacity 200ms ease-out, visibility 0s; } .decor-tray li, html.is-decor .decor-tray li { transform: none; translate: none !important; transition: opacity 200ms ease-out; } .decor-marks i::before { animation: none; } }
+
+/* 存成圖片／複製文字（2026-11-22） */
+.decor-tray header > .share { display: flex; gap: 8px; flex: 0 0 auto; }
+.decor-tray .share button { appearance: none; cursor: pointer; font: inherit; font-size: 14px; letter-spacing: .06em; color: var(--cream); background: rgba(23, 20, 41, .62); border: 0; box-shadow: inset 0 0 0 1px rgba(255, 244, 224, .3); padding: 9px 14px; border-radius: 6px; text-shadow: none; transition: scale 140ms ease-out, box-shadow 140ms ease-out; min-width: 5.6em; }
+.decor-tray .share button:disabled { cursor: default; opacity: .7; }
+.decor-tray .share button:active { scale: .97; }
+@media (hover: hover) and (pointer: fine) { .decor-tray .share button:hover { box-shadow: inset 0 0 0 1px rgba(255, 244, 224, .6); } }
+/* 存成圖片：兩張小預覽，從按鈕上面長出來 */
+.decor-tray header > .share { position: relative; }
+.decor-pick { position: absolute; right: 0; bottom: calc(100% + 12px); z-index: 2; background: var(--cream); color: var(--grape); border-radius: 10px; padding: 12px 14px 14px; box-shadow: var(--card-shadow), 0 18px 40px rgba(14, 10, 30, .45); text-shadow: none; transform-origin: 80% 100%; animation: decor-pick-in 180ms var(--d-out); }
+.decor-pick[hidden] { display: none; }
+.decor-pick p { margin: 0 0 10px; font-size: 13.5px; letter-spacing: .06em; }
+.decor-pick div { display: flex; gap: 12px; }
+.decor-tray .decor-pick button { all: unset; cursor: pointer; display: grid; gap: 7px; justify-items: center; font-family: var(--zh); font-size: 13.5px; letter-spacing: .05em; color: var(--grape); border-radius: 8px; padding: 4px; min-width: 0; transition: scale 140ms ease-out; }
+.decor-pick canvas { width: 126px; height: 224px; display: block; border-radius: 6px; background: #2a2444; box-shadow: 0 0 0 1px rgba(58, 46, 92, .16); }
+.decor-tray .decor-pick button:active { scale: .97; }
+.decor-tray .decor-pick button:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) { .decor-tray .decor-pick button:hover canvas { box-shadow: 0 0 0 2px var(--coral); } }
+@keyframes decor-pick-in { from { opacity: 0; scale: .96; translate: 0 6px; } }
+@media (prefers-reduced-motion: reduce) { .decor-pick { animation: none; } }
