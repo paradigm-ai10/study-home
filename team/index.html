@@ -67,6 +67,14 @@
   .gate label { display: grid; gap: 4px; font-size: 14.5px; color: var(--grape-2); }
   .gate input { padding: 10px 12px; border: 0; border-radius: 8px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--grape-3); font-size: 16px; color: var(--grape); }
   .gate small { font-size: 13px; color: var(--grape-3); }
+  /* 通關碼右邊的眼睛：按了看得到自己打了什麼 */
+  .pw { position: relative; display: grid; }
+  .pw input { padding-right: 48px; }
+  .pw button { position: absolute; right: 4px; top: 50%; translate: 0 -50%; width: 38px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 8px; background: none; color: var(--grape-3); cursor: pointer; }
+  .pw button:hover { background: rgba(58, 46, 92, .08); }
+  .pw button[aria-pressed=true] { color: var(--coral-ink); }
+  .pw button[aria-pressed=true] .slash { display: none; }
+  .pw svg { width: 22px; height: 22px; display: block; }
   .msg { font-size: 14.5px; color: var(--coral-ink); min-height: 1.7em; }
 
   .bar { margin-top: 22px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 20px; font-size: 14.5px; color: var(--grape-2); }
@@ -134,7 +142,13 @@
 
     <form class="gate" id="gate" hidden>
       <label>你的名字<input id="me" maxlength="20" autocomplete="off" required><small>認領課程時會顯示這個名字，每次都打一樣的。</small></label>
-      <label>通關碼<input id="key" type="password" autocomplete="current-password" required></label>
+      <label>通關碼
+        <span class="pw">
+          <input id="key" type="password" autocomplete="current-password" required>
+          <button type="button" id="eye" aria-pressed="false" aria-label="顯示通關碼" title="顯示通關碼"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M4 4l16 16"/></svg></button>
+        </span>
+        <small>大家共用同一組。按右邊的眼睛可以看到自己打了什麼。</small>
+      </label>
       <div><button class="go">進去</button></div>
       <p class="msg" id="gmsg" role="alert"></p>
     </form>
@@ -178,7 +192,7 @@ let me = store.get('paradigm.team.me'), key = store.get('paradigm.team.key')
 let claims = [], proposals = [], filter = 'first', busy = false
 const FIRST = new Set(R.first), TITLE = {}
 R.topics.forEach(t => t.all.forEach(([id, ti]) => { TITLE[id] = ti }))
-const ERR = { key: '通關碼不對。', locked: '猜錯太多次，後台先鎖住了，10 分鐘後再試。', setup: '後台的通關碼還沒設，或少於 12 個字（Apps Script 的指令碼屬性 TEAM_KEY）。', net: '連不上試算表，等一下再試。' }
+const ERR = { key: '通關碼不對。按右邊的眼睛看一下，注意大小寫和全形半形。', locked: '猜錯太多次，後台先鎖住了，10 分鐘後再試。', setup: '後台的通關碼還沒設，或少於 12 個字（Apps Script 的指令碼屬性 TEAM_KEY）。', net: '連不上試算表，等一下再試。' }
 
 async function call(body) {
   try {
@@ -231,9 +245,17 @@ async function load() {
   take(d); $('#gate').hidden = true; $('#app').hidden = false; render(); return true
 }
 function showGate(msg) {
-  $('#app').hidden = true; $('#gate').hidden = false; $('#me').value = me; $('#key').value = ''
+  $('#app').hidden = true; $('#gate').hidden = false; $('#me').value = me; $('#key').value = ''; peek(false)
   $('#gmsg').textContent = msg || (API ? '' : '還沒接上試算表：ask/endpoint.js 裡的網址是空的。')
 }
+
+// 眼睛：切換通關碼看得到／看不到
+function peek(on) {
+  const eye = $('#eye'), label = on ? '隱藏通關碼' : '顯示通關碼'
+  $('#key').type = on ? 'text' : 'password'
+  eye.setAttribute('aria-pressed', on); eye.setAttribute('aria-label', label); eye.title = label
+}
+$('#eye').addEventListener('click', e => { e.preventDefault(); peek($('#key').type === 'password'); $('#key').focus() })
 
 $('#gate').addEventListener('submit', async e => {
   e.preventDefault(); if (!API) return
@@ -241,7 +263,11 @@ $('#gate').addEventListener('submit', async e => {
   if (!me || !key) return
   $('#gmsg').textContent = '確認中…'
   const d = await call({ action: 'list' })
-  if (!d.ok) { $('#gmsg').textContent = ERR[d.error] || ERR.net; return }
+  if (!d.ok) {
+    // 從 LINE 複製貼上最常多帶一個空白，直接講出來
+    $('#gmsg').textContent = d.error === 'key' && key !== key.trim() ? '通關碼不對：前面或後面多了空白，刪掉再試一次。' : (ERR[d.error] || ERR.net)
+    return
+  }
   store.set('paradigm.team.me', me); store.set('paradigm.team.key', key)
   take(d); $('#gate').hidden = true; $('#app').hidden = false; render()
 })
