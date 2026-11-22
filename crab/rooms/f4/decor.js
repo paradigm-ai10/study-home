@@ -9,6 +9,7 @@
    Needs window.__f2 (study.js) and window.F4 (app.js). Only on the live desk. */
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 
 const html = document.documentElement;
 const Q = new URLSearchParams(location.search);
@@ -19,8 +20,10 @@ const KEEP = !Q.has('fresh') || Q.has('keep');
 /* 開發者模式（Thomas，2026-11-21）：網址加 ?dev=paradigm 打開，之後這個瀏覽器一直是開的（線上也可以）；?dev=off 或擺飾架上的「關閉」關掉。
    開著時代幣固定 9999，擺飾架多一排「清空擺飾／關閉」。這不是保密機制，知道暗號的人都能開；代幣本來就只存在自己的瀏覽器裡。 */
 const DEV_KEY = 'paradigm.decor.dev';
-try { if (Q.get('dev') === 'paradigm') localStorage.setItem(DEV_KEY, '1'); else if (Q.get('dev') === 'off') localStorage.removeItem(DEV_KEY); } catch (e) { /* private mode */ }
-let DEVMODE = false; try { DEVMODE = localStorage.getItem(DEV_KEY) === '1'; } catch (e) { DEVMODE = false; }          // same rule as app.js: ?fresh never writes into the visitor's saved progress
+/* 上線前要改回 false（Thomas，2026-11-21：「之後都先開這個，上線前再換回去」）。true ＝ 每個人一打開就是開發者模式，除非自己關掉。 */
+const DEV_DEFAULT = true;
+try { if (Q.get('dev') === 'paradigm') localStorage.setItem(DEV_KEY, '1'); else if (Q.get('dev') === 'off') localStorage.setItem(DEV_KEY, '0'); } catch (e) { /* private mode */ }
+let DEVMODE = DEV_DEFAULT; try { const v = localStorage.getItem(DEV_KEY); DEVMODE = v === '1' || (v !== '0' && DEV_DEFAULT); } catch (e) { DEVMODE = DEV_DEFAULT; }          // same rule as app.js: ?fresh never writes into the visitor's saved progress
 const V3 = THREE.Vector3, lerp = THREE.MathUtils.lerp, clamp = THREE.MathUtils.clamp, rad = THREE.MathUtils.degToRad;
 const now = () => performance.now() / 1000;
 const easeIO = (u) => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
@@ -58,6 +61,7 @@ async function main() {
   const balance = () => Math.max(0, earned() - spent());
 
   /* ------------------------------------------------------------------ small tools */
+  let uiReady = false;                                   // the button exists (the first frame runs before it is made: a narrow window used to stop everything here)
   let decorating = false, hot = null, showing = false, wasWide = true;  // 佈置模式 on; the card you are looking at; a hand-over is playing
   let skip = false;                                     // a click or Esc during the hand-over: jump to the end of every step
   const SLOW = (DEV && +Q.get('decorslow')) || 1;                // ?decorslow=10 plays every hand-over ten times slower (for looking at it frame by frame)
@@ -308,6 +312,7 @@ async function main() {
   }
   async function mount(id) {                             // there already when the page opens: no ceremony
     const it = byId[id]; if (!it || !it.ready) return;
+    if (cat.slots[it.slot].wear) { const e = { id, it, root: null, wear: true, sway: [] }; live[it.slot] = e; const parts = await dress(it); if (live[it.slot] !== e) { undress(parts); return; } Object.assign(e, parts); return; }
     const entry = { id, it, root: null, b: null, landAt: 0, flying: true }; live[it.slot] = entry;
     const root = await build(it); if (live[it.slot] !== entry) return;
     entry.root = root; scene.add(root); settle(entry); entry.landAt = -99; entry.bornAt = -99;
@@ -334,10 +339,88 @@ async function main() {
     for (let i = 0; i < BITS; i++) { bitsPos.set([p.x, p.y, p.z], i * 3); const a = Math.random() * 6.283, s = 0.6 + Math.random() * 1.1; bitsVel[i].set(Math.cos(a) * s * 0.7, 1.6 + Math.random() * 1.8, Math.sin(a) * s * 0.7); }
   }
 
+  /* ---------------- 螃蟹的衣服 (2026-11-21): things the crab wears instead of things on the desk.
+     A garment's glb is a skinned mesh made round the crab's own shell, with the same bone names (src/decor/wear_common.py).
+     Here it is bound to the live crab's bones, so it squashes, puffs and leans with every move the crab makes.
+     Loose ends (a scarf's tails) are nodes named sway:<bone>:<name>; they are hung on that bone and swing behind its motion. */
+  let shellMesh = null; model.traverse((o) => { if (!shellMesh && o.isSkinnedMesh && /shell/.test(o.userData.name || o.name)) shellMesh = o; });
+  async function dress(it) {
+    const g = await file(it); const src = cloneSkinned(g.scene); src.updateMatrixWorld(true);
+    const at = {}; shellMesh.skeleton.bones.forEach((b, i) => { at[b.name] = i; });
+    const meshes = [], sway = [];
+    src.traverse((o) => { if (o.isSkinnedMesh) meshes.push(o); else if (/^sway:/.test(o.userData.name || o.name)) sway.push(o); });
+    meshes.forEach((m) => {
+      const names = m.skeleton.bones.map((b) => b.name), ok = names.every((n) => n in at);
+      if (!ok) { console.info('[decor] garment bones do not match the crab:', names.filter((n) => !(n in at))); return; }
+      m.bind(new THREE.Skeleton(names.map((n) => shellMesh.skeleton.bones[at[n]]), names.map((n) => shellMesh.skeleton.boneInverses[at[n]])), shellMesh.bindMatrix);
+      m.position.copy(shellMesh.position); m.quaternion.copy(shellMesh.quaternion); m.scale.copy(shellMesh.scale);
+      m.frustumCulled = false; m.castShadow = true; m.receiveShadow = true; m.raycast = () => {}; m.userData.wear = true; m.name = 'wear:' + it.id;
+      shellMesh.parent.add(m);
+    });
+    const hung = sway.map((o) => {
+      const bi = at[(o.userData.name || o.name).split(':')[1]] ?? at.body, bone = shellMesh.skeleton.bones[bi];
+      const local = new THREE.Matrix4().copy(shellMesh.skeleton.boneInverses[bi]).multiply(shellMesh.bindMatrix).multiply(o.matrixWorld);
+      bone.add(o); local.decompose(o.position, o.quaternion, o.scale); o.userData.wear = true;
+      o.traverse((c) => { if (c.isMesh) { c.castShadow = true; c.raycast = () => {}; } });
+      return { o, rest: o.quaternion.clone(), ax: 0, az: 0, vx: 0, vz: 0, p: null, v: new V3(), len: 0.9 + Math.random() * 0.25 };
+    });
+    return { root: null, meshes, sway: hung };
+  }
+  const undress = (e) => { (e.meshes || []).forEach((m) => m.removeFromParent()); (e.sway || []).forEach((s) => s.o.removeFromParent()); };
+  const show = (e, on) => { (e.meshes || []).forEach((m) => { m.visible = on; }); (e.sway || []).forEach((s) => { s.o.visible = on; }); };
+  const swQ = new THREE.Quaternion(), swE = new THREE.Euler(), swP = new V3(), swA = new V3();
+  function swing(e, t, dt) {                              // the loose ends lag behind whatever the crab does, then settle
+    if (!e.sway || !e.sway.length || dt <= 0) return;
+    e.sway.forEach((s, i) => {
+      s.o.parent.getWorldPosition(swP);
+      if (!s.p) { s.p = swP.clone(); return; }
+      swA.copy(swP).sub(s.p).divideScalar(dt); s.p.copy(swP);                    // how fast the bone is going
+      const axW = clamp((swA.x - s.v.x) / dt, -60, 60), azW = clamp((swA.z - s.v.z) / dt, -60, 60), ayW = clamp((swA.y - s.v.y) / dt, -60, 60); s.v.copy(swA);
+      if (REDUCED) return;
+      const K = 46 * s.len, D = 4.2;
+      s.vz += (-K * s.az - D * s.vz - 0.5 * axW) * dt; s.vx += (-K * s.ax - D * s.vx + 0.5 * azW + 0.16 * Math.abs(ayW)) * dt;
+      s.az = clamp(s.az + s.vz * dt, -1.1, 1.1); s.ax = clamp(s.ax + s.vx * dt, -0.5, 1.1);
+      swE.set(s.ax + 0.02 * Math.sin(t * 1.3 + i * 2), 0, s.az + 0.025 * Math.sin(t * 0.9 + i));
+      s.o.quaternion.copy(s.rest).multiply(swQ.setFromEuler(swE));
+    });
+  }
+  const crabMid = (out) => out.copy(crabRoot.position).add(tmp.set(0, 0.62, 0.1));
+  // out of the gift box and straight onto the crab: the box shakes, a flash of warm light, and it is wearing the thing
+  async function putOn(it, mode = 'full') {
+    if (live[it.slot]) await putAway(it.slot, true);
+    const e = { id: it.id, it, root: null, wear: true, sway: [] }; live[it.slot] = e;
+    const full = mode === 'full' && !REDUCED;
+    skip = false; showing = true; S.busy = true; if (f2.LIFE && f2.LIFE.mode) f2.endLife(false);
+    if (full) html.classList.add('is-decor-show');
+    const parts = await dress(it); if (live[it.slot] !== e) { undress(parts); showing = false; return; }
+    Object.assign(e, parts); show(e, false);
+    const C = crabMid(new V3());
+    if (full) { camTo(new V3(C.x, C.y + 0.12, C.z), 0.62); f2.play('parcel_wiggle', { force: true }); await wait(0.5); }
+    burst(giftPos(new V3())); glow.position.copy(C); glow.position.z += 0.5;
+    await anim(full ? 0.3 : 0.2, (k, u) => { glow.material.opacity = 0.85 * easeOut(u); glow.scale.setScalar(lerp(1.6, 3.4, easeOut(u))); }, linear);
+    show(e, true); f2.play('shell_puff', { force: true }); if (S.boing) S.boing.v -= 1.6;
+    await anim(0.55, (k, u) => { glow.material.opacity = 0.85 * (1 - easeOut(u)); glow.scale.setScalar(lerp(3.4, 4.2, u)); }, linear);
+    glow.material.opacity = 0; glow.scale.setScalar(2.6);
+    if (full) { await wait(0.5); f2.play('wiggle', { force: true }); await wait(1.5); }
+    showing = false; html.classList.remove('is-decor-show');
+    if (decorating) camTo(...DECOR_CAM); else { camHome(); S.busy = false; }
+    if (full && !skip) f2.say(it.line || '穿上了，好看嗎？', { hold: 2.8 });
+  }
+  async function takeOff(e, fast) {
+    if (!e.meshes) return;
+    if (!fast && !REDUCED) {
+      const C = crabMid(new V3()); glow.position.copy(C); glow.position.z += 0.5;
+      await anim(0.18, (k, u) => { glow.material.opacity = 0.7 * u; glow.scale.setScalar(lerp(1.8, 3.2, u)); }, linear);
+      undress(e); f2.play('settle', { force: true });
+      await anim(0.4, (k, u) => { glow.material.opacity = 0.7 * (1 - easeOut(u)); }, linear); glow.material.opacity = 0; glow.scale.setScalar(2.6);
+    } else undress(e);
+  }
+
   // out of the crab's gift box, a turn in the light, then over to its place. mode 'full' (just bought) or 'quick' (put back out)
   async function present(id, mode = 'full') {
     const it = byId[id], slot = cat.slots[it.slot]; if (!it.ready || !slot) return;
     showGhost(null);
+    if (slot.wear) return putOn(it, mode);
     if (live[it.slot]) await putAway(it.slot, true);
     const entry = { id, it, root: null, b: null, landAt: 0, flying: true }; live[it.slot] = entry;
     const full = mode === 'full' && !REDUCED;
@@ -377,7 +460,7 @@ async function main() {
     if (full && !skip) f2.say(it.line || '擺好了，這樣好看多了。', { hold: 2.8 });
   }
   async function putAway(slot, fast) {                   // back into the gift box
-    const e = live[slot]; if (!e) return; delete live[slot]; if (!e.root) return;
+    const e = live[slot]; if (!e) return; delete live[slot]; if (e.wear) return takeOff(e, fast); if (!e.root) return;
     const from = e.root.position.clone(), G = giftPos(new V3()), s0 = e.root.scale.x;
     await anim(fast ? 0.3 : 0.55, (k, u) => { e.root.position.lerpVectors(from, G, k); e.root.position.y += Math.sin(u * Math.PI) * 0.8; e.root.scale.setScalar(lerp(s0, 0.12 * s0, k)); e.root.rotation.y += 0.25; });
     scene.remove(e.root); free(e.root); if (!fast && !REDUCED) f2.play('parcel_wiggle', { force: true });
@@ -386,7 +469,7 @@ async function main() {
   /* ---------------- a pale copy where it would go (while you look at its card) */
   let ghost = null;
   async function showGhost(id) {
-    const it = id && byId[id]; const want = it && it.ready && !(live[it.slot] && live[it.slot].id === id) ? id : null;
+    const it = id && byId[id]; const want = it && it.ready && !cat.slots[it.slot].wear && !(live[it.slot] && live[it.slot].id === id) ? id : null;
     if (ghost && ghost.id === want) return;
     if (ghost) { if (ghost.root) { scene.remove(ghost.root); free(ghost.root); } ghost = null; }
     if (!want) return;
@@ -407,7 +490,7 @@ async function main() {
   (function tick() {
     const t = now(), dt = Math.min(0.05, t - lastT); lastT = t;
     for (const slot in live) {
-      const e = live[slot]; if (!e.root) continue; const a = t - e.landAt;
+      const e = live[slot]; if (e.wear) { swing(e, t, dt); continue; } if (!e.root) continue; const a = t - e.landAt;
       if (e.flying) { if (e.b && e.b.tick) e.b.tick(t, t - e.bornAt, dt); continue; }
       if (!REDUCED && a < 2.2) {
         if (slot.startsWith('hang')) e.root.rotation.z = 0.045 * Math.exp(-a * 2.4) * Math.sin(a * 8);          // the line swings a little as it is hung
@@ -420,7 +503,7 @@ async function main() {
     if (ba < 1.3) { for (let i = 0; i < BITS; i++) { const v = bitsVel[i]; v.y -= 6.5 * dt; bitsPos[i * 3] += v.x * dt; bitsPos[i * 3 + 1] += v.y * dt; bitsPos[i * 3 + 2] += v.z * dt; } bitsGeo.attributes.position.needsUpdate = true; bits.material.opacity = clamp(1.3 - ba, 0, 1); } else if (bits.material.opacity) bits.material.opacity = 0;
     if (ghost && ghost.root) { const k = 0.34 + 0.12 * Math.sin((t - ghost.at) * 3.2); ghost.root.traverse((o) => { if (o.isMesh) o.material.opacity = k; }); }
     const wide = S.layout === 'wide';
-    if (wide !== wasWide) { wasWide = wide; btn.hidden = !wide; if (!wide && decorating) decorate(false); for (const k in live) if (live[k].root) live[k].root.visible = wide; }
+    if (wide !== wasWide && uiReady) { wasWide = wide; btn.hidden = !wide; if (!wide && decorating) decorate(false); for (const k in live) if (live[k].root && !live[k].wear) live[k].root.visible = wide; }
     if (decorating || showing) S.lastInteract = S.t;
     if (decorating && !showing) placeMarks();
     requestAnimationFrame(tick);
@@ -455,14 +538,14 @@ async function main() {
   const tell = (s) => { if (liveP) liveP.textContent = s; };
   const COIN = '<svg class="coin" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2"/><circle cx="8" cy="8" r="4.6"/></svg>';
   const btn = document.createElement('button'); btn.type = 'button'; btn.id = 'btn-decor'; btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', 'decor-tray');
-  ctl.prepend(btn);
+  ctl.prepend(btn); uiReady = true;
   const tray = document.createElement('section'); tray.className = 'decor-tray'; tray.id = 'decor-tray'; tray.setAttribute('aria-label', '書桌佈置'); tray.inert = true;
   tray.innerHTML = `<header><div><h2>書桌佈置</h2><p class="how"></p></div><p class="purse" aria-live="polite"></p><button type="button" class="done">完成佈置</button></header><ul class="shelf"></ul>`;
   stage.appendChild(tray);
   const scrim = document.createElement('div'); scrim.className = 'decor-scrim'; scrim.setAttribute('aria-hidden', 'true'); stage.insertBefore(scrim, tray);
   const skipHint = document.createElement('p'); skipHint.className = 'decor-skip'; skipHint.setAttribute('aria-hidden', 'true'); skipHint.textContent = '點一下跳過'; stage.appendChild(skipHint);
   const marks = document.createElement('div'); marks.className = 'decor-marks'; marks.setAttribute('aria-hidden', 'true'); stage.appendChild(marks);
-  const markEl = {}; Object.entries(cat.slots).forEach(([id, s]) => { const m = document.createElement('i'); m.innerHTML = `<b>${s.label}</b>`; marks.appendChild(m); markEl[id] = m; });
+  const markEl = {}; Object.entries(cat.slots).forEach(([id, s]) => { if (!s.pos) return; const m = document.createElement('i'); m.innerHTML = `<b>${s.label}</b>`; marks.appendChild(m); markEl[id] = m; });
   const shelf = tray.querySelector('.shelf'), purse = tray.querySelector('.purse');
   if (DEVMODE) {
     const bar = document.createElement('p'); bar.className = 'devbar'; bar.innerHTML = '<b>開發者模式</b><span>代幣不會用完</span><button type="button" data-dev="reset">清空擺飾</button><button type="button" data-dev="off">關閉開發者模式</button>';
@@ -470,7 +553,7 @@ async function main() {
     bar.addEventListener('click', async (e) => {
       const b = e.target.closest('button[data-dev]'); if (!b || showing) return;
       if (b.dataset.dev === 'reset') { for (const slot of Object.keys(live)) await putAway(slot, true); mine.owned = []; mine.placed = {}; save(); draw(); tell('擺飾已清空。'); }
-      else { try { localStorage.removeItem(DEV_KEY); } catch (err) { /* private mode */ } const u = new URL(location.href); u.searchParams.delete('dev'); location.replace(u.href); }
+      else { try { localStorage.setItem(DEV_KEY, '0'); } catch (err) { /* private mode */ } const u = new URL(location.href); u.searchParams.delete('dev'); location.replace(u.href); }
     });
   }
   tray.querySelector('.how').textContent = `每完成一課得 ${cat.currency.perLesson} ${cat.currency.name}，完成 60 秒體驗得 ${cat.currency.firstTask} ${cat.currency.name}。`;
@@ -492,7 +575,8 @@ async function main() {
   function stateOf(it, bal) {
     if (!it.ready) return { cls: 'soon', label: '', price: it.price, dis: true };
     const own = mine.owned.includes(it.id), on = mine.placed[it.slot] === it.id;
-    if (own) return on ? { cls: 'placed', label: '收起來', act: 'take' } : { cls: 'own', label: '擺上去', act: 'put' };
+    const w = cat.slots[it.slot].wear;
+    if (own) return on ? { cls: 'placed', label: w ? '脫下來' : '收起來', act: 'take' } : { cls: 'own', label: w ? '穿上' : '擺上去', act: 'put' };
     return bal >= it.price ? { cls: 'buy', label: `兌換`, price: it.price, act: 'buy' } : { cls: 'short', label: `還差 ${it.price - bal}`, price: it.price, dis: true };
   }
   function draw() {
@@ -548,10 +632,10 @@ async function main() {
     const it = byId[b.closest('li').dataset.id], act = b.dataset.act; setHot(null);
     if (act === 'buy') {
       if (balance() < it.price) return;
-      mine.owned.push(it.id); mine.placed[it.slot] = it.id; save(); draw(); tell(`已兌換${it.name}，放在${cat.slots[it.slot].label}。`);
+      mine.owned.push(it.id); mine.placed[it.slot] = it.id; save(); draw(); tell(cat.slots[it.slot].wear ? `已兌換${it.name}，螃蟹穿上了。` : `已兌換${it.name}，放在${cat.slots[it.slot].label}。`);
       await present(it.id, e.detail === 0 ? 'quick' : 'full');       // Enter or Space: the short way (keyboard actions are not made to wait)
-    } else if (act === 'put') { mine.placed[it.slot] = it.id; save(); draw(); tell(`${it.name}擺上去了。`); await present(it.id, 'quick'); }
-    else { delete mine.placed[it.slot]; save(); draw(); tell(`${it.name}收起來了。`); await putAway(it.slot); }
+    } else if (act === 'put') { mine.placed[it.slot] = it.id; save(); draw(); tell(cat.slots[it.slot].wear ? `螃蟹穿上${it.name}了。` : `${it.name}擺上去了。`); await present(it.id, 'quick'); }
+    else { delete mine.placed[it.slot]; save(); draw(); tell(cat.slots[it.slot].wear ? `${it.name}脫下來了。` : `${it.name}收起來了。`); await putAway(it.slot); }
     draw(); const again = shelf.querySelector(`li[data-id="${it.id}"] button`); if (again && decorating) again.focus({ preventScroll: true });
   });
   if (F4 && F4.on) { F4.on('state', draw); F4.on('card:open', () => { if (decorating) decorate(false); }); }

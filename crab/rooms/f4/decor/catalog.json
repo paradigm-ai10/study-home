@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "note": "書桌擺飾的唯一資料來源。格式說明見 decor/README.md。",
   "currency": {
     "name": "代幣",
@@ -51,6 +51,10 @@
         -2.04
       ],
       "rotY": 0
+    },
+    "crab": {
+      "label": "螃蟹身上",
+      "wear": true
     }
   },
   "items": [
@@ -171,6 +175,39 @@
       "file": "typewriter.glb",
       "behave": "type",
       "ready": true
+    },
+    {
+      "id": "wear_raincoat",
+      "name": "黃色雨衣",
+      "blurb": "連帽雨衣，下雨天最需要。",
+      "line": "這樣淋到雨也不怕了。",
+      "price": 25,
+      "slot": "crab",
+      "file": "wear_raincoat.glb",
+      "ready": true,
+      "whole": true
+    },
+    {
+      "id": "wear_sweater",
+      "name": "費爾島毛衣",
+      "blurb": "手織毛衣，胸前一圈菱形花紋。",
+      "line": "好暖。讀書不怕冷了。",
+      "price": 25,
+      "slot": "crab",
+      "file": "wear_sweater.glb",
+      "ready": true,
+      "whole": true
+    },
+    {
+      "id": "wear_scarf",
+      "name": "條紋圍巾",
+      "blurb": "粗針織圍巾，兩條尾巴會跟著晃。",
+      "line": "圍巾一圍，就有冬天的感覺。",
+      "price": 15,
+      "slot": "crab",
+      "file": "wear_scarf.glb",
+      "ready": true,
+      "whole": true
     }
   ]
 }

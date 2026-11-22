@@ -45,6 +45,7 @@ async function main() {
     const body = new THREE.Group(); root.add(body);       // bob and hop
     const turn = new THREE.Group(); body.add(turn);       // which way it looks
     const model = cloneSkinned(src); model.position.set(0, 0, 0); model.rotation.set(0, 0, 0);
+    { const worn = []; model.traverse((o) => { if (o.userData && o.userData.wear) worn.push(o); }); worn.forEach((o) => o.removeFromParent()); }   // not the big crab's clothes (decor.js)
     // the copy keeps whatever pose the desk crab was in (squashed, mid-hop): put every bone back to its resting pose
     model.traverse((o) => { if (o.isSkinnedMesh && o.skeleton) o.skeleton.pose(); });
     model.scale.copy(src.scale);

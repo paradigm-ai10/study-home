@@ -22,7 +22,7 @@ export function makeStudio({ base = 'decor/', px = 320 } = {}) {
   function load(it) {
     if (!cache.has(it.id)) cache.set(it.id, loader.loadAsync(base + it.file).then((g) => {
       const root = g.scene; box.setFromObject(root); box.getSize(size); box.getCenter(mid);
-      const fit = { size: size.clone(), mid: mid.clone(), wide: size.x > size.y * 2.2 };
+      const fit = { size: size.clone(), mid: mid.clone(), wide: !it.whole && size.x > size.y * 2.2 };   // `whole` in the catalog: always show all of it
       root.traverse((o) => { if (!o.isMesh || !o.material) return; if (o.material.emissiveIntensity > 1) o.material.emissiveIntensity = Math.min(o.material.emissiveIntensity, 5); if (o.material.transparent) { o.material.depthWrite = false; o.renderOrder = 2; } });
       return { root, fit };
     }));
