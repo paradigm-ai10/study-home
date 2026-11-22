@@ -50,7 +50,18 @@
   const label = p => p.dataset.tl || '封面'
 
   // ── 做完的樣子（05 起，2026-11-15 加）：還沒有影片的課，封面下面放一張成品圖（圖與圖說都來自 PDF，from_pdf.py --result 指定）；影片上線後這裡換成影片卡 ──
-  if (M.result && pages[0]) {
+  // ── 影片卡（2026-11-22）：試算表「影片連結」有網址的課（lessons/roadmap8.js 的 videos），封面下面放影片，取代做完的樣子 ──
+  const vurl = R && R.videos && R.videos[M.id]
+  const ytid = vurl && (vurl.match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/)([\w-]{11})/) || [])[1]
+  if (vurl && pages[0]) {
+    const card = document.createElement('aside'); card.className = 'pl-result pl-video'; card.setAttribute('aria-label', '這課的影片')
+    const tall = /\/shorts\/|instagram\.com|tiktok\.com/.test(vurl)
+    const host = /instagram\.com/.test(vurl) ? 'Instagram' : /threads\./.test(vurl) ? 'Threads' : ytid ? 'YouTube' : '影片頁'
+    card.innerHTML = `<p class="pl-result-h"><b>先看影片</b><a href="${esc(vurl)}" target="_blank" rel="noopener">在 ${host} 開啟 ↗</a></p>` +
+      (ytid ? `<div class="pl-video-frame${tall ? ' tall' : ''}"><iframe src="https://www.youtube-nocookie.com/embed/${ytid}" title="這課的影片" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`
+            : `<p class="pl-video-link"><a class="pl-video-btn" href="${esc(vurl)}" target="_blank" rel="noopener">▶ 到 ${host} 看這課的影片</a></p>`)
+    pages[0].after(card)
+  } else if (M.result && pages[0]) {
     const r = M.result, at = pages[r.page - 1], c = at && CH.find(x => x.k === at.dataset.ch)
     const card = document.createElement('aside'); card.className = 'pl-result'; card.setAttribute('aria-label', '做完的樣子')
     card.innerHTML = `<p class="pl-result-h"><b>做完的樣子</b>${c ? `<a href="#p${r.page}">${esc(c.t)}｜${esc(r.tl)} →</a>` : ''}</p><figure><img src="${esc(r.src)}" alt="${esc(r.alt)}"><figcaption>${esc(r.alt)}</figcaption></figure>`
