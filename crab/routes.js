@@ -3,9 +3,9 @@
    href 還沒定的放 null：點了會先做轉場，再顯示「這頁還在做」。 */
 window.CRAB_ROUTES = [
   { id: 'map',   part: 'shell',      zh: '學習地圖',      en: 'Learning map',      hint: '3 階段、17 個主題，照順序排好', href: null },
-  { id: 'ask',   part: 'eyes',       zh: '主題提案',    en: 'What to learn',     hint: '說給我們聽，下一支片就做它',           href: null },
+  { id: 'ask',   part: 'eyes',       zh: '主題提案',    en: 'What to learn',     hint: '說給我們聽，下一支片就做它',           href: '../../../ask/index.html' },   // 2026-11-22 寫信給我們的那一頁
   { id: 'pick',  part: 'claw-left',  zh: '程度評估',        en: 'Pick for me',       hint: '回答幾題，幫你挑從哪一課開始',         href: null },
-  { id: 'solve', part: 'claw-right', zh: '實作案例',    en: 'Solve one thing',   hint: '帶一件麻煩事來，一步步用 AI 做掉',     href: null },
+  { id: 'solve', part: 'claw-right', zh: '實作案例',    en: 'Solve one thing',   hint: '帶一件麻煩事來，一步步用 AI 做掉',     href: '../../../cases/index.html' },   // 2026-11-22 先放 6-1、6-E4 兩個案例
   { id: 'words', part: 'legs',       zh: 'AI 名詞辭典', en: 'AI words',          hint: 'Skill、MCP、Agent，一句話講清楚',      href: '../../../lessons/glossary.html' },
   { id: 'news',  part: 'bubbles',    zh: 'AI 新聞',       en: 'AI news',           hint: '每週整理好，學生也看得懂',             href: null },
   { id: 'free',  part: 'parcel',     zh: '資源下載',      en: 'Downloads',         hint: 'Skill 檔案、PDF 講義與提示詞範本',     href: '../../../resources/index.html' },   // 2026-11-14 資源頁做好；網址相對於首頁資料夾（rooms/f4/）

@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://paradigm-ai10.github.io/study-home/ask/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Paradigm AI 學習站">
+<meta property="og:title" content="主題提案｜Paradigm 學 AI">
+<meta property="og:description" content="想學什麼 AI 主題，寫一封信告訴 Paradigm，我們會拿這些信來排之後的課。">
+<meta property="og:url" content="https://paradigm-ai10.github.io/study-home/ask/">
+<meta property="og:image" content="https://paradigm-ai10.github.io/study-home/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#FFF4E0">
+<title>主題提案｜Paradigm 學 AI</title>
+<meta name="description" content="想學什麼 AI 主題，寫一封信告訴 Paradigm，我們會拿這些信來排之後的課。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=LXGW+WenKai+TC&family=Outfit:wght@500;600&display=swap">
+<style>
+  /* 外觀跟資源下載頁同一套：奶油底、葡萄色字、陽光黃主按鈕。
+     這頁的主角是首頁書桌上那封航空信和鋼筆：點信封、信紙攤開、打字時筆跟著寫。 */
+  :root {
+    --cream: #FFF4E0; --sheet: #FFFAF0; --grape: #3A2E5C;
+    --grape-2: rgba(58, 46, 92, .78); --grape-3: rgba(58, 46, 92, .74); --line: rgba(58, 46, 92, .18);
+    --coral: #FF6B57; --coral-ink: #C0351F; --sun: #FFC857; --gold: #D9A441;
+    --zh: "Huninn", "PingFang TC", "Noto Sans TC", system-ui, sans-serif;
+    --en: "Outfit", "Huninn", system-ui, sans-serif;
+    --hand: "LXGW WenKai TC", "BiauKai", "DFKai-SB", "Huninn", serif;
+    --paper: #FFFCF4;
+    --pad: clamp(16px, 4vw, 56px);
+    --et: 26px;   /* 信封離舞台頂端多遠 */
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--cream); }
+  body { margin: 0; background: var(--cream); color: var(--grape); font-family: var(--zh); font-size: 15.5px; line-height: 1.7; letter-spacing: .02em; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 3px solid var(--coral-ink); outline-offset: 3px; border-radius: 4px; }
+  a { color: inherit; }
+  h1, h2, p { margin: 0; }
+  h1, h2 { font-weight: 400; }
+  button, input, textarea { font: inherit; color: inherit; letter-spacing: inherit; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 var(--pad); overflow-x: clip; }
+
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-top: 18px; }
+  .wordmark { font: 600 13px/1 var(--en); letter-spacing: .26em; text-decoration: none; padding: 8px 0; }
+  .home { text-decoration: none; font-size: 14px; padding: 7px 13px 8px; border-radius: 8px; box-shadow: inset 0 0 0 1.5px var(--grape-3); line-height: 1.2; white-space: nowrap; }
+  .home:hover { box-shadow: inset 0 0 0 1.5px var(--grape); background: var(--sheet); }
+
+  .head { padding: clamp(28px, 6vh, 56px) 0 clamp(20px, 4vh, 32px); border-bottom: 1px solid var(--line); }
+  .head h1 { font-size: clamp(30px, 2.7vw, 38px); line-height: 1.36; letter-spacing: .03em; }
+  .head p { margin-top: 10px; font-size: 16px; color: var(--grape-2); max-width: 36em; }
+
+  /* ---- 舞台：信封分三層（背面、口袋、封口蓋），信紙夾在背面和口袋中間 */
+  .stage { position: relative; width: min(620px, 100%); margin: 44px auto 64px; container-type: inline-size; }
+  .env-b, .env-f, .env-flap { position: absolute; left: 17cqw; top: var(--et); width: 66cqw; height: 44cqw;
+    translate: var(--ex, 0) var(--ey, 0); opacity: var(--eo, 1);
+    transition: translate .6s cubic-bezier(.3, .7, .2, 1), opacity .45s ease-out; pointer-events: none; }
+  .env-b svg, .env-f svg, .env-flap svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .env-b { z-index: 1; filter: drop-shadow(0 14px 18px rgba(58, 46, 92, .16)); }
+  .env-f { z-index: 3; }
+  .env-flap { z-index: 4; transform-origin: 50% 0; transform: perspective(900px) rotateX(0deg);
+    transition: transform .5s cubic-bezier(.5, 0, .3, 1), translate .6s cubic-bezier(.3, .7, .2, 1), opacity .45s ease-out; }
+  .s-flap .env-flap { transform: perspective(900px) rotateX(178deg); }
+  .flap-under .env-flap { z-index: 1; }
+  .seal { position: absolute; z-index: 5; left: 50cqw; top: calc(var(--et) + 24.6cqw); width: 46px; height: 46px; margin: -23px 0 0 -23px;
+    border-radius: 50%; background: radial-gradient(circle at 36% 30%, #ff8a78, var(--coral) 46%, #d9412d);
+    box-shadow: 0 2px 0 #b9321f, 0 5px 10px rgba(58, 46, 92, .25); display: grid; place-items: center;
+    font: 600 19px/1 var(--en); color: #fff4e0; translate: var(--ex, 0) var(--ey, 0); opacity: var(--eo, 1);
+    transition: scale .28s cubic-bezier(.3, 1.6, .5, 1) .46s, opacity .2s .46s, translate .6s cubic-bezier(.3, .7, .2, 1); pointer-events: none; }   /* 寄信時等蓋子蓋好才蓋章 */
+  .s-flap .seal { scale: 1.5; opacity: 0; transition-delay: 0s; }
+  .s-out { --ey: 70px; --eo: 0; }
+  .s-fly { --ex: 46cqw; --ey: -150px; --eo: 0; }
+  .s-fly .letter { visibility: hidden; }   /* 信已經在信封裡，跟著一起走 */
+
+  .open-btn { position: absolute; z-index: 6; left: 17cqw; top: var(--et); width: 66cqw; height: 44cqw; border: 0; background: none; cursor: pointer; border-radius: 6px; }
+  .open-btn:hover ~ .seal { scale: 1.08; }
+  .hint { position: absolute; left: 0; right: 0; top: calc(var(--et) + 44cqw + 22px); text-align: center; font-size: 16px; color: var(--grape-2); transition: opacity .3s; }
+  .s-flap .open-btn, .s-flap .hint, .sending .open-btn, .sending .hint { opacity: 0; pointer-events: none; }
+
+  /* ---- 信紙：三折。f2 掛在 f1 底下、f3 掛在 f2 底下，折起來時一正一反疊成一疊 */
+  .letter { position: relative; z-index: 2; perspective: 1500px; transform-origin: 50% 0;
+    transform: translateY(calc(var(--et) + 7cqw)) scale(var(--fs, .6));
+    transition: transform .55s cubic-bezier(.3, .7, .2, 1); }
+  .s-rise .letter { transform: translateY(calc(var(--et) - 10cqw)) scale(var(--fs, .6)); }
+  .s-out .letter { transform: none; transition-duration: .6s; }
+  /* 三片是同一張紙：同一個紙色和纖維紋，攤平後只留一道淡淡的折痕，不要像三張卡片 */
+  .fold { position: absolute; left: 0; right: 0; transform-style: preserve-3d; background-color: var(--paper);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .36 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+    box-shadow: 0 14px 22px -12px rgba(58, 46, 92, .3); transition: transform .55s cubic-bezier(.45, 0, .2, 1), box-shadow .5s; }
+  .f1 { top: 0; height: 33.34%; border-radius: 2px 2px 0 0; }
+  .f2, .f3 { top: 100%; height: 100%; transform-origin: 50% 0; }
+  .f2 { transform: rotateX(176deg); }
+  .f3 { transform: rotateX(-176deg); border-radius: 0 0 2px 2px; }
+  .s-b .f2, .s-c .f3 { transform: rotateX(0deg); }
+  .f2::before, .f3::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 14px; opacity: 0; transition: opacity .4s;
+    background: linear-gradient(rgba(58, 46, 92, .1), rgba(58, 46, 92, .03) 2px, rgba(255, 255, 255, .5) 3px, transparent 14px); }
+  .s-open .fold { box-shadow: none; }
+  .s-open .f2::before, .s-open .f3::before { opacity: 1; }
+
+  .sheet { position: relative; transform: translateZ(1px);   /* 墊高 1px，不然攤平的折頁會蓋到字 */
+    padding: 44px clamp(22px, 7cqw, 48px) 34px; opacity: 0; visibility: hidden; transition: opacity .45s ease-out, visibility 0s .45s;
+    border-radius: 2px; box-shadow: 0 0 0 1px rgba(58, 46, 92, .08), 0 2px 3px rgba(58, 46, 92, .08), 0 30px 46px -22px rgba(58, 46, 92, .38); }
+  .s-open .sheet { opacity: 1; visibility: visible; transition-delay: 0s; }
+  /* 信紙上緣一條航空信斜紋，跟信封同一套 */
+  .sheet::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 7px; border-radius: 2px 2px 0 0;
+    background: repeating-linear-gradient(-45deg, var(--coral) 0 9px, var(--paper) 9px 18px, var(--grape) 18px 27px, var(--paper) 27px 36px); }
+  .sheet .row1 { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; min-height: 84px; padding-bottom: 6px; }
+  .sheet .to { font: 400 27px/1.3 var(--hand); letter-spacing: .06em; white-space: nowrap; }
+  /* 郵票和郵戳 */
+  .post { position: relative; flex: none; width: 124px; height: 84px; }
+  .stamp { position: absolute; right: 0; top: 0; width: 62px; height: 76px; padding: 2px; rotate: 3deg; background: #fff;
+    border: 5px dotted var(--paper); box-shadow: inset 0 0 0 1px rgba(58, 46, 92, .12); }   /* 紙色的點狀邊框蓋在白底上，就是郵票的齒孔 */
+  .stamp b { display: grid; place-items: center; align-content: center; gap: 5px; height: 100%; background: var(--sun); font: 600 8px/1 var(--en); letter-spacing: .14em; color: var(--grape); }
+  .stamp svg { width: 34px; display: block; }
+  .mark { position: absolute; left: 0; top: 12px; width: 78px; height: 78px; rotate: -14deg; opacity: .62; }
+  .q { display: block; margin-top: 22px; font-size: 15px; color: var(--grape-2); }
+  .q small { font-size: 13px; color: var(--grape-3); }
+  /* 橫線信紙：行高固定 36px，線跟著行走；寫上去的字用楷體，像手寫的 */
+  .sheet textarea, .sheet input[type=text] { display: block; width: 100%; margin-top: 0; padding: 0 4px; border: 0; border-radius: 0; background-color: transparent; outline: none; resize: none; overflow: hidden;
+    font-family: var(--hand); font-size: 21px; line-height: 36px; letter-spacing: .04em; color: #2b2560; caret-color: var(--coral-ink);
+    background-image: linear-gradient(transparent 34.5px, rgba(74, 98, 160, .3) 34.5px, rgba(74, 98, 160, .3) 35.5px, transparent 35.5px); background-size: 100% 36px; }
+  .sheet input[type=text] { height: 36px; }
+  .sheet textarea:focus, .sheet input[type=text]:focus { background-image: linear-gradient(transparent 34.5px, rgba(192, 53, 31, .55) 34.5px, rgba(192, 53, 31, .55) 35.5px, transparent 35.5px); }
+  .sheet ::placeholder { color: rgba(58, 46, 92, .36); }
+  .sign { margin: 26px 0 0 auto; width: min(260px, 100%); }
+  .sign .q { margin-top: 0; }
+  .who { border: 0; padding: 0; margin: 24px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 4px; }
+  .who legend { float: left; padding: 0; margin-right: 12px; font-size: 16px; }
+  .chip { position: relative; border: 0; background: none; padding: 6px 16px; font-size: 16.5px; cursor: pointer; }
+  /* 選到的那個用紅筆圈起來 */
+  .chip::after { content: ""; position: absolute; inset: 1px 2px; border: 1.6px solid var(--coral); border-radius: 50% 46% 52% 48% / 58% 50% 54% 46%; rotate: -3deg; opacity: 0; clip-path: inset(0 100% 0 0); }
+  .chip[aria-pressed=true]::after { opacity: 1; clip-path: inset(0 0 0 0); transition: clip-path .32s ease-out; }
+  .chip:hover { color: var(--coral-ink); }
+  /* 圈了「其他」才出現的一小段橫線，讓人自己寫 */
+  .sheet .who input.other { display: none; flex: 1 1 150px; width: auto; min-width: 0; max-width: 240px; margin-left: 6px; }
+  .sheet .who.has-other input.other { display: block; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .end { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+  .go { border: 0; cursor: pointer; background: var(--sun); color: var(--grape); font-size: 16px; line-height: 1.3; padding: 13px 22px; border-radius: 10px; box-shadow: 0 2px 0 #c9942a;
+    transition: translate 90ms ease-out, box-shadow 90ms ease-out, background-color 120ms ease-out; text-decoration: none; display: inline-block; }
+  .go:hover { background: #ffd373; }
+  .go:active { translate: 0 2px; box-shadow: 0 0 0 #c9942a; }
+  .go.alt { background: none; box-shadow: inset 0 0 0 1.5px var(--grape-3); }
+  .go.alt:hover { background: var(--sheet); box-shadow: inset 0 0 0 1.5px var(--grape); }
+  .fine { font-size: 13.5px; color: var(--grape-3); }
+  .err { margin-top: 12px; font-size: 14.5px; color: var(--coral-ink); min-height: 1.7em; }
+
+  /* ---- 羽毛筆：筆尖是定位點（圖裡的 14,152），外層管位置、裡層管抬筆和寫字的擺動。不寫的時候插回右邊的墨水瓶 */
+  .pen { position: absolute; z-index: 4; left: 0; top: 0; width: 124px; height: 166px; pointer-events: none; opacity: 0;
+    translate: calc(100cqw + 29px) -62px; transition: translate .3s cubic-bezier(.2, .8, .3, 1), opacity .35s; }
+  .s-open .pen { opacity: 1; }
+  .pen i { display: block; width: 100%; height: 100%; transform-origin: 14px 152px; transition: rotate .35s ease-out, translate .35s ease-out; filter: drop-shadow(6px 9px 4px rgba(58, 46, 92, .2)); }
+  .pen.lift i { translate: -3px -10px; filter: drop-shadow(12px 18px 6px rgba(58, 46, 92, .14)); animation: sway 2.6s ease-in-out infinite alternate; }
+  .pen.rest i { rotate: 16deg; }
+  .pen svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  @keyframes sway { from { rotate: 4deg; } to { rotate: 9deg; } }
+  .ink { position: absolute; z-index: 3; left: calc(100cqw + 14px); top: 78px; width: 58px; height: 60px; opacity: 0; transition: opacity .4s; pointer-events: none; filter: drop-shadow(0 8px 8px rgba(58, 46, 92, .22)); }
+  .s-open .ink { opacity: 1; }
+  .ink svg { display: block; width: 100%; height: 100%; }
+
+  .thanks { display: none; text-align: center; padding: 56px 0 24px; }
+  .s-done .thanks { display: block; }
+  .s-done .letter, .s-done .env-b, .s-done .env-f, .s-done .env-flap, .s-done .seal, .s-done .open-btn, .s-done .hint { display: none; }
+  .thanks h2 { font-size: 26px; letter-spacing: .03em; }
+  .thanks p { margin-top: 10px; color: var(--grape-2); }
+  .thanks .end { justify-content: center; margin-top: 26px; }
+  .thanks .demo { margin-top: 22px; font-size: 14px; color: var(--coral-ink); }
+
+  .mirror { position: absolute; left: -9999px; top: 0; visibility: hidden; overflow-wrap: break-word; }
+
+  @media (max-width: 640px) {
+    .stage { margin-top: 30px; }
+    /* 手機旁邊沒位置放墨水瓶：筆小一點，不寫的時候靠在信紙右上角 */
+    .pen { width: 93px; height: 124.5px; translate: calc(100cqw - 96px) -52px; }
+    .pen i { transform-origin: 10.5px 114px; }
+    .ink { display: none; }
+    .sheet textarea, .sheet input[type=text] { font-size: 19px; }
+    .sheet .to { font-size: 23px; }
+    .post { scale: .86; transform-origin: 100% 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stage *, .stage { transition-duration: .01s !important; animation-duration: .01s !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="wordmark" href="../crab/rooms/f4/index.html">PARADIGM</a>
+    <a class="home" href="../crab/rooms/f4/index.html">← 回首頁</a>
+  </header>
+  <main>
+    <section class="head">
+      <h1>主題提案</h1>
+      <p>想學什麼、卡在哪件事，寫一封信告訴我們。我們會拿這些信來排之後的課。</p>
+    </section>
+
+    <div class="stage" id="stage">
+      <div class="env-b"><svg viewBox="0 0 300 200" preserveAspectRatio="none" aria-hidden="true"><rect width="300" height="200" rx="3" fill="#F1E2C4"/></svg></div>
+
+      <form class="letter" id="letter" novalidate>
+        <div class="fold f1"><div class="fold f2"><div class="fold f3"></div></div></div>
+        <div class="sheet">
+          <div class="row1">
+            <p class="to">給 Paradigm：</p>
+            <div class="post" aria-hidden="true">
+              <div class="stamp"><b><svg viewBox="0 0 13 7" shape-rendering="crispEdges"><path fill="#FF6B57" d="M2 0h9v2h2v2h-2v1h1v2h-1V6h-1v1H9V6H4v1H3V6H2v1H1V5h1V4H0V2h2z"/><path fill="#3A2E5C" d="M4 2h1v1H4zM8 2h1v1H8z"/></svg>PARADIGM</b></div>
+              <svg class="mark" viewBox="0 0 80 80"><g fill="none" stroke="#3A2E5C" stroke-width="1.4"><circle cx="40" cy="40" r="36"/><circle cx="40" cy="40" r="24"/><path d="M78 31 q8 -4 16 0 M78 40 q8 -4 16 0 M78 49 q8 -4 16 0"/></g>
+                <path id="arc" d="M11 40 a29 29 0 0 1 58 0" fill="none"/><text font-size="7.5" fill="#3A2E5C" style="font-family:var(--en);letter-spacing:.2em"><textPath href="#arc" startOffset="50%" text-anchor="middle">AIR MAIL</textPath></text>
+                <text id="date" x="40" y="43.5" text-anchor="middle" font-size="8.6" fill="#3A2E5C" style="font-family:var(--en);font-weight:600;letter-spacing:.04em"></text></svg>
+            </div>
+          </div>
+          <label class="q" for="topic">我想學</label>
+          <textarea id="topic" name="topic" rows="2" maxlength="300" required placeholder="例：用 AI 整理上課錄音，做成考前重點"></textarea>
+          <label class="q" for="use">學會之後想拿來做什麼 <small>（選填）</small></label>
+          <textarea id="use" name="use" rows="2" maxlength="300" placeholder="例：期末前不用重聽三小時的錄音"></textarea>
+          <fieldset class="who">
+            <legend>我是</legend>
+            <button type="button" class="chip" aria-pressed="false">學生</button>
+            <button type="button" class="chip" aria-pressed="false">上班族</button>
+            <button type="button" class="chip" aria-pressed="false">其他</button>
+            <input type="text" class="other" id="other" name="other" maxlength="40" autocomplete="off" aria-label="其他：請寫下你的身分" placeholder="例：自由接案、家長">
+          </fieldset>
+          <div class="sign">
+            <label class="q" for="name">署名 <small>（選填，可以留 IG 帳號）</small></label>
+            <input type="text" id="name" name="name" maxlength="60" autocomplete="off">
+          </div>
+          <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <p class="err" id="err" role="alert"></p>
+          <div class="end">
+            <button type="submit" class="go">寄出這封信</button>
+            <span class="fine">內容只用來規劃之後的課程，不會公開。</span>
+          </div>
+        </div>
+        <div class="pen rest" id="pen" aria-hidden="true"><i>
+          <svg viewBox="-14 -152 124 166"><defs>
+            <linearGradient id="vane" x1="36" x2="158" y1="0" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fffefb"/><stop offset=".55" stop-color="#f1eafa"/><stop offset="1" stop-color="#cfc2ea"/></linearGradient>
+            <linearGradient id="vane2" x1="36" x2="158" y1="0" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f4eee6"/><stop offset=".55" stop-color="#e2d8f1"/><stop offset="1" stop-color="#b9a9dc"/></linearGradient>
+          </defs><g transform="rotate(-58)">
+            <path d="M36 0 C46 -16 70 -27 93 -27 L89 -20 C101 -28 121 -27 135 -19 L129 -14 C141 -15 151 -9 158 -1 Z" fill="url(#vane)"/>
+            <path d="M158 -1 C148 9 133 15 119 17 L121 11 C105 20 85 21 69 17 L71 12 C57 14 45 8 36 0 Z" fill="url(#vane2)"/>
+            <path d="M36 0 C46 -16 70 -27 93 -27 L89 -20 C101 -28 121 -27 135 -19 L129 -14 C141 -15 151 -9 158 -1 C148 9 133 15 119 17 L121 11 C105 20 85 21 69 17 L71 12 C57 14 45 8 36 0 Z" fill="none" stroke="rgba(58,46,92,.6)" stroke-width=".9" stroke-linejoin="round"/>
+            <path d="M54 -1 L66 -19 M70 -1 L84 -24 M88 -1 L104 -24 M106 -1 L122 -20 M124 -1 L138 -14 M58 1 L70 12 M76 1 L90 18 M96 1 L110 17 M116 1 L130 13" stroke="rgba(58,46,92,.16)" stroke-width=".8" fill="none"/>
+            <path d="M14 0 Q80 -3 158 -1" stroke="#b08a4a" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+            <path d="M12 -2.4 L36 -2 L36 2 L12 2.4 Z" fill="#e9dcc0" stroke="rgba(58,46,92,.3)" stroke-width=".6"/>
+            <path d="M0 0 L14 -2.8 L14 2.8 Z" fill="#2b2560"/>
+          </g></svg>
+        </i></div>
+        <div class="ink" aria-hidden="true"><svg viewBox="0 0 58 60">
+          <rect x="19" y="2" width="20" height="9" rx="2" fill="#2A2145"/><rect x="21" y="10" width="16" height="7" fill="#4a3d73"/>
+          <path d="M8 26 Q8 17 19 17 H39 Q50 17 50 26 V52 Q50 58 44 58 H14 Q8 58 8 52 Z" fill="#3A2E5C"/>
+          <path d="M11 34 H47 V52 Q47 55 44 55 H14 Q11 55 11 52 Z" fill="#1d1740"/>
+          <path d="M13 24 Q13 21 17 21 V50 Q13 50 13 46 Z" fill="#fff" opacity=".2"/>
+          <rect x="19" y="36" width="20" height="13" rx="1.5" fill="#FFFCF4"/><text x="29" y="45.5" text-anchor="middle" font-size="7" fill="#3A2E5C" style="font-family:var(--en);font-weight:600;letter-spacing:.1em">INK</text>
+        </svg></div>
+      </form>
+
+      <div class="env-f"><svg viewBox="0 0 300 200" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <pattern id="air" width="36" height="36" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="36" height="36" fill="#FFFAF0"/><rect width="9" height="36" fill="#FF6B57"/><rect x="18" width="9" height="36" fill="#3A2E5C"/></pattern>
+          <clipPath id="pocket"><path d="M0 0 L150 112 L300 0 L300 200 L0 200 Z"/></clipPath>
+        </defs>
+        <path d="M0 0 L150 112 L300 0 L300 197 Q300 200 297 200 L3 200 Q0 200 0 197 Z" fill="#FFFAF0"/>
+        <g clip-path="url(#pocket)"><rect x="4" y="4" width="292" height="192" fill="none" stroke="url(#air)" stroke-width="8"/></g>
+        <path d="M0 0 L150 112 L300 0 M8 192 L118 88 M292 192 L182 88" fill="none" stroke="rgba(58,46,92,.2)" stroke-width="1"/>
+        <rect x="20" y="164" width="62" height="18" fill="#3A2E5C"/><text x="51" y="177" text-anchor="middle" font-size="11" fill="#FFF4E0" style="font-family:var(--zh);letter-spacing:.12em">限時專送</text>
+      </svg></div>
+      <div class="env-flap"><svg viewBox="0 0 300 200" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0 L300 0 L150 112 Z" fill="#FFF6E6" stroke="rgba(58,46,92,.2)" stroke-width="1"/></svg></div>
+      <button type="button" class="open-btn" id="open" aria-label="打開信封，寫下想學的主題"></button>
+      <div class="seal" aria-hidden="true">P</div>
+      <p class="hint">點一下信封，寫信給我們</p>
+
+      <div class="thanks" id="thanks" tabindex="-1">
+        <h2>信寄出了，謝謝你。</h2>
+        <p>排下一批課的時候，我們會把它放進去一起看。</p>
+        <p class="demo" id="demo" hidden>預覽版還沒接上收件的試算表，這封信沒有真的寄出。</p>
+        <div class="end"><button type="button" class="go" id="again">再寫一封</button><a class="go alt" href="../crab/rooms/f4/index.html">回首頁</a></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="endpoint.js"></script>
+<script>
+// 收件網址在 endpoint.js。還沒接上時是空的：動畫照跑，但會寫明沒有真的寄出。
+const ENDPOINT = window.PARADIGM_API || ''
+
+const $ = s => document.querySelector(s)
+const stage = $('#stage'), letter = $('#letter'), pen = $('#pen'), penIn = pen.firstElementChild
+const fields = [$('#topic'), $('#use'), $('#other'), $('#name')]
+const whoBox = document.querySelector('.who'), other = $('#other')
+const calm = matchMedia('(prefers-reduced-motion: reduce)').matches
+const wait = ms => new Promise(r => setTimeout(r, calm ? 0 : ms))
+const d = new Date()
+$('#date').textContent = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
+
+// 折起來的信要塞得進信封：手機上信紙比較長，縮小一點
+function fitFold() {
+  const envH = stage.clientWidth * .44, third = letter.offsetHeight / 3
+  stage.style.setProperty('--fs', Math.min(.6, envH * .7 / third).toFixed(3))
+}
+fitFold(); addEventListener('resize', fitFold)
+
+// textarea 跟著內容長高，橫線才不會跑掉
+// 空的時候固定兩行：Chrome 會把換行的 placeholder 也算進 scrollHeight
+function grow(t) { if (t.tagName !== 'TEXTAREA') return; t.style.height = 'auto'; t.style.height = (t.value ? Math.max(72, Math.ceil(t.scrollHeight / 36) * 36) : 72) + 'px' }
+fields.forEach(grow)
+
+// 游標在信紙上的位置：把游標前的字倒進一個同樣排版的隱形盒子裡量
+const mirror = document.createElement('div'); mirror.className = 'mirror'; document.body.append(mirror)
+function caretXY(el) {
+  const cs = getComputedStyle(el)
+  for (const k of ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing', 'padding', 'boxSizing', 'textIndent']) mirror.style[k] = cs[k]
+  mirror.style.width = el.offsetWidth + 'px'
+  mirror.style.whiteSpace = el.tagName === 'TEXTAREA' ? 'pre-wrap' : 'pre'
+  mirror.textContent = el.value.slice(0, el.selectionEnd)
+  const dot = document.createElement('span'); dot.textContent = '​'; mirror.append(dot)
+  const er = el.getBoundingClientRect(), lr = letter.getBoundingClientRect()
+  return { x: er.left - lr.left + Math.min(dot.offsetLeft, el.clientWidth) - el.scrollLeft, y: er.top - lr.top + dot.offsetTop - el.scrollTop }
+}
+
+const tip = () => (innerWidth <= 640 ? [10.5, 114] : [14, 152])
+function penTo(x, y) { const [tx, ty] = tip(); pen.style.translate = `${x - tx}px ${y - ty}px` }
+let idle
+function follow(el, writing) {
+  const p = caretXY(el)
+  penTo(p.x, p.y + 30)   // 行高 36，筆尖落在字的腳邊
+  pen.classList.remove('rest', 'lift')
+  if (writing && !calm) penIn.animate([{ rotate: '0deg', translate: '0 0' }, { rotate: '-6deg', translate: '2px -2px' }, { rotate: '4deg', translate: '-1px 1px' }, { rotate: '-2deg', translate: '1px 0' }, { rotate: '0deg', translate: '0 0' }], { duration: 230, easing: 'ease-out' })
+  clearTimeout(idle); idle = setTimeout(() => pen.classList.add('lift'), 1100)   // 停筆一下就把筆抬起來
+}
+function penRest() { clearTimeout(idle); pen.classList.remove('lift'); pen.classList.add('rest'); pen.style.translate = '' }
+
+fields.forEach(el => {
+  el.addEventListener('input', () => { grow(el); follow(el, true); $('#err').textContent = '' })
+  for (const ev of ['focus', 'click', 'keyup']) el.addEventListener(ev, () => follow(el, false))
+  el.addEventListener('blur', () => setTimeout(() => { if (!fields.includes(document.activeElement)) penRest() }, 60))
+})
+
+const chips = [...document.querySelectorAll('.chip')]
+chips.forEach(c => c.addEventListener('click', () => {
+  const on = c.getAttribute('aria-pressed') === 'true'
+  chips.forEach(x => x.setAttribute('aria-pressed', 'false'))
+  const isOther = !on && c.textContent === '其他'
+  whoBox.classList.toggle('has-other', isOther)
+  if (!isOther) other.value = ''
+  if (isOther) { c.setAttribute('aria-pressed', 'true'); other.focus(); return }   // 筆直接去那條線上等著寫
+  if (!on) {
+    c.setAttribute('aria-pressed', 'true')
+    const r = c.getBoundingClientRect(), lr = letter.getBoundingClientRect()
+    penTo(r.right - lr.left - 6, r.top - lr.top + r.height * .55)
+    pen.classList.remove('rest', 'lift'); clearTimeout(idle); idle = setTimeout(penRest, 900)
+  }
+}))
+
+const on = (...c) => stage.classList.add(...c), off = (...c) => stage.classList.remove(...c)
+
+// 拆信：封蠟彈開、掀蓋、抽出信、信封退場、信紙兩段攤開
+async function openUp() {
+  on('s-flap'); await wait(260); on('flap-under'); await wait(260)
+  on('s-rise'); await wait(520)
+  on('s-out'); await wait(560)
+  on('s-b'); await wait(480)
+  on('s-c'); await wait(560)
+  on('s-open'); fields[0].focus({ preventScroll: true }); follow(fields[0], false)
+}
+$('#open').addEventListener('click', openUp, { once: true })
+
+// 寄信：照拆信的順序倒著做，最後蓋封蠟、飛走
+async function sendOff() {
+  on('sending'); penRest(); off('s-open'); await wait(380)
+  fitFold(); scrollTo({ top: Math.max(0, stage.getBoundingClientRect().top + scrollY - 120), behavior: calm ? 'auto' : 'smooth' })
+  off('s-c'); await wait(460); off('s-b'); await wait(520)
+  off('s-out'); await wait(600)
+  off('s-rise'); await wait(500)
+  off('flap-under'); off('s-flap'); await wait(1150)   // 蓋好、蓋章、停一下再飛
+  on('s-fly'); await wait(650)
+  on('s-done'); $('#thanks').focus({ preventScroll: true })
+}
+
+letter.addEventListener('submit', async e => {
+  e.preventDefault()
+  const f = new FormData(letter), topic = (f.get('topic') || '').trim()
+  if (!topic) { $('#err').textContent = '先寫下想學的主題，再寄出。'; fields[0].focus(); return }
+  if (f.get('website')) return   // 機器人才會填這格
+  const who = chips.find(c => c.getAttribute('aria-pressed') === 'true')
+  const otherText = other.value.trim()
+  const data = { topic, use: (f.get('use') || '').trim(), who: who ? who.textContent + (who.textContent === '其他' && otherText ? '：' + otherText : '') : '', name: (f.get('name') || '').trim() }
+  letter.querySelector('.go').disabled = true
+  if (ENDPOINT) {
+    // text/plain 才不會多一次預檢請求，Apps Script 接不了預檢
+    try { const r = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(data) }); if (!(await r.json()).ok) throw 0 }
+    catch { letter.querySelector('.go').disabled = false; $('#err').textContent = '沒有寄出去。檢查一下網路，再按一次寄出。'; return }
+  } else { $('#demo').hidden = false }
+  sendOff()
+})
+
+// 再寫一封：清空，直接回到攤開的信紙
+$('#again').addEventListener('click', () => {
+  letter.reset(); fields.forEach(grow); chips.forEach(x => x.setAttribute('aria-pressed', 'false')); whoBox.classList.remove('has-other')
+  letter.querySelector('.go').disabled = false
+  off('s-done', 's-fly', 'sending'); on('s-flap', 'flap-under', 's-rise', 's-out', 's-b', 's-c', 's-open')
+  fields[0].focus(); setTimeout(() => follow(fields[0], false), 120)
+})
+</script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://paradigm-ai10.github.io/study-home/cases/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Paradigm AI 學習站">
+<meta property="og:title" content="實作案例｜Paradigm 學 AI">
+<meta property="og:description" content="帶一件麻煩事來，看 AI 怎麼一步步把它做掉。每個案例都對應一堂 Paradigm 的課，可以照著做。">
+<meta property="og:url" content="https://paradigm-ai10.github.io/study-home/cases/">
+<meta property="og:image" content="https://paradigm-ai10.github.io/study-home/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#FFF4E0">
+<title>實作案例｜Paradigm 學 AI</title>
+<meta name="description" content="帶一件麻煩事來，看 AI 怎麼一步步把它做掉。每個案例都對應一堂 Paradigm 的課，可以照著做。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=LXGW+WenKai+TC&family=Outfit:wght@500;600&display=swap">
+<style>
+  /* 外觀跟資源下載頁同一套。這頁的主角是首頁書桌上那疊黃色便條和鉛筆：
+     便條上寫一件麻煩事，鉛筆把右邊的步驟一格一格打勾，最後回來把便條劃掉。 */
+  :root {
+    --cream: #FFF4E0; --sheet: #FFFAF0; --grape: #3A2E5C;
+    --grape-2: rgba(58, 46, 92, .78); --grape-3: rgba(58, 46, 92, .74); --line: rgba(58, 46, 92, .18);
+    --coral: #FF6B57; --coral-ink: #C0351F; --sun: #FFC857;
+    --zh: "Huninn", "PingFang TC", "Noto Sans TC", system-ui, sans-serif;
+    --en: "Outfit", "Huninn", system-ui, sans-serif;
+    --hand: "LXGW WenKai TC", "BiauKai", "DFKai-SB", "Huninn", serif;
+    --pad: clamp(16px, 4vw, 56px);
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--cream); }
+  body { margin: 0; background: var(--cream); color: var(--grape); font-family: var(--zh); font-size: 15.5px; line-height: 1.7; letter-spacing: .02em; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 3px solid var(--coral-ink); outline-offset: 3px; border-radius: 4px; }
+  a { color: inherit; }
+  h1, h2, h3, p, ol { margin: 0; }
+  h1, h2, h3 { font-weight: 400; }
+  button { font: inherit; color: inherit; letter-spacing: inherit; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 var(--pad); overflow-x: clip; }
+
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-top: 18px; }
+  .wordmark { font: 600 13px/1 var(--en); letter-spacing: .26em; text-decoration: none; padding: 8px 0; }
+  .home { text-decoration: none; font-size: 14px; padding: 7px 13px 8px; border-radius: 8px; box-shadow: inset 0 0 0 1.5px var(--grape-3); line-height: 1.2; white-space: nowrap; }
+  .home:hover { box-shadow: inset 0 0 0 1.5px var(--grape); background: var(--sheet); }
+
+  .head { padding: clamp(28px, 6vh, 56px) 0 clamp(20px, 4vh, 32px); border-bottom: 1px solid var(--line); }
+  .head h1 { font-size: clamp(30px, 2.7vw, 38px); line-height: 1.36; letter-spacing: .03em; }
+  .head p { margin-top: 10px; font-size: 16px; color: var(--grape-2); max-width: 42em; }
+
+  /* ---- 一個案例：左邊便條（麻煩事），右邊做法 */
+  .case { position: relative; display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 0 clamp(28px, 5vw, 64px); padding: 52px 0 56px; border-bottom: 1px dashed var(--line); }
+  .side { position: relative; }
+  .note { position: relative; rotate: -2.2deg; padding: 34px 26px 96px; min-height: 250px;   /* 底下留一塊給「做掉了」的章 */
+    background: linear-gradient(168deg, #FFDC7E, #FFCB5C 70%); border-radius: 2px 2px 26px 2px / 2px 2px 18px 2px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .5) inset, 0 18px 22px -14px rgba(58, 46, 92, .4), 0 3px 4px rgba(58, 46, 92, .1); }
+  .case:nth-of-type(even) .note { rotate: 1.8deg; }
+  /* 便條上緣那條膠 */
+  .note::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 22px; background: linear-gradient(rgba(201, 148, 42, .32), rgba(201, 148, 42, 0)); border-radius: 2px 2px 0 0; }
+  .note .label { font-size: 13px; color: rgba(58, 46, 92, .7); }
+  .note .row { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; margin-top: 10px; }
+  .note .text { font: 400 22px/1.62 var(--hand); letter-spacing: .04em; }
+  .note .text span { background: linear-gradient(var(--coral-ink), var(--coral-ink)) no-repeat 0 56% / 0 1.6px; -webkit-box-decoration-break: clone; box-decoration-break: clone; transition: background-size .7s ease-out, color .5s; }
+  .solved .note .text span { background-size: 100% 1.6px; color: rgba(58, 46, 92, .55); }
+  .stamp { position: absolute; right: 18px; bottom: 14px; width: 78px; height: 78px; display: grid; place-items: center; border-radius: 50%; rotate: -14deg;
+    font: 400 19px/1 var(--hand); letter-spacing: .08em; color: var(--coral-ink); box-shadow: inset 0 0 0 2.5px var(--coral-ink), inset 0 0 0 5px transparent, inset 0 0 0 6px var(--coral-ink);
+    opacity: 0; scale: 1.6; transition: opacity .18s ease-in, scale .22s cubic-bezier(.3, 1.5, .5, 1); }
+  .solved .stamp { opacity: .86; scale: 1; }
+  .meta { list-style: none; padding: 0; margin: 30px 0 0 4px; font-size: 14px; color: var(--grape-2); }
+  .meta li { padding-left: 14px; position: relative; }
+  .meta li::before { content: ""; position: absolute; left: 0; top: .78em; width: 5px; height: 5px; border-radius: 50%; background: var(--grape-3); }
+
+  .box { display: block; width: 26px; height: 26px; margin-top: 5px; overflow: visible; }
+  .box rect { fill: rgba(255, 255, 255, .35); stroke: var(--grape); stroke-width: 1.8; }
+  .box path { fill: none; stroke: var(--coral-ink); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 44; stroke-dashoffset: 44; transition: stroke-dashoffset .3s ease-out; }
+  .done > .box path, .done .box path { stroke-dashoffset: 0; }
+
+  .how .no { font: 600 15px/1 var(--en); color: var(--coral-ink); letter-spacing: .04em; }
+  .how h2 { margin-top: 8px; font-size: clamp(23px, 2.2vw, 28px); line-height: 1.42; letter-spacing: .03em; }
+  .tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; padding: 0; list-style: none; }
+  .tools li { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px 5px 8px; border-radius: 99px; background: var(--sheet); box-shadow: inset 0 0 0 1px var(--line); font: 500 13.5px/1.3 var(--en); }
+  .tools img { height: 17px; width: auto; max-width: 46px; display: block; }
+  .steps { list-style: none; padding: 0; margin: 26px 0 0; display: grid; gap: 4px; }
+  .steps li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 14px; padding: 10px 12px 11px; margin: 0 -12px; border-radius: 10px; transition: background-color .3s; }
+  .steps li.now { background: rgba(255, 200, 87, .28); }
+  .steps .box rect { fill: var(--sheet); }
+  .steps p { font-size: 16.5px; line-height: 1.66; }
+  .steps small { display: block; margin-top: 2px; font-size: 14px; color: var(--grape-2); }
+  .steps q { quotes: "「" "」"; font-family: var(--hand); font-size: 1.1em; }
+  .got { margin-top: 26px; padding-top: 20px; border-top: 1px dashed var(--line); display: grid; grid-template-columns: minmax(0, 1fr) 210px; gap: 20px 26px; align-items: start; }
+  .got h3 { font-size: 15px; color: var(--grape-3); }
+  .got p { margin-top: 4px; font-size: 16.5px; }
+  .got .warn { margin-top: 10px; font-size: 14px; color: var(--grape-2); }
+  .shot { margin: 0; }
+  .shot img { display: block; width: 100%; aspect-ratio: 16 / 11; object-fit: cover; object-position: 0 0; border-radius: 8px; box-shadow: 0 0 0 1px var(--line), 0 12px 18px -12px rgba(58, 46, 92, .35); background: var(--sheet); }
+  .shot figcaption { margin-top: 7px; font-size: 13px; color: var(--grape-3); line-height: 1.5; }
+  .acts { margin-top: 26px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+  .go { border: 0; cursor: pointer; background: var(--sun); color: var(--grape); font-size: 16px; line-height: 1.3; padding: 13px 20px; border-radius: 10px; box-shadow: 0 2px 0 #c9942a;
+    transition: translate 90ms ease-out, box-shadow 90ms ease-out, background-color 120ms ease-out; text-decoration: none; display: inline-block; }
+  .go:hover { background: #ffd373; }
+  .go:active { translate: 0 2px; box-shadow: 0 0 0 #c9942a; }
+  .again { border: 0; background: none; padding: 6px 0; cursor: pointer; font-size: 14.5px; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--coral); text-decoration-thickness: 1.5px; }
+
+  /* ---- 鉛筆：筆尖是定位點（圖裡的 10,100） */
+  .pencil { position: absolute; z-index: 5; left: 0; top: 0; width: 96px; height: 110px; pointer-events: none; opacity: 0;
+    transition: translate .42s cubic-bezier(.3, .8, .25, 1), opacity .3s; }
+  .pencil.on { opacity: 1; }
+  .pencil i { display: block; width: 100%; height: 100%; transform-origin: 10px 100px; transition: rotate .4s ease-out; filter: drop-shadow(6px 9px 4px rgba(58, 46, 92, .22)); }
+  .pencil.rest i { rotate: 62deg; }
+  .pencil svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+  .more { padding: 44px 0 64px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; }
+  .more p { font-size: 17px; }
+  .more small { display: block; font-size: 14px; color: var(--grape-2); }
+  .go.alt { background: none; box-shadow: inset 0 0 0 1.5px var(--grape-3); }
+  .go.alt:hover { background: var(--sheet); box-shadow: inset 0 0 0 1.5px var(--grape); }
+  .credit { padding-bottom: 40px; font-size: 13px; color: var(--grape-3); }
+
+  @media (max-width: 820px) {
+    .case { grid-template-columns: minmax(0, 1fr); padding: 36px 0 44px; }
+    .note { max-width: 330px; min-height: 0; margin: 0 6px; }
+    .meta { margin: 26px 0 30px 4px; }
+    .got { grid-template-columns: minmax(0, 1fr); }
+    .shot { max-width: 330px; }
+    .pencil { width: 77px; height: 88px; }
+    .pencil i { transform-origin: 8px 80px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .case *, .pencil { transition-duration: .01s !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="wordmark" href="../crab/rooms/f4/index.html">PARADIGM</a>
+    <a class="home" href="../crab/rooms/f4/index.html">← 回首頁</a>
+  </header>
+  <main>
+    <section class="head">
+      <h1>實作案例</h1>
+      <p>帶一件麻煩事來，看 AI 怎麼一步步把它做掉。每個案例都對應一堂課，可以照著做。</p>
+    </section>
+
+    <article class="case" id="6-1">
+      <div class="side">
+        <div class="note" data-tick>
+          <p class="label">今天的麻煩事</p>
+          <div class="row">
+            <svg class="box" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="3"/><path d="M5 13 L11 20 L25 1"/></svg>
+            <p class="text"><span>教授來信說下週日要開會。要回信、記行事曆，還要把雲端的資料整理好寄過去。</span></p>
+          </div>
+          <span class="stamp" aria-hidden="true">做掉了</span>
+        </div>
+        <ul class="meta">
+          <li>動手約 10–20 分鐘</li>
+          <li>要一個 Google 帳號</li>
+          <li>不用寫程式</li>
+        </ul>
+      </div>
+      <div class="how">
+        <p class="no">6-1</p>
+        <h2>一封開會通知，四句話交代完</h2>
+        <ul class="tools" aria-label="用到的工具">
+          <li><img src="../lessons/media/6-1/img/logo/claude.svg" alt="">Claude</li>
+          <li><img src="../lessons/media/6-1/img/logo/google-gmail.svg" alt="">Gmail</li>
+          <li><img src="../lessons/media/6-1/img/logo/google-calendar.svg" alt="">Google Calendar</li>
+          <li><img src="../lessons/media/6-1/img/logo/google-drive.svg" alt="">Google Drive</li>
+        </ul>
+        <ol class="steps">
+          <li data-tick><svg class="box" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="3"/><path d="M5 13 L11 20 L25 1"/></svg>
+            <p>請它找出教授那封信，擬好回信。<small>你看過草稿、按下確認，它才寄出。</small></p></li>
+          <li data-tick><svg class="box" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="3"/><path d="M5 13 L11 20 L25 1"/></svg>
+            <p>照信裡的時間和地點，把會議記進 Google 日曆。</p></li>
+          <li data-tick><svg class="box" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="3"/><path d="M5 13 L11 20 L25 1"/></svg>
+            <p>到雲端硬碟找出兩份資料，匯出成 Excel 和 Word 讓你下載。</p></li>
+          <li data-tick><svg class="box" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="3"/><path d="M5 13 L11 20 L25 1"/></svg>
+            <p>把進度摘要存回雲端硬碟，再起草下一封信。<small>只存成草稿，不會自己寄。</small></p></li>
+        </ol>
+        <div class="got">
+          <div>
+            <h3>做完你手上有</h3>
+            <p>一封寄出的回信、日曆上的會議、Excel 和 Word 各一份、雲端硬碟一份進度摘要、Gmail 一封待寄的草稿。</p>
+            <p class="warn">免費版做得到，但很吃用量：我們實測 5 則訊息就用完 5 小時的訊息上限。</p>
+          </div>
+          <figure class="shot"><img src="../lessons/media/6-1/img/d4_found_draft.png" alt="Claude 找到教授的信，列出時間地點，並擬好回信草稿的畫面" loading="lazy"><figcaption>它先說找到哪封信，再給回信草稿</figcaption></figure>
+        </div>
+        <div class="acts"><a class="go" href="../lessons/6-1.html">照著做：6-1 Connectors 入門</a><button type="button" class="again">再看一次怎麼做掉</button></div>
+      </div>
+    </article>
+
+    <article class="case" id="6-E4">
+      <div class="side">
+        <div class="note" data-tick>
+          <p class="label">今天的麻煩事</p>
+          <div class="row">
+            <svg class="box" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="3"/><path d="M5 13 L11 20 L25 1"/></svg>
+            <p class="text"><span>想吃拉麵。Threads 上推薦文一大堆，看不出哪幾家真的很多人推。</span></p>
+          </div>
+          <span class="stamp" aria-hidden="true">做掉了</span>
+        </div>
+        <ul class="meta">
+          <li>動手約 15–25 分鐘</li>
+          <li>主線免費版就能做</li>
+          <li>不用寫程式</li>
+        </ul>
+      </div>
+      <div class="how">
+        <p class="no">6-E4</p>
+        <h2>把 Threads 上的推薦，整理成一張能挑的店家清單</h2>
+        <ul class="tools" aria-label="用到的工具">
+          <li><img src="../lessons/media/6-E4/img/logo/i_threads.svg" alt="">Threads</li>
+          <li><img src="../lessons/media/6-E4/img/logo/i_apify.svg" alt="">Apify</li>
+          <li><img src="../lessons/media/6-E4/img/logo/i_claude-icon.svg" alt="">Claude</li>
+          <li><img src="../lessons/media/6-E4/img/logo/i_google-maps.svg" alt="">Google Maps</li>
+        </ul>
+        <ol class="steps">
+          <li data-tick><svg class="box" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="3"/><path d="M5 13 L11 20 L25 1"/></svg>
+            <p>在 Claude 接上 Apify 連接器。<small>只要做一次，之後每個對話都能用。</small></p></li>
+          <li data-tick><svg class="box" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="3"/><path d="M5 13 L11 20 L25 1"/></svg>
+            <p>說一句<q>用 Apify 幫我找 Threads 上的台北拉麵</q>，它去抓最熱門的 20 則貼文。</p></li>
+          <li data-tick><svg class="box" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="3"/><path d="M5 13 L11 20 L25 1"/></svg>
+            <p>請 Claude 整理成店家清單。<small>照讚數排，被多則貼文提到的放前面，每家附 Google Maps 連結。</small></p></li>
+          <li data-tick><svg class="box" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="3"/><path d="M5 13 L11 20 L25 1"/></svg>
+            <p>挑好想去的幾家，存進 Google Maps 清單。<small>付費方案可以讓 Claude 代存；免費版拿連結自己按儲存。</small></p></li>
+        </ol>
+        <div class="got">
+          <div>
+            <h3>做完你手上有</h3>
+            <p>一個存著 10 家左右餐廳的 Google Maps 清單，手機上也看得到。</p>
+          </div>
+          <figure class="shot"><img src="../lessons/media/6-E4/img/s4_table.jpg" alt="店家審閱表：每家店有讚數、貼文日期和一句摘錄，可以勾選和打星" loading="lazy"><figcaption>整理好的店家表，可以勾選、打星</figcaption></figure>
+        </div>
+        <div class="acts"><a class="go" href="../lessons/6-E4.html">照著做：6-E4 Threads 找好店</a><button type="button" class="again">再看一次怎麼做掉</button></div>
+      </div>
+    </article>
+
+    <section class="more">
+      <p>你的麻煩事不在這裡？<small>寫信告訴我們，之後的案例會從這些信裡挑。</small></p>
+      <a class="go alt" href="../ask/index.html">寫一封主題提案</a>
+    </section>
+    <p class="credit">圖中的 logo 屬於各公司，這裡只用來標示是哪個服務。</p>
+  </main>
+</div>
+<script>
+const calm = matchMedia('(prefers-reduced-motion: reduce)').matches
+const wait = ms => new Promise(r => setTimeout(r, ms))
+const PENCIL = `<i><svg viewBox="-10 -100 96 110"><g transform="rotate(-50)">
+  <path d="M0 0 L8 -3 L8 3 Z" fill="#3A2E5C"/><path d="M8 -3 L24 -7 L24 7 L8 3 Z" fill="#f3dcae"/>
+  <rect x="24" y="-7" width="78" height="14" fill="#FF6B57"/><rect x="24" y="-7" width="78" height="4.5" fill="#ff8a78"/><rect x="24" y="3" width="78" height="4" fill="#e0523f"/>
+  <rect x="102" y="-7.5" width="9" height="15" fill="#D9A441"/><path d="M105 -7.5 V7.5 M108 -7.5 V7.5" stroke="#b07f25" stroke-width=".8"/>
+  <rect x="111" y="-7" width="11" height="14" rx="3.5" fill="#ffb3a7"/></g></svg></i>`
+
+document.querySelectorAll('.case').forEach(c => {
+  const ticks = [...c.querySelectorAll('.steps [data-tick]'), c.querySelector('.note')]   // 先勾步驟，最後回來勾便條
+  const pencil = document.createElement('div'); pencil.className = 'pencil'; pencil.setAttribute('aria-hidden', 'true'); pencil.innerHTML = PENCIL; c.append(pencil)
+  const tip = () => (innerWidth <= 820 ? [8, 80] : [10, 100])
+  const to = (x, y) => { const [tx, ty] = tip(); pencil.style.translate = `${x - tx}px ${y - ty}px` }
+  const at = el => { const r = el.getBoundingClientRect(), cr = c.getBoundingClientRect(); return [r.left - cr.left, r.top - cr.top, r.width, r.height] }
+  // 沒事的時候鉛筆橫躺在便條下面
+  const rest = () => { const [x, y, w, h] = at(c.querySelector('.note')); pencil.classList.add('rest'); to(x + w * .6, y + h + 56) }
+  let run = 0
+  async function play() {
+    const me = ++run
+    c.classList.remove('solved'); ticks.forEach(t => t.classList.remove('done', 'now'))
+    if (calm) { ticks.forEach(t => t.classList.add('done')); c.classList.add('solved'); return }
+    pencil.classList.add('on'); await wait(350)
+    for (const t of ticks) {
+      if (me !== run) return
+      const [x, y, w, h] = at(t.querySelector('.box'))
+      pencil.classList.remove('rest'); to(x + w * .3, y + h * .62); t.classList.add('now')
+      await wait(520); if (me !== run) return
+      t.classList.add('done')
+      pencil.firstElementChild.animate([{ rotate: '0deg', translate: '0 0' }, { rotate: '-7deg', translate: '5px 5px' }, { rotate: '8deg', translate: '14px -12px' }, { rotate: '0deg', translate: '0 0' }], { duration: 330, easing: 'ease-out' })
+      await wait(620); t.classList.remove('now')
+    }
+    if (me !== run) return
+    c.classList.add('solved'); await wait(300); rest()
+  }
+  c.querySelector('.again').addEventListener('click', play)
+  // 捲到這個案例才開始，只自動播一次
+  new IntersectionObserver((es, ob) => { if (es[0].isIntersecting) { ob.disconnect(); play() } }, { threshold: .45 }).observe(c.querySelector('.steps'))
+  addEventListener('resize', () => { if (c.classList.contains('solved') && !calm) rest() })
+})
+</script>
+</body>
+</html>
