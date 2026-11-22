@@ -185,6 +185,9 @@
   .les select { padding: 4px 26px 5px 10px; border: 0; border-radius: 8px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%233A2E5C' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 9px center / 10px; box-shadow: inset 0 0 0 1.5px var(--line); font-size: 14px; color: var(--grape); appearance: none; cursor: pointer; }
   .les select:hover { box-shadow: inset 0 0 0 1.5px var(--grape-3); }
   .les .ctl a { margin-left: auto; text-underline-offset: 4px; text-decoration-color: var(--line); }
+  .les .brief { grid-column: 2 / -1; font-size: 14px; color: var(--grape-2); }
+  .les .brief summary { cursor: pointer; font-size: 13.5px; color: var(--grape-3); }
+  .les .brief p { margin-top: 4px; white-space: pre-wrap; max-width: 46em; }
 
   /* ---- 專案：課程以外的事。一張卡一個專案，系列裡的每一集是卡片裡的一塊牌子 */
   .pgroup { margin-top: 26px; font-size: 19px; display: flex; align-items: baseline; gap: 10px; }
@@ -424,7 +427,8 @@ function panelLessons() {
         <span class="ti">${live ? `<a href="${esc(pageUrl(l))}">${esc(l.title)}</a>` : esc(l.title)}${tags}</span>
         <span class="who">${l.owner ? `<b>${esc(l.owner)}</b>${l.since ? esc(day(l.since)) + ' 起' : ''}` : ''}${mine ? `<button type="button" data-release="${esc(l.code)}" ${busy ? 'disabled' : ''}>放掉</button>` : l.owner ? '' : `<button type="button" data-claim="${esc(l.code)}" ${busy ? 'disabled' : ''}>我來做</button>`}</span>
         <span class="ctl"><label>網頁${sel(l, 'page_stage', PAGE, l.page_stage || '未開始')}</label><label>影片${sel(l, 'video_plan', VPLAN, l.video_plan || '未定')}</label>${l.video_plan === '要' ? `<label>拍到哪${sel(l, 'video_stage', VSTAGE, l.video_stage || '未開始')}</label>` : ''}
-          <a href="${esc(rowLink('lessons', l.row))}" target="_blank" rel="noopener">到試算表改這一列</a></span></li>`
+          <a href="${esc(rowLink('lessons', l.row))}" target="_blank" rel="noopener">到試算表改這一列</a></span>
+        ${l.brief ? `<details class="brief"><summary>內容補充</summary><p>${esc(l.brief)}</p></details>` : ''}</li>`
     }).join('')}</ul></div>`
   }).join('')
   return `<h2>課程</h2>
