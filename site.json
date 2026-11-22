@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-22T22:06:36+08:00",
+ "generated": "2026-11-22T22:15:08+08:00",
  "lessons": [
   {
    "code": "L001",
@@ -43,7 +43,7 @@
   {
    "code": "L004",
    "id": "1-4",
-   "title": "Claude 方案比較：Free 與付費版差在哪、什麼時候該升級-測試",
+   "title": "Claude 方案比較：Free 與付費版差在哪、什麼時候該升級",
    "topic": 1,
    "type": "必修",
    "first": true,
