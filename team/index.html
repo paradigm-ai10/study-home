@@ -91,6 +91,15 @@
   .hand li { margin-top: 8px; display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 8px; font-size: 15px; line-height: 1.5; }
   .hand .id, .les .id { font: 600 14.5px/1.6 var(--en); color: var(--coral-ink); }
   .none { margin-top: 14px; color: var(--grape-2); }
+  /* 地圖改過、對不上的認領 */
+  .stale { margin-top: 16px; display: grid; gap: 12px; }
+  .stale li { background: var(--sheet); border: 1px solid var(--line); border-left: 4px solid var(--coral); border-radius: 10px; padding: 14px 18px 16px; }
+  .stale .was { font-size: 16px; }
+  .stale .was b { font: 400 18px/1 var(--hand); padding: 2px 9px 3px; border-radius: 6px; background: rgba(255, 200, 87, .55); margin-right: 6px; }
+  .stale .now { margin-top: 4px; font-size: 14.5px; color: var(--grape-2); }
+  .stale .acts { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .stale button { border: 0; cursor: pointer; padding: 7px 14px; border-radius: 8px; font-size: 14.5px; line-height: 1.3; background: var(--sun); box-shadow: 0 2px 0 #c9942a; }
+  .stale button + button { background: none; box-shadow: inset 0 0 0 1.5px var(--grape-3); }
 
   /* ---- 課程清單 */
   .filters { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
@@ -162,6 +171,12 @@
         <div id="hands"></div>
       </section>
 
+      <section id="stalebox" hidden>
+        <h2>學習地圖改過，這幾筆認領要確認</h2>
+        <p class="sub">認領當時的課名，在現在的學習地圖上找不到了。課號只是換了位置的，已經自動跟過去，不會出現在這裡。</p>
+        <ul class="stale" id="stale"></ul>
+      </section>
+
       <section>
         <h2>課程認領</h2>
         <p class="sub">要做哪一課就按「我來做」，對方打開這頁就看得到。一課只能一個人拿。</p>
@@ -190,8 +205,9 @@ const store = {
 }
 let me = store.get('paradigm.team.me'), key = store.get('paradigm.team.key')
 let claims = [], proposals = [], filter = 'first', busy = false
-const FIRST = new Set(R.first), TITLE = {}
-R.topics.forEach(t => t.all.forEach(([id, ti]) => { TITLE[id] = ti }))
+// 課程清單直接讀 roadmap8.js，跟首頁同一份；Thomas 重產學習地圖推上來，這頁就跟著變
+const FIRST = new Set(R.first), TITLE = {}, IDOF = {}
+R.topics.forEach(t => t.all.forEach(([id, ti]) => { TITLE[id] = ti; IDOF[ti] = ti in IDOF ? '' : id }))   // 課名 → 課號；同名的不拿來對
 const ERR = { key: '通關碼不對。按右邊的眼睛看一下，注意大小寫和全形半形。', locked: '猜錯太多次，後台先鎖住了，10 分鐘後再試。', setup: '後台的通關碼還沒設，或少於 12 個字（Apps Script 的指令碼屬性 TEAM_KEY）。', net: '連不上試算表，等一下再試。' }
 
 async function call(body) {
@@ -201,20 +217,50 @@ async function call(body) {
   } catch { return { ok: false, error: 'net' } }
 }
 const take = d => { if (d.claims) claims = d.claims; if (d.proposals) proposals = d.proposals }
+
+/* 認領是用「課號＋當時的課名」記的。學習地圖改過之後：
+   課名還在、只是課號換了 → 請後台把課號改過去；課名找不到了 → 放進 stale，列出來請人確認。 */
+let stale = []
+function sortClaims() {
+  const ops = []; stale = []
+  claims.forEach(c => {
+    const now = TITLE[c.lesson]
+    if (!c.title) { if (now) ops.push({ lesson: c.lesson, title: '', to: c.lesson, toTitle: now }); else stale.push(c); return }   // 早期的認領沒記課名，補上
+    if (now === c.title) return
+    if (IDOF[c.title]) ops.push({ lesson: c.lesson, title: c.title, to: IDOF[c.title], toTitle: c.title }); else stale.push(c)
+  })
+  return ops
+}
+async function settle() {
+  let ops = sortClaims()
+  if (!ops.length) return
+  const d = await call({ action: 'sync', ops }); if (d.ok) take(d)
+  // 要換課號但後台沒照做的（例如新課號已經有人認領），一樣列出來；只是補課名沒補成的不用吵人
+  sortClaims().forEach(o => { const c = o.to !== o.lesson && claims.find(x => x.lesson === o.lesson && x.title === o.title); if (c && !stale.includes(c)) stale.push(c) })
+}
 const day = s => { const m = /^\d+-(\d+)-(\d+)/.exec(s || ''); return m ? `${+m[1]}/${+m[2]}` : s }
 
 function render() {
   $('#hello').textContent = `${me}，你好。`
-  const by = {}; claims.forEach(c => { by[c.lesson] = c })
+  const good = claims.filter(c => !stale.includes(c))
+  const by = {}; good.forEach(c => { by[c.lesson] = c })
   // 誰手上有什麼
-  const people = {}; claims.forEach(c => (people[c.who] = people[c.who] || []).push(c))
+  const people = {}; good.forEach(c => (people[c.who] = people[c.who] || []).push(c))
   const names = Object.keys(people).sort((a, b) => (b === me) - (a === me))
   $('#hands').innerHTML = names.length
     ? `<ul class="hands">${names.map(n => `<li class="hand"><h3>${esc(n)}</h3><ul>${people[n].map(c => `<li><span class="id">${esc(c.lesson)}</span><span>${esc(TITLE[c.lesson] || '')}</span></li>`).join('')}</ul></li>`).join('')}</ul>`
     : '<p class="none">還沒有人認領。到下面挑一課，按「我來做」。</p>'
+  // 地圖改過、對不上的認領
+  $('#stalebox').hidden = !stale.length
+  $('#stale').innerHTML = stale.map(c => {
+    const now = TITLE[c.lesson], mine = c.who === me
+    return `<li><p class="was"><b>${esc(c.who)}</b>認領的是「${esc(c.title || '沒記到課名')}」，當時課號 ${esc(c.lesson)}</p>
+      <p class="now">${now ? `現在的 ${esc(c.lesson)} 是「${esc(now)}」。` : `現在的學習地圖上沒有 ${esc(c.lesson)} 了。`}${mine ? '' : `請 ${esc(c.who)} 進來處理，或直接改試算表的「認領」分頁。`}</p>
+      ${mine ? `<div class="acts">${now ? `<button type="button" data-keep="${esc(c.lesson)}">我做的就是現在這一課</button>` : ''}<button type="button" data-release="${esc(c.lesson)}">放掉</button></div>` : ''}</li>`
+  }).join('')
   // 課程清單
   const total = R.topics.reduce((n, t) => n + t.all.length, 0)
-  const F = [['first', `首版 ${R.first.length} 課`], ['taken', `有人在做 ${claims.length} 課`], ['all', `全部 ${total} 課`]]
+  const F = [['first', `首版 ${R.first.length} 課`], ['taken', `有人在做 ${good.length} 課`], ['all', `全部 ${total} 課`]]
   $('#filters').innerHTML = F.map(([id, label]) => `<button type="button" data-f="${id}" aria-pressed="${filter === id}">${label}</button>`).join('')
   $('#topics').innerHTML = R.topics.map(t => {
     const rows = t.all.filter(([id]) => filter === 'all' || (filter === 'first' ? FIRST.has(id) : by[id]))
@@ -242,7 +288,7 @@ async function load() {
     if (d.error === 'locked') { showGate(ERR.locked); return false }
     $('#amsg').textContent = ERR.net; return false
   }
-  take(d); $('#gate').hidden = true; $('#app').hidden = false; render(); return true
+  take(d); await settle(); $('#gate').hidden = true; $('#app').hidden = false; render(); return true
 }
 function showGate(msg) {
   $('#app').hidden = true; $('#gate').hidden = false; $('#me').value = me; $('#key').value = ''; peek(false)
@@ -269,7 +315,7 @@ $('#gate').addEventListener('submit', async e => {
     return
   }
   store.set('paradigm.team.me', me); store.set('paradigm.team.key', key)
-  take(d); $('#gate').hidden = true; $('#app').hidden = false; render()
+  take(d); await settle(); $('#gate').hidden = true; $('#app').hidden = false; render()
 })
 
 $('#app').addEventListener('click', async e => {
@@ -277,10 +323,13 @@ $('#app').addEventListener('click', async e => {
   if (b.dataset.f) { filter = b.dataset.f; render(); return }
   if (b.id === 'reload') { busy = true; b.disabled = true; await load(); b.disabled = false; busy = false; return }
   if (b.id === 'leave') { key = ''; store.set('paradigm.team.key', ''); showGate(); return }
-  const lesson = b.dataset.claim || b.dataset.release; if (!lesson) return
+  const lesson = b.dataset.claim || b.dataset.release || b.dataset.keep; if (!lesson) return
   busy = true; b.disabled = true; $('#amsg').textContent = ''
-  const d = await call({ action: b.dataset.claim ? 'claim' : 'release', lesson })
-  busy = false; take(d)
+  const old = stale.find(c => c.lesson === lesson && c.who === me)
+  const d = b.dataset.keep
+    ? await call({ action: 'sync', ops: [{ lesson, title: old ? old.title : '', to: lesson, toTitle: TITLE[lesson] }] })   // 課名改過但還是同一課：把記的課名換成現在的
+    : await call({ action: b.dataset.claim ? 'claim' : 'release', lesson, title: TITLE[lesson] })
+  take(d); await settle(); busy = false
   if (!d.ok) $('#amsg').textContent = d.error === 'taken' ? `${lesson} 剛剛被 ${d.by} 拿走了。` : (ERR[d.error] || ERR.net)
   render()
 })
