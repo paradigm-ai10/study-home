@@ -227,7 +227,7 @@
     if (level >= 1 && byId['1-1'] && !known.includes('1-1')) known.push('1-1');   // only once 1-1 has a page: a lesson that is not open is never counted as learned
     const done = state.known.filter((id) => !state.self.includes(id));   // finished on the lesson pages
     const all = [...new Set(known.concat(done))];
-    let start = level === 0 ? '1-1' : level === 1 ? '1-4' : GOAL_START[goal] || '2-1';
+    let start = level === 0 ? '1-1' : level === 1 ? '1-5' : GOAL_START[goal] || '2-1';
     if (all.includes(start)) {
       const i = LESSONS.findIndex((l) => l.id === start);
       const after = LESSONS.slice(i + 1).concat(LESSONS.slice(0, i)).find((l) => !all.includes(l.id));

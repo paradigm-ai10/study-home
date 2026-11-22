@@ -91,21 +91,21 @@ window.GLOSSARY = [
   "term": "幻覺",
   "en": "Hallucination",
   "plain": "AI 自信地講出錯誤或編造的內容，例如不存在的論文。",
-  "lesson": "1-4",
+  "lesson": "1-5",
   "topic": "T1"
  },
  {
   "term": "附和",
   "en": "Sycophancy",
   "plain": "AI 為了讓你滿意而順著你的說法，就算你錯了也同意。",
-  "lesson": "1-4",
+  "lesson": "1-5",
   "topic": "T1"
  },
  {
   "term": "偏見",
   "en": "Bias",
   "plain": "AI 從資料學到的刻板印象或不公平傾向。",
-  "lesson": "1-4",
+  "lesson": "1-5",
   "topic": "T1"
  },
  {
@@ -133,7 +133,7 @@ window.GLOSSARY = [
   "term": "知識截止日",
   "en": "Knowledge cutoff",
   "plain": "模型訓練資料停在哪個時間點，官方通常公布到月份（例如某年 3 月）；之後的事它不知道，除非上網查。",
-  "lesson": "1-4",
+  "lesson": "1-5",
   "topic": "T1"
  },
  {
@@ -390,7 +390,7 @@ window.GLOSSARY = [
   "term": "無痕對話",
   "en": "Incognito chat",
   "plain": "不進對話紀錄、不寫進記憶、不拿去訓練的對話；但仍會保留 30 天（企業方案依組織設定可能更久），不是「完全不保存」。目前只能在 Project 以外的對話使用。",
-  "lesson": "1-5",
+  "lesson": "1-E3",
   "topic": "T1"
  },
  {
@@ -558,14 +558,14 @@ window.GLOSSARY = [
   "term": "AI 標示",
   "en": "AI disclosure / labeling",
   "plain": "告訴觀眾內容由 AI 生成或修改，平台和部分法規有要求；支援的 Claude 模型產出的文字和檔案也會帶浮水印或內容憑證（見 9-4）。",
-  "lesson": "1-5",
+  "lesson": "1-E3",
   "topic": "T1"
  },
  {
   "term": "去識別化",
   "en": "De-identification",
   "plain": "把姓名、電話、病歷號等能認出個人的資料換掉或拿掉。",
-  "lesson": "1-5",
+  "lesson": "1-E3",
   "topic": "T1"
  },
  {
@@ -1214,7 +1214,7 @@ window.GLOSSARY = [
   "term": "AI Fluency 4D",
   "en": "AI Fluency 4D (Delegation, Description, Discernment, Diligence)",
   "plain": "Anthropic 官方免費 AI 素養課的四個能力：委派（哪些事交給 AI）、描述（把需求講清楚）、判斷（檢查結果）、負責（用得正當、對結果負責）。",
-  "lesson": "1-5",
+  "lesson": "1-E3",
   "topic": "T1"
  },
  {
@@ -1242,7 +1242,7 @@ window.GLOSSARY = [
   "term": "AI 文字浮水印",
   "en": "Text watermark",
   "plain": "藏在 AI 寫出的文字裡、人看不出來的記號。支援的 Claude 模型會自動加，不改內容；文字的偵測目前是私人預覽，只開給符合條件的組織（例如教育機構、媒體、研究者）申請，一般人用的檔案檢查頁不查文字。",
-  "lesson": "1-5",
+  "lesson": "1-E3",
   "topic": "T1"
  },
  {
@@ -1284,7 +1284,7 @@ window.GLOSSARY = [
   "term": "國外交易手續費",
   "en": "Foreign transaction fee",
   "plain": "用台灣的信用卡刷外幣（例如美元訂閱）時，發卡銀行另外收的手續費；費率各家不同，看你的發卡銀行公告。",
-  "lesson": "1-3",
+  "lesson": "1-4",
   "topic": "T1"
  },
  {
@@ -1326,7 +1326,7 @@ window.GLOSSARY = [
   "term": "紅黃綠資料分級",
   "en": "Data classification (red / yellow / green)",
   "plain": "本課程共用的資料三色分級：紅色＝機密與個資（密碼、身分證字號、病歷、別人的個資），永遠不貼；黃色＝內部資料（公司文件、合約草稿、別人的作業），先問規定或去識別化再貼；綠色＝公開資料或你自己寫的東西，可以貼。",
-  "lesson": "1-5",
+  "lesson": "1-E3",
   "topic": "T1"
  },
  {
@@ -1712,7 +1712,7 @@ window.GLOSSARY = [
   "term": "能力落差（鋸齒狀能力邊界）",
   "en": "Jagged frontier",
   "plain": "AI 的能力參差不齊：能解很難的題目，卻可能在簡單的事上出錯。哪些事做得好無法憑感覺判斷，要實際測試。",
-  "lesson": "1-4",
+  "lesson": "1-5",
   "topic": "T1"
  },
  {
@@ -1918,14 +1918,14 @@ window.GLOSSARY = [
   "term": "AI 偵測器",
   "en": "AI detector",
   "plain": "號稱能判斷文字是不是 AI 寫的工具，本質上是推測、誤判率高，不能當成是否使用 AI 的證據；跟文字浮水印不同。",
-  "lesson": "1-5",
+  "lesson": "1-E3",
   "topic": "T1"
  },
  {
   "term": "訓練資料設定",
   "en": "Training opt-out",
   "plain": "決定你的對話會不會被拿去訓練模型。Claude 在隱私設定裡有對應的開關；Team、Enterprise 等公司方案預設不拿來訓練。其他 AI 服務多半也能在隱私設定裡關閉。",
-  "lesson": "1-5",
+  "lesson": "1-E3",
   "topic": "T1"
  },
  {

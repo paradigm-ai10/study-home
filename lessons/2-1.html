@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<meta name="description" content="Prompt 四要素：一次講清楚需求。Paradigm AI 學習站的免費中文課程，附完整教學 PDF 與動手練習，不會寫程式也學得會。">
+<link rel="canonical" href="https://paradigm-ai10.github.io/study-home/lessons/2-1.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Paradigm AI 學習站">
+<meta property="og:title" content="Prompt 四要素：一次講清楚需求｜Paradigm 學 AI">
+<meta property="og:description" content="Prompt 四要素：一次講清楚需求。Paradigm AI 學習站的免費中文課程，附完整教學 PDF 與動手練習，不會寫程式也學得會。">
+<meta property="og:url" content="https://paradigm-ai10.github.io/study-home/lessons/2-1.html">
+<meta property="og:image" content="https://paradigm-ai10.github.io/study-home/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prompt 四要素：一次講清楚需求｜Paradigm 學 AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap">
+<link rel="stylesheet" href="media/2-1/pdf.css">
+<link rel="stylesheet" href="pdf-lesson.css">
+<link rel="stylesheet" href="pdf-flip.css">
+<link rel="stylesheet" href="pdf-chapter.css">
+</head>
+<body data-flip="chapter">
+<!-- 網頁課（2-1）：內容是定稿 PDF 的原文（lessons/09_Prompt四要素/PDF/index.html），由 tools/from_pdf.py 產生，不要手改；
+     要改字請改 PDF 那邊，再重跑這支工具。外框與互動在 pdf-lesson.js、pdf-lesson.css。 -->
+<header class="pl-top" id="top"></header>
+<div class="pl-map" id="map"></div>
+<div class="pl-strip" id="strip" aria-hidden="true"></div>
+<button type="button" class="pl-opener" id="opener" aria-controls="side" aria-expanded="false" hidden>目錄</button>
+<div class="pl-wrap">
+  <nav class="pl-side" id="side" aria-label="這課的章節"></nav>
+  <div class="pl-main">
+  <div class="pl-run" id="run"></div>
+  <main class="pdfdoc" id="doc">
+<section class="pdfpage cover" id="p1" data-n="1">
+  <div class="brand">PARADIGM · 2-1</div>
+  <h1>Prompt 四要素</h1>
+  <div class="tagline">用 MAPS 一次講清楚需求</div>
+  <p class="who">給已經會開 Claude 聊天、但常覺得回答空泛或要重問好幾次的大學生和上班族。不用會寫程式，免費版就能做。</p>
+  <div class="learn-t">學完這課，你能</div>
+  <ol class="pz-ol">
+    <li><b>檢查</b>一句模糊的需求，看出它缺了 MAPS（目的、任務、限制、格式）裡的哪幾項。</li>
+    <li><b>改寫</b>同一個需求，用 MAPS 寫成完整的 Prompt，並比較改前改後的結果差在哪。</li>
+    <li><b>用</b>「交給一位不認識你的新同事，他看得懂嗎？」檢查自己的 Prompt，補上缺的目的和背景資料。</li>
+    <li><b>存下</b>改好的 Prompt，當作自己的第 1 個常用範本。</li>
+  </ol>
+  <div class="make">
+    <p class="make-t">這課你會動手做</p>
+    <p>拿一件你這週真的要做的事，先用一句話問 Claude，再用 MAPS 重寫一次，兩次結果並排看。做完，你手上會有<b>一份填好的 MAPS Prompt，存成你的第 1 個常用範本</b>，下次換內容就能再用。</p>
+  </div>
+  <div class="meta"><span>閱讀約 6–8 分鐘</span><span>動手約 10–15 分鐘</span><span>免費版就能做</span><span>不用寫程式</span></div>
+  <div class="toc" id="toc"><div class="toc-t">目錄</div></div>
+</section>
+<section class="pdfpage" id="p2" data-n="2" data-ch="what" data-tl="Prompt 是什麼、新同事">
+  <p class="kicker">為什麼一句話不夠</p>
+  <h1>同樣用 Claude，為什麼有人一次就拿到能交的東西？</h1>
+  <p class="lead">差別多半在 Prompt（提示詞），也就是你打給 Claude 的那段話。<span class="em">這次任務的條件，Claude 只看得到你寫下來的字、你附上的檔案。你沒寫的，它只能猜。</span></p>
+  <p class="pz-p">現在的 Claude 很照字面做事。你寫「幫我寫報告大綱」，它手上就只有這幾個字：哪一門課、老師要什麼、要寫多長、你手上有什麼資料，它都不知道。這時它可能先反問你，可能猜錯，也可能自己補一些看起來合理、其實是編的內容。需求太模糊，回答就容易籠統，誰來問都差不多。開了記憶的帳號，它會參考你以前聊過的事，但這次老師要什麼，你不講它還是不知道。</p>
+
+  <h2>把 Claude 想成第一天上班的新同事</h2>
+  <p class="pz-p">Anthropic 官方的說法是：把 Claude 當成一位很聰明、但剛到職的新同事。他能力很強，可是不知道你的習慣、這份東西要給誰看、為什麼要做。你交辦時沒講的，他只能猜，猜錯的機會很高。</p>
+  <p class="pz-p">交辦給這樣一位新同事，你會講四件事。我們用四個英文字的開頭記成 MAPS：</p>
+<h2>MAPS：交辦時要講的四件事</h2>
+  <div class="four4">
+    <div class="q m"><em>M</em><b>目的</b><i>Mission</i><span>這份東西給誰、為什麼要做、你手上有哪些資料。</span></div>
+    <div class="q a"><em>A</em><b>任務</b><i>Ask</i><span>要他做什麼、最後交出什麼。</span></div>
+    <div class="q p"><em>P</em><b>限制</b><i>Parameters</i><span>範圍、字數、哪些不能出現、資料不夠時怎麼辦。</span></div>
+    <div class="q s"><em>S</em><b>格式</b><i>Shape</i><span>交出來長什麼樣子：條列、表格或段落，語氣、長度、語言。</span></div>
+    <div class="mid">MAPS</div>
+  </div>
+  <p class="pz-p">這四件事就是這課的「Prompt 四要素」，記成 MAPS 就好：M 目的、A 任務、P 限制、S 格式。寫 Prompt 之前，用它檢查有沒有漏掉該講的事。</p>
+  <p class="pl-key"><span>這段重點</span>這次任務的條件，你沒寫它只能猜</p>
+</section>
+<section class="pdfpage" id="p3" data-n="3" data-ch="four" data-tl="M、A、P、S 各寫什麼">
+  <p class="kicker">MAPS</p>
+  <h1>MAPS 四項：各寫什麼</h1>
+  <p class="lead">四項裡<span class="em">A 任務最重要</span>，一定要寫清楚要它做什麼、交出什麼；其他三項讓結果更貼近你要的。</p>
+
+  <h2><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg>M 目的 Mission：寫給誰、為什麼，附上手上的資料</h2>
+  <p class="pz-p">「我是大學生」幫助不大。說清楚這份東西給誰、拿來做什麼、為什麼這樣要求，再附上你手上的資料，Claude 才抓得到重點。資料可以直接貼在 Prompt 裡，或用輸入框左邊的「＋」附上檔案。</p>
+  <ul class="pz-ul">
+    <li>學生：這是通識課的期末報告，老師說只整理資料、沒有自己觀點的，分析分數最多給一半。</li>
+    <li>上班族：這封信要給客戶的採購主管，他上次抱怨我們回覆太慢，所以語氣要先道歉再講方案。</li>
+  </ul>
+
+  <h2><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>A 任務 Ask：用動詞開頭，寫出要交什麼</h2>
+  <p class="pz-p">只寫「報告大綱」，還沒說清楚要它做到什麼程度。改成「幫我寫報告大綱，交出條列式大綱，每一節寫 2–3 個要點和預計字數」，就看得出怎樣算做完。</p>
+  <ul class="pz-ul">
+    <li>學生：幫我把這三章講義整理成考前複習表，每章 5 個重點。</li>
+    <li>上班族：幫我擬一封回覆客戶的信，確認交貨日改到下週五。</li>
+  </ul>
+
+  <h2><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="4 3"/><path d="M8 12h8"/></svg>P 限制 Parameters：範圍、字數，還有資料不夠時怎麼辦</h2>
+  <p class="pz-p">寫出範圍、字數、一定要有的段落，以及不能出現的東西。另外加一句「資料不夠的地方標『待補』告訴我」，可以減少它自己編。字數寫在限制或格式都可以：四項是幫你檢查有沒有漏，不是考分類，有寫到就好。</p>
+  <ul class="pz-ul">
+    <li>學生：總字數 2,500–3,000 字；缺的文獻標「待找」，不要幫我編。</li>
+    <li>上班族：只講交期，不提價格；不確定的日期請標出來讓我確認。</li>
+  </ul>
+
+  <h2><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12"/><circle cx="4" cy="6" r="1.2"/><circle cx="4" cy="12" r="1.2"/><circle cx="4" cy="18" r="1.2"/></svg>S 格式 Shape：寫到你可以檢查</h2>
+  <p class="pz-p">「寫得清楚一點」沒辦法檢查，「條列、每點一行、繁體中文、台灣用語、300 字內」可以。寫出條列或表格、語氣、長度、語言，收到結果時就能一項一項對。AI 寫的東西很空，常常就是因為目的和格式沒講：它不知道寫給誰、要交出什麼樣子，只好寫得四平八穩。</p>
+  <ul class="pz-ul">
+    <li>學生：用表格，三欄：章節、重點、我的熟悉度（第三欄留白，我自己填）。</li>
+    <li>上班族：信件格式，200 字內，語氣正式但不生硬，最後列出下一步。</li>
+  </ul>
+  <p class="pl-key"><span>這段重點</span>A 任務最重要：用動詞開頭，寫出要交什麼</p>
+</section>
+<section class="pdfpage" id="p4" data-n="4" data-ch="four" data-tl="不必每次填滿">
+  <p class="kicker">MAPS</p>
+  <h1>MAPS 是用來檢查的，不必每次填滿</h1>
+  <p class="lead">MAPS 是一張檢查表，不是要你每次都寫成四大段。<span class="em">依任務補上必要的資訊就好，不是越長越好。</span></p>
+  <p class="pz-p">問「APA 第 7 版的期刊文章怎麼引用」，一句話就夠了，Claude 不需要知道你的目的。要它幫你寫一份會被打分數、會寄給別人、會拿去做決定的東西，就值得把四項想一遍。</p>
+  <p class="pz-p">寫太多也有代價：細節堆太多，真正重要的條件反而被淹沒。每一句都問自己：少了這句，結果會不會不一樣？不會就刪掉。</p>
+  <p class="pz-p">寫的時候，也盡量寫「要做什麼」，少寫「不要做什麼」。「不要寫得太長」不如「300 字內」；「不要用太難的詞」不如「寫給沒修過這門課的大一新生看得懂」。說清楚要什麼，它比較容易做到。</p>
+  <p class="pz-p">MAPS 讓第一版更接近你要的，但不保證一次到位。拿到初稿之後怎麼追問、修改，是 2-3 那課的內容。</p>
+  <p class="pl-key"><span>這段重點</span>依任務補必要的資訊，不是越長越好</p>
+</section>
+<section class="pdfpage" id="p5" data-n="5" data-ch="compare" data-tl="期末報告大綱">
+  <p class="kicker">前後對照</p>
+  <h1>同一個需求，兩種問法：期末報告大綱</h1>
+  <p class="lead">我們用免費帳號、各開一個新對話，問同一件事。<span class="em">這次一句話版 Claude 先反問你；MAPS 版它直接交出照老師要求寫的大綱。</span></p>
+  <p class="small muted">示範的課程與老師要求是虛構的。為了不讓帳號記憶影響結果，兩次都用「無痕對話」（右上角的幽靈圖示），所以截圖上方是黑色的。</p>
+
+  <h2>一句話版：「幫我寫報告大綱」</h2>
+  <figure class="pz-fig">
+    <img src="media/2-1/img/a_one_line.png" alt="只打「幫我寫報告大綱」，Claude 沒有寫大綱，先問報告主題、用途或場合、預期篇幅或時間">
+    <figcaption>它沒有亂寫，而是先問你三件事：主題、用途或場合、篇幅或時間。</figcaption>
+  </figure>
+  <p class="pz-p">遇到太模糊的需求，現在的 Claude 有時會先反問，有時會自己假設一個方向先寫。仔細看它問的：主題、這份報告用在哪、要多長，都是你還沒交代的目的、任務細節和限制。<b>MAPS 做的事，就是把它會問你的，一開始一次講完</b>，少掉一來一回。</p>
+
+  <h2>MAPS 版：同一件事，講清楚</h2>
+  <div class="prompt"><span class="tag">MAPS 版 Prompt</span>
+    <p>【目的】通識課「科技與社會」的期末報告，題目「生成式 AI 對大學生學習方式的影響」。評分：問題意識 25%、分析有根據 35%、個人反思 20%、格式與引用 20%。我手上有教育部的 AI 使用指引、一篇學生用 ChatGPT 寫作業的新聞。</p>
+    <p>【任務】幫我列報告大綱，每節 2–3 個要點、標預計字數。</p>
+    <p>【限制】報告總字數 2,500–3,000 字；文獻至少 5 篇，缺的標「待找」，不要編。</p>
+    <p>【格式】條列，繁體中文。</p>
+  </div>
+  <p class="pz-p">一項一行、短句就好，打起來大約一分鐘。不用寫成文章，重點是四項都有講到。</p>
+  <p class="small muted">用【】標出四項是為了讓你看清楚，自己寫的時候不一定要加。</p>
+  <p class="pl-key"><span>這段重點</span>MAPS＝把它會問你的事，一開始一次講完</p>
+</section>
+<section class="pdfpage" id="p6" data-n="6" data-ch="compare" data-tl="差在哪">
+  <p class="kicker">前後對照</p>
+  <h1>MAPS 版拿到什麼：照評分寫、排進你手上的資料</h1>
+  <p class="lead">比的不是誰比較長，而是<span class="em">有沒有照老師的要求、有沒有把你手上的資料排進去</span>。</p>
+  <figure class="pz-fig">
+    <img src="media/2-1/img/b1_four_outline.png" alt="Claude 交出的大綱開頭：總字數目標約 2,800 字，每一節標預計字數和對應評分，例如前言與問題意識對應問題意識 25%">
+    <figcaption>每一節都有預計字數，總目標約 2,800 字，落在 2,500–3,000 字內；大部分章節還標出「對應評分」，例如問題意識 25%、分析有根據 35%。</figcaption>
+  </figure>
+  <figure class="pz-fig">
+    <img src="media/2-1/img/b2_four_refs.png" alt="文獻清單：教育部 AI 使用指引、學生用 ChatGPT 寫作業的新聞報導標已有並請補上出處，另外四篇標待找，下面附建議找法">
+    <figcaption>你提到的兩篇標「已有」，並提醒你補上正式名稱和日期；還缺的四篇標「待找」，附上去哪裡找。它沒有自己編文獻。</figcaption>
+  </figure>
+  <h2>兩次結果差在哪</h2>
+  <table class="pz-table">
+    <thead><tr><th></th><th>一句話版</th><th>MAPS 版</th></tr></thead>
+    <tbody>
+      <tr><th>拿到大綱了嗎</th><td>還沒，先反問三件事</td><td>直接交出完整大綱</td></tr>
+      <tr><th>有照老師的評分嗎</th><td>它不知道評分</td><td>大部分章節標出對應哪個評分項目</td></tr>
+      <tr><th>排進你的資料嗎</th><td>它不知道你有資料</td><td>你提到的兩篇文章排進對應的章節</td></tr>
+      <tr><th>文獻怎麼處理</th><td>—</td><td>缺的標「待找」，不編</td></tr>
+    </tbody>
+  </table>
+  <p class="pz-p">這次只說了手上有哪兩篇，沒有貼內容，所以它是依文章類型安排位置，並沒有讀過文章。要它照文章內容寫，就把文章貼上或附檔。它列出的資料庫和網站，也要自己點進去確認找得到。寫得再好，Claude 也可能出錯，事實和出處要自己查；怎麼查證是主題 3 的內容。</p>
+  <p class="pl-key"><span>這段重點</span>比結果有沒有符合要求，不是比誰寫得長</p>
+</section>
+<section class="pdfpage" id="p7" data-n="7" data-ch="check" data-tl="送出前檢查">
+  <p class="kicker">自我檢查</p>
+  <h1>送出之前，用這三招檢查</h1>
+  <p class="lead">三招的前提是你自己先想清楚要什麼。<span class="em">你沒辦法講給一個人聽懂的事，也寫不成好的 Prompt。</span></p>
+
+  <h2>一、新同事測試</h2>
+  <p class="pz-p">假裝把這段 Prompt 交給一位不認識你的新同事，他看完就能開始做嗎？還是會跑回來問你「這是哪一門課」「要給誰看」「要多長」？他會問的，就是你還沒寫的目的、限制或格式。這是 Anthropic 官方建議的檢查法。</p>
+
+  <h2>二、先寫草稿，請 Claude 幫你找缺漏</h2>
+  <p class="pz-p">不確定缺什麼，可以先讓 Claude 問你。下面這句，把「我想……」換成你的事就能用：</p>
+  <div class="prompt"><span class="tag">請 Claude 先問你</span>
+    <p>我想寫一封信請教授讓我晚一週交期末報告。先不要寫信，照目的、任務、限制、格式四項，告訴我還缺哪些資訊，一次問完。</p>
+  </div>
+  <figure class="pz-fig">
+    <img src="media/2-1/img/c_ask_missing.png" alt="Claude 依目的、任務、限制、格式四組，列出 14 個要補的問題，例如延期原因、原本期限、教授稱呼、語氣與長度">
+    <figcaption>它照四項分組，一次列出要補的問題。照著回答，再請它寫信，第一版就會接近你要的。</figcaption>
+  </figure>
+
+  <h2>三、MAPS 各看一眼</h2>
+  <ul class="tick">
+    <li>M 目的：寫了給誰、為什麼，附上手上的資料</li>
+    <li>A 任務：用動詞開頭，寫出要交什麼、怎樣算做完</li>
+    <li>P 限制：寫了範圍、長度，資料不夠時要它標「待補」</li>
+    <li>S 格式：寫到收到結果時可以一項一項對</li>
+  </ul>
+  <p class="pl-key"><span>這段重點</span>先讓不熟悉這件事的人也看得懂</p>
+</section>
+<section class="pdfpage" id="p8" data-n="8" data-ch="two" data-tl="MAPS 與角色工程">
+  <p class="kicker">兩種寫法</p>
+  <h1>兩種寫 Prompt 的方式：MAPS 和角色工程</h1>
+  <p class="lead">這兩種沒有新舊之分，兩種都能用。<span class="em">一次性的事，MAPS 就夠；會一再重做的事，值得進一步用角色工程。</span></p>
+
+  <h2>MAPS：把這一次的需求講清楚</h2>
+  <p class="pz-p">就是這課教的。適合這週的報告大綱、這一封信、這一份簡報這類做一次就結束的事。每次要用，把四項想一遍、補上必要的資訊。</p>
+
+  <h2>角色工程：把 AI 當新進員工來帶</h2>
+  <p class="pz-p">這是創業顧問 Dan Martell 在 YouTube 上分享的做法，他把這份東西叫 <b>Master Prompt</b>：給 AI 一份長期用的工作說明書。不是只交辦一件事，而是像帶新進員工一樣，給它一個固定的職位：</p>
+  <ul class="pz-ul">
+    <li>它的職責是什麼</li>
+    <li>做到什麼程度算合格，寫成可以驗收的完成標準</li>
+    <li>它需要的背景資料</li>
+    <li>一份滿分範例</li>
+    <li>每次做錯的地方，寫成下次要遵守的規則</li>
+  </ul>
+  <p class="pz-p">寫出來大概長這樣，以攝影社每週的 IG 貼文為例（指定角色、給範例的細節在下一課 2-2）：</p>
+  <div class="prompt show"><span class="tag">角色工程範例（Master Prompt）</span>
+    <p>【職責】你是攝影社的社群小編，每週把我給的社課內容寫成一篇 IG 貼文。</p>
+    <p>【完成標準】150 字內；第一句寫這週學什麼；最後一句寫時間地點；結尾 3 個 hashtag。</p>
+    <p>【背景】社員多半是大一新生；社課每週三晚上 7 點，在學生活動中心 204。</p>
+    <p>【滿分範例】（貼上你最滿意的一篇）</p>
+    <p>【規則】不用「超讚」「必看」這類字；日期一律寫成「11/26（三）」。之後哪裡做錯，就在這裡加一條。</p>
+  </div>
+  <p class="pz-p">之後每週只要說「這週社課：人像打光」，它就照這份說明書寫。跟 MAPS 比，它是長期用的，另外放了滿分範例，還會一條條累積修正的規則。這種寫法適合每週都要寫的社群貼文、每次開完會都要整理的紀錄這類一再重做的事。這些設定要存在 Claude 記得住的地方，之後會在 4-1 個人化指令、4-3 Project、4-4 Skills 這幾課教。</p>
+
+  <h2>MAPS 不是唯一的公式</h2>
+  <p class="pz-p">MAPS 是這課整理的記法，不是官方唯一的寫法。Google 的指南用「角色、任務、背景、格式」四項；Anthropic 的官方說明則建議清楚交代指令和背景，並視需要加入範例、指定格式。不論哪一種，都在講同一件事：把需求講清楚。指定角色和給範例，留到下一課 2-2。</p>
+  <p class="pl-key"><span>這段重點</span>一次性的事 MAPS 就夠，重複的事再用角色工程</p>
+</section>
+<section class="pdfpage" id="p9" data-n="9" data-ch="try" data-tl="你的第 1 個範本">
+  <p class="kicker">動手做</p>
+  <h1>換成你自己的事，存成第 1 個範本</h1>
+  <p class="lead">挑一件你這週真的要做的事：一份作業、一封信、一份簡報都可以。<span class="em">先用一句話問一次，再用 MAPS 重寫一次，兩次結果並排看。</span></p>
+  <ol class="steps">
+    <li>開一個新對話，用一句話把這件事丟給 Claude（開了記憶的人，可以用右上角的「無痕對話」，比較公平）。看它直接做了，還是先反問你；反問的話，記下它問了什麼。</li>
+    <li>再開一個新對話，用下面的範本把四項填好送出。</li>
+    <li>把兩次的結果並排看，照「前後對照」那張表的四列比：拿到成品了嗎、有照要求嗎、用上你的資料嗎、缺的資料怎麼處理？</li>
+    <li>結果還差一點，可以直接在對話裡追問（2-3 那課會教）；同時把缺的那一項補進範本，下次一開始就寫進去。</li>
+    <li>把填好的範本存起來，例如手機的備忘錄或你的筆記軟體，取一個好找的名字，例如「報告大綱」。下次同類的事複製出來，先換掉題目、日期、資料這些每次不同的地方，再送出。</li>
+  </ol>
+  <div class="prompt"><span class="tag">MAPS 範本：填空後複製</span>
+    <p>【目的】這是要給＿＿＿＿的，為了＿＿＿＿。我手上有＿＿＿＿。</p>
+    <p>【任務】幫我＿＿＿＿，交出＿＿＿＿。</p>
+    <p>【限制】範圍是＿＿＿＿，長度＿＿＿＿；只用我給的資料，不夠的地方標「待補」並告訴我。</p>
+    <p>【格式】用＿＿＿＿（條列、表格或段落），語氣＿＿＿＿；用繁體中文、台灣用語。</p>
+  </div>
+  <p class="pz-p">這份就是你的第 1 個常用範本。「Prompt 技巧」這個主題學完，你會累積 5 個自己常用的範本。</p>
+  <p class="pl-key"><span>這段重點</span>填好的 MAPS，就是你的第 1 個範本</p>
+</section>
+<section class="pdfpage" id="p10" data-n="10" data-ch="end" data-tl="常見問題與下一課">
+  <p class="kicker">常見問題</p>
+  <h1>常見問題</h1>
+  <div class="faq">
+    <div><b>每次都要寫這麼長嗎？</b>不用。MAPS 是檢查表，簡單的問題一句話就夠。要交出去、會被打分數、會拿去做決定的東西，才值得四項都想一遍。</div>
+    <div><b>Claude 先反問我，是我問錯了嗎？</b>不是，它在幫你補缺的資訊。把它問的事回答完就好；下次同類的事，一開始就寫進 Prompt。</div>
+    <div><b>一定要用【目的】【任務】這種標記嗎？</b>不一定。標記只是讓你自己看清楚有沒有漏，寫成一段話也可以，四項都講到就好。</div>
+    <div><b>照 MAPS 寫了，結果還是有錯？</b>Prompt 寫得好，第一版會更接近你要的，但 Claude 還是可能出錯。數字、引用、事實要自己查；追問和修改在 2-3 那課。</div>
+    <div><b>每次都要重講我是誰、我的習慣，好麻煩？</b>每次都一樣的背景，可以存成個人化指令（4-1），或把資料放進 Project（4-3），就不用每次重打。</div>
+    <div><b>加一句「你是專業的○○」有用嗎？</b>指定角色是另一種技巧，下一課 2-2 會講。只加角色、不講清楚目的和任務，幫助有限。</div>
+  </div>
+  <h2>做到這三件，就學會了</h2>
+  <ul class="dots">
+    <li>拿一句模糊的需求，說得出它缺了 MAPS 的哪幾項</li>
+    <li>用 MAPS 重寫過一次自己的需求，比較過兩次結果</li>
+    <li>存好第 1 個常用的 MAPS 範本</li>
+  </ul>
+  <h2>考考你</h2>
+  <div class="quiz">
+    <p>第 1 題：「幫我寫一份攝影社的招生文宣。對象是大一新生，社課在每週三晚上。用 3 個條列重點、語氣輕鬆。」社費和報名期限你都還沒給。想避免 Claude 自己編出社費和報名期限，最該加哪一句？</p>
+    <ol>
+      <li>語氣再活潑一點</li>
+      <li>對象是剛入學、還沒參加社團的大一新生</li>
+      <li>社費和報名期限我還沒定，請標「待補」，不要自己寫數字</li>
+      <li>改成 5 個條列重點</li>
+    </ol>
+    <span class="ans">答案：C。這是 P 限制裡「資料不夠時怎麼辦」那一句；其他三句只調整語氣、對象或格式，擋不住它自己補數字。</span>
+  </div>
+  <div class="quiz">
+    <p>第 2 題：你只打「幫我寫報告大綱」，Claude 先反問主題、用途、篇幅。最好的做法是？</p>
+    <ol>
+      <li>換一個 AI 工具再問一次</li>
+      <li>回答它問的事，下次一開始就把這些寫進 Prompt</li>
+      <li>叫它不要問，直接寫</li>
+      <li>在同一句話後面多加幾個形容詞，例如「詳細、專業」</li>
+    </ol>
+    <span class="ans">答案：B。它問的是你還沒給的必要資訊；一開始講完，就少掉一來一回。</span>
+  </div>
+  <div class="quiz">
+    <p>第 3 題：下週你要拿上次存的「報告大綱」範本，寫另一門課的報告。送出前最該先做什麼？</p>
+    <ol>
+      <li>直接送出，範本已經寫好了</li>
+      <li>換掉題目、課名、日期、資料和這次老師的要求</li>
+      <li>把範本再加長一倍，寫得越細越好</li>
+      <li>刪掉【限制】那段，讓它自由發揮</li>
+    </ol>
+    <span class="ans">答案：B。範本留下固定的要求，每次不同的內容要換成這次的；沒換，它會照舊題目和舊條件寫。</span>
+  </div>
+  <div class="next">
+    <div class="k">下一課</div>
+    <div class="t">Prompt 範例與角色：讓輸出照你的格式</div>
+    <p>練習給它範例、指定角色，讓輸出更接近你要的格式。</p>
+  </div>
+  <div class="end-cta">
+    <div class="big">挑一件這週要做的事，<br>用 MAPS 寫一次，存成你的第 1 個範本。</div>
+  </div>
+  <h2>想看官方說明</h2>
+  <ul class="refs">
+    <li>Prompting best practices｜platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices</li>
+    <li>Best practices for prompt engineering｜claude.com/resources/articles/best-practices-for-prompt-engineering</li>
+  </ul>
+  <p class="small muted">示範畫面是 2026 年 11 月 21 日用 Claude 免費方案（網頁版、中文介面、Sonnet 5.5）實測。同樣的 Prompt，每次的回答不會一字不差，但結構差不多。</p>
+  <p class="pl-key"><span>這段重點</span>卡住就回來翻這頁</p>
+</section>
+  </main>
+  </div>
+</div>
+<script>window.PDFLESSON = {"id": "2-1", "title": "Prompt 四要素：一次講清楚需求", "pdf": "media/2-1/prompt-four-elements-guide.pdf", "pdfName": "Prompt四要素完整教學.pdf", "chapters": [{"k": "what", "t": "為什麼一句話不夠", "d": "Prompt 是什麼、交辦給新同事"}, {"k": "four", "t": "MAPS 四項", "d": "M 目的、A 任務、P 限制、S 格式，各怎麼寫"}, {"k": "compare", "t": "前後對照", "d": "期末報告大綱：一句話版 vs MAPS 版"}, {"k": "check", "t": "自我檢查", "d": "新同事測試、請 Claude 幫你補"}, {"k": "two", "t": "兩種寫法", "d": "MAPS 和角色工程，什麼時候用哪個"}, {"k": "try", "t": "動手做", "d": "換成你自己的事，存成第 1 個範本"}, {"k": "end", "t": "常見問題與測驗", "d": "常見問題、課後測驗、下一課"}], "source": "lessons/09_Prompt四要素/PDF", "built": "2026-11-22", "draft": false}</script>
+<script src="../pixel.js"></script>
+<script src="roadmap8.js"></script>
+<script src="glossary.js"></script>
+<script src="pdf-chapter-core.js"></script>
+<script src="pdf-chapter.js"></script>
+</body>
+</html>
