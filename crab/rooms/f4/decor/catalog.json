@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "note": "書桌擺飾的唯一資料來源。格式說明見 decor/README.md。",
   "currency": {
     "name": "代幣",
@@ -216,6 +216,66 @@
       "file": "wear_scarf.glb",
       "ready": true,
       "whole": true
+    }
+  ],
+  "keepshelf": {
+    "file": "keepshelf.glb",
+    "label": "紀念品台",
+    "pos": [
+      3.38,
+      0,
+      0.32
+    ],
+    "rotY": -12
+  },
+  "keeps": [
+    {
+      "id": "keep_notes",
+      "lesson": "2-1",
+      "name": "四色便利貼",
+      "seat": 2,
+      "ready": true,
+      "file": "keep_notes.glb",
+      "scale": 1.5,
+      "blurb": "目的、任務、限制、格式",
+      "line": "四張都寫了，才算把話說清楚。",
+      "whole": true
+    },
+    {
+      "id": "keep_cookbook",
+      "lesson": "4-4",
+      "name": "迷你食譜書",
+      "seat": 3,
+      "ready": true,
+      "file": "keep_cookbook.glb",
+      "scale": 1.5,
+      "blurb": "照著做，每次都一樣好",
+      "line": "這本只有一道菜：你自己的 Skill。",
+      "whole": true
+    },
+    {
+      "id": "keep_plug",
+      "lesson": "6-1",
+      "name": "小插頭",
+      "seat": 0,
+      "ready": true,
+      "file": "keep_plug.glb",
+      "scale": 1.5,
+      "blurb": "插上去，資料就通了",
+      "line": "插上去就通了。拔掉也不會怎樣。",
+      "whole": true
+    },
+    {
+      "id": "keep_ramen",
+      "lesson": "6-E4",
+      "name": "迷你拉麵",
+      "seat": 1,
+      "file": "keep_ramen.glb",
+      "scale": 1.5,
+      "behave": "steam",
+      "ready": true,
+      "blurb": "豚骨湯頭，叉燒兩片",
+      "line": "這碗是紀念品，不能吃。聞一下可以。"
     }
   ]
 }
