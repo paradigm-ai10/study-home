@@ -255,7 +255,7 @@ async function main() {
       let gust = 0, last = 0;
       return {
         hit: hitBox(root), cursor: 'pointer',
-        click() { gust = 1; chimeSound(); f2.say('叮鈴——', { hold: 1.6 }); },
+        click(quiet) { gust = 1; if (!quiet) { chimeSound(); f2.say('叮鈴——', { hold: 1.6 }); } },     // quiet: the crab's own nudge (use.*) never makes a sound nobody asked for
         tick(t) {
           const dt = Math.min(0.05, t - last); last = t; if (REDUCED) return; gust = Math.max(0, gust - dt / 3.5);
           const w = Math.sin(t * 0.9) + 0.5 * Math.sin(t * 2.3 + 1), w2 = Math.sin(t * 1.4 + 2) + 0.4 * Math.sin(t * 3.1), k = 1 + gust * 4;
@@ -302,16 +302,16 @@ async function main() {
     /* the typewriter: click and it types a few letters, the carriage stepping along; at the end of the line, the bell and the return */
     type(root) {
       const car = root.getObjectByName('tw_carriage'), paper = root.getObjectByName('tw_paper'); if (!car) return null;
-      const x0 = car.position.x; let col = 5, left = 0, next = 0, back = -1, feed = 0, tgt = x0 + (7 - col) * 0.02;
+      const x0 = car.position.x; let mute = false, col = 5, left = 0, next = 0, back = -1, feed = 0, tgt = x0 + (7 - col) * 0.02;
       car.position.x = tgt;
       return {
         hit: hitBox(root), cursor: 'pointer',
-        click() { if (back < 0) left += 5; },
+        click(quiet) { if (back < 0) left += 5; mute = !!quiet; },
         tick(t) {
           if (back >= 0) { const u = Math.min(1, (t - back) / 0.42); car.position.x = lerp(car.userData.from, x0 + 7 * 0.02, easeIO(u)); if (paper) paper.position.y = feed + 0.014 * easeOut(u); if (u >= 1) { back = -1; col = 0; feed += 0.014; if (feed > 0.06) feed = 0; tgt = car.position.x; } return; }
           if (left > 0 && t >= next) {
-            left--; col++; next = t + 0.1 + Math.random() * 0.07; tgt = x0 + (7 - col) * 0.02; clack();
-            if (col >= 14) { left = 0; back = t + 0.12; car.userData.from = tgt; ding(); f2.say('叮！換行。', { hold: 1.4 }); }
+            left--; col++; next = t + 0.1 + Math.random() * 0.07; tgt = x0 + (7 - col) * 0.02; if (!mute) clack();
+            if (col >= 14) { left = 0; back = t + 0.12; car.userData.from = tgt; if (!mute) { ding(); f2.say('叮！換行。', { hold: 1.4 }); } }
           }
           car.position.x = lerp(car.position.x, tgt, 0.45);
         },
@@ -885,10 +885,72 @@ async function main() {
     b.textContent = ok ? '複製好了' : '複製失敗'; tell(ok ? '分享文字已複製。' : '文字沒有複製成功。'); setTimeout(() => { b.textContent = '複製文字'; }, 1800);
   });
 
+
+  /* ------------------------------------------------------------------ 第 6 項（2026-11-23）：沒人理牠的時候，螃蟹自己去用你買的東西
+     Left alone for half a minute, the crab goes over to one of the things you own (on the sill, hanging, on the desk, on the stand, or
+     what it is wearing), does something with it, says a line, and comes back. Which claw, where it stands and what it says: USES.
+     It never holds you up: move the mouse or touch anything and it drops what it is doing at once (S.busy is given back first).
+     Timed on the desk's own clock (f2.later), so window.__f2.advance() steps it too. No sounds: the bell and the typewriter are nudged quietly. */
+  const AT = { L: [0.78, -1.12], R: [1.9, -0.98], K: [2.62, 0.42] };      // where it stands: under the left of the sill, in front of the right of the sill and the back of the desk, beside the stand
+  const USES = {
+    garland: { act: 'eyes_wide', poke: true, line: '燈換個閃法，心情也換一下。' },
+    stars: { act: 'hop', poke: true, line: '跳一下，星星就轉了。' },
+    furin: { act: 'hop', poke: true, line: '有風。風鈴在動。' },
+    cactus: { at: 'L', act: 'snap_R', poke: true, line: '戳一下。……好，不戳了。' },
+    candle: { at: 'L', act: 'lean_bubbles', line: '聞起來像剛曬好的被子。' },
+    luckycat: { at: 'L', act: 'wave_L', poke: true, line: '牠招手，我也招手。' },
+    globe: { at: 'R', act: 'wave_R', poke: true, line: '轉到哪，下次就去哪。' },
+    snowglobe: { at: 'R', act: 'wiggle', poke: true, line: '搖一搖，下雪了。' },
+    fishbowl: { at: 'R', act: 'lean_bubbles', poke: true, line: '開飯了，慢慢吃。' },
+    typewriter: { at: 'R', act: 'legs_tap', poke: true, line: '我也來寫一段 prompt。' },
+    wear_raincoat: { act: 'shell_puff', line: '穿著雨衣，外面的雨就跟我沒關係了。' },
+    wear_sweater: { act: 'wiggle', line: '這件毛衣，很暖。' },
+    wear_scarf: { act: 'wiggle', line: '圍巾甩一下。帥吧。' },
+    keep_ramen: { at: 'K', act: 'lean_bubbles', line: '只聞不吃。……再聞一下。' },
+    keep_notes: { at: 'K', act: 'eyes_wide', line: '目的、任務、限制、格式。再背一次。' },
+    keep_cookbook: { at: 'K', act: 'lean_bubbles', line: '今天照食譜做哪一道？' },
+    keep_plug: { at: 'K', act: 'snap_L', line: '插著呢，資料都通。' },
+  };
+  const use = { on: false, tok: 0, t0: 0, beat: -1, last: null };
+  const usable = () => {                                  // what is out on the desk right now and has something written for it
+    const ids = []; for (const slot in live) { const id = mine.placed[slot]; if (USES[id] && (live[slot].wear || live[slot].root)) ids.push(id); }
+    for (const e of keepLive) if (USES[e.id] && !e.flying) ids.push(e.id);
+    return ids;
+  };
+  const entryOf = (id) => { for (const slot in live) if (mine.placed[slot] === id) return live[slot]; return keepLive.find((e) => e.id === id) || null; };
+  const useFree = () => S.introDone && !S.busy && !S.walk && !S.focus && !S.celebrating && !(F4 && F4.card) && !decorating && !showing && !paying && !REDUCED && S.layout === 'wide' && !document.hidden;
+  function endUse(walkHome) {
+    if (!use.on) return; use.on = false; use.tok++; S.busy = decorating;
+    if (walkHome && !S.focus && !decorating && crabRoot.position.distanceTo(S.crabHome) > 0.05) f2.walkTo(S.crabHome.clone());
+  }
+  function useThing(id, test) {                           // returns false if there is nothing to do with it just now. test: from the console, with the pane hidden
+    const u = USES[id], e = entryOf(id); if (!u || !e || use.on || !(useFree() || (test && DEV && !S.busy && !decorating))) return false;
+    if (f2.LIFE && f2.LIFE.mode) f2.endLife(false);
+    use.on = true; use.last = id; use.t0 = S.t; S.busy = true; const tok = ++use.tok;
+    const step = (sec, fn) => f2.later(sec, () => { if (tok === use.tok && use.on) fn(); });
+    const T = u.at ? f2.walkTo(new V3(AT[u.at][0], 0, AT[u.at][1])) : 0;
+    step(T + 0.2, () => { f2.play(u.act, { force: true }); });
+    step(T + 0.55, () => { if (u.poke && e.b && e.b.click) e.b.click(true); f2.say(u.line, { hold: 2.8 }); });   // after its own click, so this is the line that stays
+    step(T + 3.1, () => { const back = u.at ? f2.walkTo(S.crabHome.clone()) : 0; step(back + 0.15, () => endUse(false)); });
+    return true;
+  }
+  (function watch() {                                     // twice in a quiet spell (after about 28 and 44 seconds), before it nods off; a different thing each time
+    requestAnimationFrame(watch);
+    const active = Math.max(S.lastInteract || 0, S.lastPointer || 0, (f2.LIFE && f2.LIFE.lastActive) || 0), idle = S.t - active;
+    if (use.on) { if (active > use.t0 + 0.05 || decorating || showing || paying || S.focus || (F4 && F4.card)) endUse(true); return; }
+    if (idle < 1) { use.beat = -1; return; }
+    const beat = idle < 28 ? -1 : Math.floor((idle - 28) / 16);
+    if (beat < 0 || beat > 1 || beat === use.beat || (f2.LIFE && f2.LIFE.mode === 'doze')) return;
+    if (!useFree()) return;                               // try again next frame: the beat is not spent until something happened
+    use.beat = beat;
+    const ids = usable(); if (!ids.length) return;
+    const pick = ids.filter((id) => id !== use.last); useThing((pick.length ? pick : ids)[Math.floor(Math.random() * (pick.length || ids.length))]);
+  })();
+
   if (F4 && F4.on) { F4.on('state', draw); F4.on('card:open', () => { if (decorating) decorate(false); }); }
   addEventListener('storage', (e) => { if (['pd-done', 'pd-quiz', 'pd-chapters', 'pd-awards'].includes(e.key)) draw(); });
   draw();
   Object.values(mine.placed).forEach(mount);
-  window.__decor = { giveKeep, keeps, keepLive, payout, unpaid, allSources, journal: jr, snapshot, shoot, SHOT, shareText: (over) => shareTextOf(stats(over)), stats, mine, balance, present, putAway, mount, decorate, live, cat, draw, showGhost };
+  window.__decor = { useThing, endUse, usable, use, USES, giveKeep, keeps, keepLive, payout, unpaid, allSources, journal: jr, snapshot, shoot, SHOT, shareText: (over) => shareTextOf(stats(over)), stats, mine, balance, present, putAway, mount, decorate, live, cat, draw, showGhost };
 }
 main().catch((e) => console.info('[decor] not started:', e && e.message));
