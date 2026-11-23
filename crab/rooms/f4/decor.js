@@ -12,6 +12,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { sources, markVisit } from './coins.js';
 import { mountJournal } from './journal.js';
+import { SHARE, STYLES, stats, compose, shareText as shareTextOf, fileOf, CAN_SHARE, download } from './share-card.js';
 
 const html = document.documentElement;
 const Q = new URLSearchParams(location.search);
@@ -40,7 +41,7 @@ function waitFor(test, ms = 25000) {
 /* ------------------------------------------------------------------ what you own (this browser only) */
 function load() {
   let s = {}; try { if (KEEP) s = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { s = {}; }
-  return { owned: Array.isArray(s.owned) ? s.owned : [], placed: s.placed && typeof s.placed === 'object' ? s.placed : {}, seen: +s.seen || 0, paid: Array.isArray(s.paid) ? s.paid : [] };   // paid ＝ 螃蟹已經交給你的那幾筆（coins.js 的 key）
+  return { owned: Array.isArray(s.owned) ? s.owned : [], placed: s.placed && typeof s.placed === 'object' ? s.placed : {}, seen: +s.seen || 0, paid: Array.isArray(s.paid) ? s.paid : [], kept: Array.isArray(s.kept) ? s.kept : [] };   // paid ＝ 螃蟹已經交給你的那幾筆（coins.js 的 key）
 }
 const mine = load();
 const save = () => { try { if (KEEP) localStorage.setItem(KEY, JSON.stringify(mine)); } catch (e) { /* private mode */ } };
@@ -121,8 +122,15 @@ async function main() {
   const ding = () => { tone(1568, 0.9, 0.03); tone(3136, 0.5, 0.01); };
   const clack = () => { tone(150 + Math.random() * 60, 0.035, 0.03, 'square'); tone(900, 0.02, 0.008, 'square'); };
   const live = {};                                      // slot -> { id, it, root, b (behaviour), landAt, flying }
+  const keepLive = [], extraHits = [];                  // 課程紀念品 on their stand; other things on the desk that answer a click
 
   const BEHAVE = {
+    /* the bowl of ramen: three soft wisps rise from the broth and thin out (sprites, no light) */
+    steam(root) {
+      const wisps = [0, 1, 2].map((i) => { const w = sprite(glowTex, new THREE.Color('#FFF1DC'), 0.12); w.material.blending = THREE.NormalBlending; w.userData.ph = i / 3; root.add(w); return w; });
+      const top = root.userData.size.y * 0.8;
+      return { tick(t) { wisps.forEach((w, i) => { const u = (t * 0.33 + w.userData.ph) % 1; w.position.set(Math.sin(t * 0.9 + i * 2.1) * 0.02 + (i - 1) * 0.022, top + u * 0.26, Math.cos(t * 0.7 + i) * 0.015); w.scale.setScalar(0.07 + u * 0.13); w.material.opacity = (REDUCED ? 0.1 : 0.2) * Math.sin(u * Math.PI); }); } };
+    },
     /* the string of lights: every bulb has its own filament; they breathe, hold steady or chase (click to change);
        one warm light really shines from them onto the frame, the sill and whatever stands there; brighter with the lamp off */
     twinkle(root, it) {
@@ -505,11 +513,12 @@ async function main() {
       if (e.b && e.b.tick) e.b.tick(t, t - e.bornAt, dt);
     }
     if (ring.userData.at) { const u = (t - ring.userData.at) / 0.8; if (u >= 1) { ring.material.opacity = 0; ring.userData.at = 0; } else { ring.scale.setScalar(ring.userData.r * (0.4 + 0.9 * easeOut(u))); ring.material.opacity = 0.75 * (1 - u); } }
+    for (const e of keepLive) if (e.b && e.b.tick && !e.flying) e.b.tick(t, t - e.bornAt, dt);
     const ba = t - bitsAt;
     if (ba < 1.3) { for (let i = 0; i < BITS; i++) { const v = bitsVel[i]; v.y -= 6.5 * dt; bitsPos[i * 3] += v.x * dt; bitsPos[i * 3 + 1] += v.y * dt; bitsPos[i * 3 + 2] += v.z * dt; } bitsGeo.attributes.position.needsUpdate = true; bits.material.opacity = clamp(1.3 - ba, 0, 1); } else if (bits.material.opacity) bits.material.opacity = 0;
     if (ghost && ghost.root) { const k = 0.34 + 0.12 * Math.sin((t - ghost.at) * 3.2); ghost.root.traverse((o) => { if (o.isMesh) o.material.opacity = k; }); }
     const wide = S.layout === 'wide';
-    if (wide !== wasWide && uiReady) { wasWide = wide; btn.hidden = !wide; jr.btn.hidden = !wide; if (!wide) jr.show(false, false); if (!wide && decorating) decorate(false); for (const k in live) if (live[k].root && !live[k].wear) live[k].root.visible = wide; }
+    if (wide !== wasWide && uiReady) { wasWide = wide; btn.hidden = !wide; jr.btn.hidden = !wide; if (!wide) jr.show(false, false); if (!wide && decorating) decorate(false); for (const k in live) if (live[k].root && !live[k].wear) live[k].root.visible = wide; if (keepRoot) keepRoot.visible = wide; }
     if (decorating || showing) S.lastInteract = S.t;
     if (decorating && !showing) placeMarks();
     requestAnimationFrame(tick);
@@ -519,7 +528,7 @@ async function main() {
   const ndc = (e) => { const r = canvas.getBoundingClientRect(); return v2.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); };
   const under = (e) => {
     if (showing || (F4 && F4.card) || html.classList.contains('has-map')) return null;
-    const hits = Object.values(live).filter((x) => x.b && x.b.hit && !x.flying); if (!hits.length) return null;
+    const hits = Object.values(live).filter((x) => x.b && x.b.hit && !x.flying).concat(extraHits); if (!hits.length) return null;
     ray.setFromCamera(ndc(e), camera); const h = ray.intersectObjects(hits.map((x) => x.b.hit), false)[0];
     return h ? hits.find((x) => x.b.hit === h.object) : null;
   };
@@ -546,7 +555,7 @@ async function main() {
   const btn = document.createElement('button'); btn.type = 'button'; btn.id = 'btn-decor'; btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', 'decor-tray');
   ctl.prepend(btn); uiReady = true;
   const tray = document.createElement('section'); tray.className = 'decor-tray'; tray.id = 'decor-tray'; tray.setAttribute('aria-label', '書桌佈置'); tray.inert = true;
-  tray.innerHTML = `<header><div><h2>書桌佈置</h2><p class="how"></p></div><p class="purse" aria-live="polite"></p><div class="share"><button type="button" class="snap">存成圖片</button><button type="button" class="copy">複製文字</button></div><button type="button" class="done">完成佈置</button></header><ul class="shelf"></ul>`;
+  tray.innerHTML = `<header><div><h2>書桌佈置</h2><p class="how"></p></div><p class="purse" aria-live="polite"></p><div class="share"><button type="button" class="snap">存成圖片</button><button type="button" class="copy">複製文字</button></div><button type="button" class="done">完成佈置</button></header><p class="tabs" role="tablist"><button type="button" role="tab" data-tab="things" aria-selected="true">擺飾</button><button type="button" role="tab" data-tab="keeps" aria-selected="false">紀念品</button></p><ul class="shelf"></ul><ul class="shelf keeps" hidden></ul>`;
   stage.appendChild(tray);
   const scrim = document.createElement('div'); scrim.className = 'decor-scrim'; scrim.setAttribute('aria-hidden', 'true'); stage.insertBefore(scrim, tray);
   const skipHint = document.createElement('p'); skipHint.className = 'decor-skip'; skipHint.setAttribute('aria-hidden', 'true'); skipHint.textContent = '點一下跳過'; stage.appendChild(skipHint);
@@ -558,7 +567,7 @@ async function main() {
     tray.querySelector('header').after(bar);
     bar.addEventListener('click', async (e) => {
       const b = e.target.closest('button[data-dev]'); if (!b || showing) return;
-      if (b.dataset.dev === 'reset') { for (const slot of Object.keys(live)) await putAway(slot, true); mine.owned = []; mine.placed = {}; save(); draw(); tell('擺飾已清空。'); }
+      if (b.dataset.dev === 'reset') { for (const slot of Object.keys(live)) await putAway(slot, true); mine.owned = []; mine.placed = {}; mine.kept = []; keepLive.splice(0).forEach((e) => { keepRoot.remove(e.root); free(e.root); }); save(); draw(); tell('擺飾已清空。'); }
       else { try { localStorage.setItem(DEV_KEY, '0'); } catch (err) { /* private mode */ } const u = new URL(location.href); u.searchParams.delete('dev'); location.replace(u.href); }
     });
   }
@@ -724,10 +733,92 @@ async function main() {
     if (!S.introDone) return; if (!readyAt) readyAt = now();
     if (now() - readyAt < 2.8 || paying || S.busy || decorating || showing || jr.open || (F4 && F4.card) || S.layout !== 'wide' || document.hidden || html.classList.contains('has-map') || html.classList.contains('pk-leaving')) return;
     if (DEMO_PAY && !demoDone) { demoDone = true; payout(DEMO_PAY, { demo: true }); return; }
-    const list = unpaid(); if (list.length) payout(list);
+    const list = unpaid(); if (list.length) { payout(list); return; }
+    if (keepRoot) { const fin = finished(), nk = keeps.find((k) => hasKeep(k, fin) && !mine.kept.includes(k.id)); if (nk) giveKeep(nk); }
   }, 1200);
+
+  /* ------------------------------------------------------------------ 課程紀念品（2026-11-23）：每完成一課送一件買不到的小東西，擺在桌子右前方的展示台上
+     資料在 catalog.json 的 keepshelf（展示台）和 keeps（一課一件：lesson 課號、seat 第幾格、ready 模型做好了沒）。
+     有沒有拿到只看 pd-done（開發者模式：做好的都算拿到）。mine.kept ＝ 螃蟹已經親手放上去的；新拿到的那件回首頁時由螃蟹放。
+     圖鑑在佈置模式的「紀念品」分頁：沒拿到的是剪影，寫完成哪一課可得。 */
+  const keeps = cat.keeps || [], KS = cat.keepshelf;
+  let keepRoot = null; const seatAt = {};
+  const finished = () => { let d = []; try { d = JSON.parse(localStorage.getItem('pd-done') || '[]'); } catch (e) { d = []; } return new Set(d); };
+  const hasKeep = (k, fin = finished()) => !!k.ready && (DEVMODE || fin.has(k.lesson));
+  const keepItem = (k) => ({ ...k, slot: 'keep' });
+  async function seatKeep(k) {                           // on its seat, no ceremony
+    if (!keepRoot || keepLive.some((e) => e.id === k.id)) return null;
+    const root = await build(keepItem(k)); root.position.copy(seatAt[k.seat] || seatAt[0]); keepRoot.add(root);
+    const e = { id: k.id, root, b: BEHAVE[k.behave] ? BEHAVE[k.behave](root, k) : null, bornAt: now(), flying: false }; keepLive.push(e); return e;
+  }
+  async function giveKeep(k) {                           // the crab takes it out of its box and sets it on the stand; the chair leans over to look
+    if (paying || showing) return; paying = true; skip = false; S.busy = true; if (f2.LIFE && f2.LIFE.mode) f2.endLife(false); jr.show(false, false);
+    mine.kept.push(k.id); save();
+    const e = await seatKeep(k); if (!e) { paying = false; S.busy = false; return; }
+    const root = e.root, P = root.position.clone(), W = keepRoot.localToWorld(P.clone()); e.flying = true;
+    tell(`完成 ${k.lesson} 的紀念品：${k.name}。放在${KS.label}上了。`);
+    if (!REDUCED) {
+      html.classList.add('is-decor-show'); showing = true;
+      camTo(new V3(crabRoot.position.x + 0.1, 1.85, crabRoot.position.z + 0.2), 0.6); f2.play('parcel_wiggle', { force: true }); await wait(0.45);
+      const G = keepRoot.worldToLocal(giftPos(new V3())); burst(giftPos(new V3()));
+      const R = keepRoot.worldToLocal(new V3(crabRoot.position.x + 0.05, 2.45, crabRoot.position.z + 0.35)), big = 3.2;
+      await anim(0.6, (q, u) => { root.position.lerpVectors(G, R, easeOut(u)); root.scale.setScalar(lerp(0.3, big, backOut(u))); root.rotation.y = -(1 - q) * 3.2; });
+      f2.play('eyes_wide', { force: true });
+      await anim(1.5, (q, u) => { root.rotation.y = u * Math.PI * 2; root.rotation.x = 0.5 * Math.sin(u * Math.PI); root.position.y = R.y + Math.sin(u * Math.PI * 2) * 0.035; }, linear);
+      camTo(new V3(W.x, 0.25, W.z), 0.42);
+      const from = root.position.clone(), apex = Math.max(from.y, P.y) + 0.7;
+      await anim(1.0, (q, u) => { root.position.lerpVectors(from, P, q); root.position.y = lerp(lerp(from.y, apex, u), lerp(apex, P.y, u), u); root.scale.setScalar(lerp(big, 1, q)); root.rotation.y = (1 - q) * Math.PI * 2; root.rotation.x = 0; });
+      ring.position.set(W.x, W.y + 0.012, W.z); ring.userData.at = now(); ring.userData.r = 0.5;
+      f2.play('hop', { force: true }); await wait(1.7);
+      showing = false; html.classList.remove('is-decor-show');
+    }
+    root.position.copy(P); root.scale.setScalar(1); root.rotation.set(0, 0, 0); e.flying = false; e.bornAt = now();
+    if (decorating) camTo(...DECOR_CAM); else camHome();
+    f2.say(`這是 ${k.lesson} 的紀念品：${k.name}。${k.line || ''}`, { hold: 4.6 });
+    S.busy = decorating; paying = false; skip = false; drawKeeps();
+  }
+  if (KS) loader.loadAsync('decor/' + KS.file).then(async (g) => {
+    keepRoot = new THREE.Group(); keepRoot.name = 'decor:keepshelf'; keepRoot.add(g.scene);
+    keepRoot.position.fromArray(KS.pos); keepRoot.rotation.y = rad(KS.rotY || 0); keepRoot.visible = S.layout === 'wide';
+    keepRoot.traverse((o) => { if (/^seat_(\d+)/.test(o.name)) seatAt[+RegExp.$1] = o.position.clone(); if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+    scene.add(keepRoot);
+    const hit = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.6, 0.9), new THREE.MeshBasicMaterial({ visible: false })); hit.position.set(0, 0.3, 0); keepRoot.add(hit);
+    let looking = 0;
+    extraHits.push({ b: { hit, cursor: 'pointer', click() {
+      if (paying || showing || decorating || S.busy && !looking) return;
+      clearTimeout(looking); if (looking) { looking = 0; camHome(); S.busy = false; return; }
+      S.busy = true; camTo(new V3(KS.pos[0], 0.25, KS.pos[2]), 0.42); const n = keepLive.length;
+      f2.say(n ? `課程紀念品，現在有 ${n} 件。每完成一課多一件。` : '這裡放課程紀念品。每完成一課，我就放一件上去。', { hold: 4 });
+      looking = setTimeout(() => { looking = 0; if (!decorating && !paying && !showing) { camHome(); S.busy = false; } }, 5200);
+    } } });
+    const fin = finished();
+    for (const k of keeps) if (hasKeep(k, fin) && mine.kept.includes(k.id)) await seatKeep(k);
+    drawKeeps();
+  }).catch(() => {});
+  const keepShelf = tray.querySelector('.shelf.keeps'), tabs = tray.querySelector('.tabs');
+  if (!keeps.length) tabs.hidden = true;                // no keepsakes in the catalogue yet: no empty tab
+  function drawKeeps() {
+    const fin = finished(), got = keeps.filter((k) => hasKeep(k, fin)).length;
+    tabs.querySelector('[data-tab="keeps"]').textContent = `紀念品 ${got}／${keeps.length}`;
+    keeps.forEach((k) => {
+      let li = keepShelf.querySelector(`li[data-id="${k.id}"]`);
+      if (!li) { li = document.createElement('li'); li.dataset.id = k.id; li.style.setProperty('--i', Math.min(7, keepShelf.children.length)); li.innerHTML = `<div class="pic">${k.ready ? '<canvas width="368" height="288"></canvas>' : '<span>製作中</span>'}</div><h3></h3><p></p>`; keepShelf.appendChild(li); }
+      const own = hasKeep(k, fin), href = F4 && F4.lessonHref ? F4.lessonHref(k.lesson) : null;
+      li.className = own ? 'kept' : k.ready ? 'locked' : 'locked soon';
+      li.querySelector('h3').textContent = k.name;
+      li.querySelector('p').innerHTML = own ? `${k.lesson} 的紀念品${k.blurb ? '・' + k.blurb : ''}` : `完成 ${k.lesson} 可得${href ? `　<a href="${href}">去上課</a>` : ''}`;
+    });
+  }
+  async function keepPictures() {
+    if (!studio) { const m = await import('./decor-view.js'); studio = m.makeStudio({ px: 368 }); }
+    for (const k of keeps) { if (!k.ready) continue; const c = keepShelf.querySelector(`li[data-id="${k.id}"] canvas`); if (c && !c.dataset.done) { await studio.shoot(keepItem(k), c, 0.55); c.dataset.done = '1'; } }
+  }
+  tabs.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-tab]'); if (!b) return; const k = b.dataset.tab === 'keeps';
+    tabs.querySelectorAll('button').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    shelf.hidden = k; keepShelf.hidden = !k; setHot(null); if (k) { drawKeeps(); keepPictures(); camTo(new V3(KS.pos[0] - 0.5, 0.5, KS.pos[2] - 0.6), 0.8); } else camTo(...DECOR_CAM);
+  });
   /* ------------------------------------------------------------------ 存成圖片（2026-11-22）：書桌和螃蟹一張 1080×1920 直式圖，沒有任何按鈕，角落印帳號和網址 */
-  const SHARE = { handle: '@paradigmai_tw', url: 'paradigm-study.pages.dev' };          // 網址：Cloudflare 那個（協作說明：之後正式用這個）
   /* 分享卡的兩種版面（Thomas 2026-11-23 從 8 版裡留下這兩個；其他 6 版的程式在 可刪/存圖前/decor.v3八版.js）：
      magazine＝書桌滿版，PARADIGM 刊頭橫跨上方；pass＝掛繩學員證，大頭照是你的螃蟹，背景是模糊的書桌。 */
   const SHOT = {
@@ -739,23 +830,6 @@ async function main() {
     },
   };
   const shotCam = new THREE.PerspectiveCamera(SHOT.fov, 1, 0.5, 80);
-  /* what the card says about you: which role you are working toward and how far (first-release lessons in that role's topics),
-     the lesson you finished last, and the time spent on lesson pages (pd-time, written by the lesson pages). `over` is for testing. */
-  function stats(over) {
-    const M8 = window.ROADMAP8 || {}, first = new Set(M8.first || []), title = {}, topicOf = {};
-    (M8.topics || []).forEach((t) => (t.all || []).forEach(([id, ti]) => { title[id] = ti; topicOf[id] = t.id; }));
-    let done = []; try { done = JSON.parse(localStorage.getItem('pd-done') || '[]'); } catch (e) { done = []; }
-    let secs = 0; try { secs = +(JSON.parse(localStorage.getItem('pd-time') || '{}') || {}).total || 0; } catch (e) { secs = 0; }
-    if (over) { if (over.done) done = over.done; if (over.secs != null) secs = over.secs; }
-    done = done.filter((id) => title[id]);
-    const roles = (M8.roles || []).map((r) => { const ids = [...first].filter((id) => r.topics.includes(topicOf[id])); return { name: r.name, total: ids.length, n: ids.filter((id) => done.includes(id)).length }; }).filter((r) => r.total);
-    const role = roles.find((r) => r.n < r.total) || roles[roles.length - 1] || { name: 'AI Power User', total: 0, n: 0 };
-    const m = Math.floor(secs / 60), time = m < 1 ? '' : m < 60 ? `${m} 分鐘` : `${Math.floor(m / 60)} 小時${m % 60 ? ` ${m % 60} 分` : ''}`;
-    const last = done[done.length - 1];
-    let per = {}; try { per = (JSON.parse(localStorage.getItem('pd-time') || '{}') || {}).lessons || {}; } catch (e) { per = {}; }
-    if (over && over.per) per = over.per;
-    return { role, lessons: done.length, time, last: last ? title[last] : '', list: done.map((id) => ({ id, title: title[id], min: Math.round((+per[id] || 0) / 60) })) };
-  }
   function shoot(c) {                                    // one frame of the desk from the card's own camera, borrowed from the page's renderer and given back in the same task
     const R = f2.renderer, el = rad(c.elev), yw = rad(c.yaw), t = c.target;
     shotCam.fov = SHOT.fov; shotCam.aspect = c.w / c.h; shotCam.layers.mask = camera.layers.mask;
@@ -771,75 +845,20 @@ async function main() {
     if (ghostWas && decorating) showGhost(ghostWas);
     return pic;
   }
-  function snapshot(over, style = SHOT.style) {
-    const W = SHOT.w, H = SHOT.h, st = stats(over), pic = shoot(SHOT.cams[style]);
-    const out = document.createElement('canvas'); out.width = W; out.height = H; const g = out.getContext('2d');
-    const ZH = 'Huninn, "PingFang TC", sans-serif', EN = 'Outfit, sans-serif', CREAM = '#FFF4E0', SUN = '#FFC857', GRAPE = '#3A2E5C', CORAL = '#FF6B57';
-    const fit = (s, max) => { if (g.measureText(s).width <= max) return s; while (s.length > 1 && g.measureText(s + '…').width > max) s = s.slice(0, -1); return s + '…'; };
-    const text = (s, x, y, font, color, { align = 'left', alpha = 1, sp = 0 } = {}) => { g.font = font; g.fillStyle = color; g.globalAlpha = alpha; g.textAlign = align; g.letterSpacing = sp + 'px'; g.fillText(s, x, y); g.globalAlpha = 1; g.letterSpacing = '0px'; g.textAlign = 'left'; };
-    const lead = st.role.total && st.role.n >= st.role.total ? '我已經是' : '我正在成為';
-    const d = new Date(), date = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-    // the progress as one small mark per lesson (18 lessons, 18 marks): you can count them, a bar you cannot
-    const ticks = (x, y, w, h, on, off) => { const n = st.role.total || 1, gap = Math.min(10, w / n * 0.28), tw = (w - gap * (n - 1)) / n; for (let i = 0; i < n; i++) { g.fillStyle = i < st.role.n ? on : off; g.beginPath(); g.roundRect(x + i * (tw + gap), y, tw, h, Math.min(h / 2, 6)); g.fill(); } };
-    const barcode = (x, y, w, h, color) => { g.fillStyle = color; for (let cx = x, i = 0; cx < x + w; i++) { const bw = [2, 5, 2, 7, 3, 2, 6, 2, 4, 3][(i * 7 + st.role.n) % 10]; g.fillRect(cx, y, bw, h); cx += bw + [3, 2, 5, 2][i % 4]; } };
-    g.textBaseline = 'alphabetic';
-
-    if (style === 'magazine') {
-      /* 雜誌封面：滿版書桌，刊頭橫跨上方，封面標題寫在桌面前緣空的木頭上（2026-11-23 磨細：字不再壓到筆和信封，
-         大字收緊字距、小字放寬，暗角只鋪在字後面而且用畫面裡的暮色） */
-      g.drawImage(pic, 0, 0);
-      const X = 72, XR = W - 72;
-      g.font = `600 100px ${EN}`; const fs = Math.floor((XR - X) / g.measureText('PARADIGM').width * 100 * 1.012);
-      const top = g.createLinearGradient(0, 0, 0, 560); top.addColorStop(0, 'rgba(52,34,62,.5)'); top.addColorStop(1, 'rgba(52,34,62,0)'); g.fillStyle = top; g.fillRect(0, 0, W, 560);
-      g.save(); g.shadowColor = 'rgba(30,18,40,.35)'; g.shadowBlur = 24; g.shadowOffsetY = 4;
-      text('PARADIGM', X - 6, 352, `600 ${fs}px ${EN}`, CREAM, { sp: -2 }); g.restore();
-      g.fillStyle = CREAM; g.fillRect(X, 380, XR - X, 2);
-      text('AI 學習誌', X, 420, `400 26px ${ZH}`, CREAM, { sp: 7 }); text(`${date}　第 ${st.role.n} 課`, XR, 420, `400 26px ${ZH}`, CREAM, { align: 'right', sp: 1 });
-      const low = g.createLinearGradient(0, 1250, 0, 1760); low.addColorStop(0, 'rgba(46,28,44,0)'); low.addColorStop(0.5, 'rgba(46,28,44,.36)'); low.addColorStop(1, 'rgba(46,28,44,.5)'); g.fillStyle = low; g.fillRect(0, 1250, W, H - 1250);
-      text(lead, X, 1420, `400 30px ${ZH}`, CREAM, { alpha: 0.9, sp: 4 });
-      g.font = `500 104px ${EN}`; text(fit(st.role.name, XR - X), X - 5, 1524, `500 104px ${EN}`, CREAM, { sp: -2.5 });
-      ticks(X, 1562, XR - X, 10, SUN, 'rgba(255,244,224,.28)');
-      text(`已完成 ${st.role.n}／${st.role.total} 課`, X, 1628, `400 34px ${ZH}`, CREAM, { sp: 1 }); if (st.time) text(`學習 ${st.time}`, XR, 1628, `400 34px ${ZH}`, CREAM, { align: 'right', sp: 1 });
-      text(SHARE.handle, X, 1690, `600 28px ${EN}`, SUN); text(SHARE.url, XR, 1690, `500 24px ${EN}`, CREAM, { align: 'right', alpha: 0.8 });
-    } else if (style === 'pass') {
-      /* 學員證：掛繩識別證，大頭照是你的螃蟹，後面是自己的書桌（模糊） */
-      const back = shoot(SHOT.cams.back); g.filter = 'blur(26px) brightness(.55) saturate(1.1)'; g.drawImage(back, -60, -100, W + 120, H + 200); g.filter = 'none';
-      const vig = g.createRadialGradient(W / 2, 960, 420, W / 2, 960, 1250); vig.addColorStop(0, 'rgba(20,12,34,0)'); vig.addColorStop(1, 'rgba(20,12,34,.55)'); g.fillStyle = vig; g.fillRect(0, 0, W, H);
-      const strap = g.createLinearGradient(460, 0, 620, 0); strap.addColorStop(0, '#241C3D'); strap.addColorStop(0.5, '#4A3B78'); strap.addColorStop(1, '#241C3D');
-      g.fillStyle = strap; g.beginPath(); g.moveTo(470, 0); g.lineTo(520, 0); g.lineTo(552, 372); g.lineTo(524, 372); g.closePath(); g.fill(); g.beginPath(); g.moveTo(560, 0); g.lineTo(610, 0); g.lineTo(556, 372); g.lineTo(528, 372); g.closePath(); g.fill();
-      const cx0 = 130, cy0 = 330, cw = 820, chh = 1250, L = cx0 + 50, Rr = cx0 + cw - 50;
-      g.fillStyle = CREAM; g.shadowColor = 'rgba(8,4,20,.5)'; g.shadowBlur = 90; g.shadowOffsetY = 44; g.beginPath(); g.roundRect(cx0, cy0, cw, chh, 40); g.fill();      // far, soft: the room
-      g.shadowColor = 'rgba(8,4,20,.45)'; g.shadowBlur = 14; g.shadowOffsetY = 6; g.beginPath(); g.roundRect(cx0, cy0, cw, chh, 40); g.fill(); g.shadowColor = 'transparent'; g.shadowBlur = 0; g.shadowOffsetY = 0;   // near, tight: the card's own edge
-      const edge = g.createLinearGradient(0, cy0, 0, cy0 + 90); edge.addColorStop(0, 'rgba(255,255,255,.75)'); edge.addColorStop(1, 'rgba(255,255,255,0)'); g.strokeStyle = edge; g.lineWidth = 3; g.beginPath(); g.roundRect(cx0 + 1.5, cy0 + 1.5, cw - 3, chh - 3, 39); g.stroke();   // light catching the top edge
-      g.fillStyle = 'rgba(42,33,68,.85)'; g.beginPath(); g.roundRect(W / 2 - 70, cy0 + 28, 140, 26, 13); g.fill();
-      text('PARADIGM AI', L, cy0 + 122, `600 28px ${EN}`, GRAPE, { sp: 5 }); text('LEARNER PASS', Rr, cy0 + 122, `500 22px ${EN}`, GRAPE, { align: 'right', alpha: 0.62, sp: 4 });
-      g.save(); g.beginPath(); g.roundRect(L, cy0 + 156, 720, 600, 26); g.clip(); g.drawImage(pic, L, cy0 + 156); g.restore();
-      g.strokeStyle = 'rgba(58,46,92,.16)'; g.lineWidth = 2; g.beginPath(); g.roundRect(L + 1, cy0 + 157, 718, 598, 25); g.stroke();
-      text(lead, L, cy0 + 826, `400 28px ${ZH}`, GRAPE, { alpha: 0.66, sp: 3 });
-      g.font = `500 88px ${EN}`; text(fit(st.role.name, 720), L - 4, cy0 + 918, `500 88px ${EN}`, GRAPE, { sp: -2.2 });
-      ticks(L, cy0 + 950, 720, 12, CORAL, 'rgba(58,46,92,.16)');
-      [['已完成', `${st.role.n}／${st.role.total} 課`], ['學習時間', st.time || '剛開始'], ['日期', date]].forEach(([a, b], i) => { const x = L + i * 248; text(a, x, cy0 + 1024, `400 24px ${ZH}`, GRAPE, { alpha: 0.6 }); text(b, x, cy0 + 1070, `400 32px ${ZH}`, GRAPE, { sp: 0.5 }); });
-      barcode(L, cy0 + 1118, 330, 70, GRAPE); text(SHARE.handle, Rr, cy0 + 1170, `600 28px ${EN}`, GRAPE, { align: 'right' });
-      text(SHARE.url, W / 2, 1668, `500 26px ${EN}`, CREAM, { align: 'center', alpha: 0.8 });
-    }
-    return out;
-  }
-  const shareText = (over) => {
-    const st = stats(over);
-    const a = st.role.n ? `我在 Paradigm AI 學習站完成了 ${st.role.n} 課，${st.role.name} 的進度 ${st.role.n}／${st.role.total}${st.time ? `，學習 ${st.time}` : ''}。` : '我開始在 Paradigm AI 學習站學 AI 了。';
-    return a + (st.last ? `\n剛學完：${st.last}` : '') + `\n一起來學：https://${SHARE.url}/\n${SHARE.handle}`;
-  };
+  const snapshot = (over, style = SHOT.style) => compose(style, stats(over), shoot(SHOT.cams[style]), style === 'pass' ? shoot(SHOT.cams.back) : null);
   /* 存成圖片：先跳出兩張小預覽（學員證／雜誌封面，都是用你現在的書桌算的），點哪張就存哪張（Thomas 2026-11-23：給學員選） */
-  const STYLES = [['pass', '學員證'], ['magazine', '雜誌封面']];
+  /* 手機分享選單（2026-11-23）：觸控裝置而且瀏覽器能分享檔案時，點預覽＝打開系統的分享選單（存到相簿、IG、LINE…）；其他情況照舊下載。
+     分享一定要緊接在點擊之後，所以兩張大圖在預覽畫好時就先轉成檔案（shots），點的時候不用再等。 */
+  const SNAP_LABEL = CAN_SHARE ? '分享圖片' : '存成圖片', shots = {};
   const snapBtn = tray.querySelector('.snap'), shareBox = tray.querySelector('.share');
   const pick = document.createElement('div'); pick.className = 'decor-pick'; pick.hidden = true; pick.setAttribute('role', 'group'); pick.setAttribute('aria-label', '選一種圖片樣式');
-  pick.innerHTML = '<p>選一張存下來</p><div>' + STYLES.map(([id, name]) => `<button type="button" data-style="${id}"><canvas width="216" height="384"></canvas><span>${name}</span></button>`).join('') + '</div>';
+  pick.innerHTML = `<p>${CAN_SHARE ? '選一張分享' : '選一張存下來'}</p><div>` + STYLES.map(([id, name]) => `<button type="button" data-style="${id}"><canvas width="216" height="384"></canvas><span>${name}</span></button>`).join('') + '</div>';
   shareBox.appendChild(pick); snapBtn.setAttribute('aria-haspopup', 'true'); snapBtn.setAttribute('aria-expanded', 'false');
   const closePick = (focus) => { if (pick.hidden) return; pick.hidden = true; snapBtn.setAttribute('aria-expanded', 'false'); if (focus) snapBtn.focus({ preventScroll: true }); };
   async function openPick() {
     pick.hidden = false; snapBtn.setAttribute('aria-expanded', 'true');
     try { await document.fonts.load('40px Huninn'); await document.fonts.load('600 46px Outfit'); await document.fonts.load('500 32px Outfit'); } catch (e) { /* the fallback font will do */ }
-    for (const [id] of STYLES) { if (pick.hidden) return; const c = pick.querySelector(`[data-style="${id}"] canvas`), g2 = c.getContext('2d'); g2.imageSmoothingQuality = 'high'; g2.drawImage(snapshot(null, id), 0, 0, c.width, c.height); await new Promise((r) => requestAnimationFrame(r)); }
+    for (const [id] of STYLES) { if (pick.hidden) return; const c = pick.querySelector(`[data-style="${id}"] canvas`), g2 = c.getContext('2d'); g2.imageSmoothingQuality = 'high'; const full = snapshot(null, id); g2.drawImage(full, 0, 0, c.width, c.height); if (CAN_SHARE) { shots[id] = null; full.toBlob((bl) => { shots[id] = bl; }, 'image/png'); } await new Promise((r) => requestAnimationFrame(r)); }
     const first = pick.querySelector('button'); if (first && !pick.hidden) first.focus({ preventScroll: true });
   }
   snapBtn.addEventListener('click', () => { if (showing) return; if (pick.hidden) openPick(); else closePick(true); });
@@ -847,14 +866,18 @@ async function main() {
   pick.addEventListener('click', async (e) => {
     const b = e.target.closest('button[data-style]'); if (!b || showing) return; const style = b.dataset.style, name = b.querySelector('span').textContent;
     try {
-      const blob = await new Promise((ok) => snapshot(null, style).toBlob(ok, 'image/png'));
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `paradigm-${name}.png`; document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 4000); tell(`${name}的圖片存好了。`); snapBtn.textContent = '存好了';
+      if (CAN_SHARE && shots[style]) {                    // the system share sheet; no await before it, or the tap no longer counts
+        try { await navigator.share({ files: [fileOf(shots[style], name)], title: 'Paradigm AI 學習站' }); tell(`${name}的圖片分享出去了。`); snapBtn.textContent = '分享好了'; closePick(true); setTimeout(() => { snapBtn.textContent = SNAP_LABEL; }, 1800); return; }
+        catch (err) { if (err && err.name === 'AbortError') return; console.info('[decor] share failed, saving instead:', err); }   // closed the sheet: leave the previews open
+      }
+      const blob = (CAN_SHARE && shots[style]) || await new Promise((ok) => snapshot(null, style).toBlob(ok, 'image/png'));
+      download(blob, name); tell(`${name}的圖片存好了。`); snapBtn.textContent = '存好了';
     } catch (err) { console.info('[decor] snapshot failed:', err); tell('圖片沒有存成功，再試一次。'); snapBtn.textContent = '再試一次'; }
-    closePick(true); setTimeout(() => { snapBtn.textContent = '存成圖片'; }, 1800);
+    closePick(true); setTimeout(() => { snapBtn.textContent = SNAP_LABEL; }, 1800);
   });
+  snapBtn.textContent = SNAP_LABEL;
   tray.querySelector('.copy').addEventListener('click', async (e) => {
-    const b = e.currentTarget, s = shareText(); let ok = false;
+    const b = e.currentTarget, s = shareTextOf(); let ok = false;
     try { await navigator.clipboard.writeText(s); ok = true; } catch (err) {
       const ta = document.createElement('textarea'); ta.value = s; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select();
       try { ok = document.execCommand('copy'); } catch (er) { ok = false; } ta.remove();
@@ -866,6 +889,6 @@ async function main() {
   addEventListener('storage', (e) => { if (['pd-done', 'pd-quiz', 'pd-chapters', 'pd-awards'].includes(e.key)) draw(); });
   draw();
   Object.values(mine.placed).forEach(mount);
-  window.__decor = { payout, unpaid, allSources, journal: jr, snapshot, SHOT, shareText, stats, mine, balance, present, putAway, mount, decorate, live, cat, draw, showGhost };
+  window.__decor = { giveKeep, keeps, keepLive, payout, unpaid, allSources, journal: jr, snapshot, shoot, SHOT, shareText: (over) => shareTextOf(stats(over)), stats, mine, balance, present, putAway, mount, decorate, live, cat, draw, showGhost };
 }
 main().catch((e) => console.info('[decor] not started:', e && e.message));
