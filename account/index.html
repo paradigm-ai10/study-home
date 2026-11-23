@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://paradigm-ai10.github.io/study-home/account/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Paradigm AI 學習站">
+<meta property="og:title" content="隱私說明｜Paradigm 學 AI">
+<meta property="og:description" content="用 Google 登入 Paradigm 學 AI 之後，我們存了什麼、存在哪裡、拿來做什麼，以及怎麼刪掉。">
+<meta property="og:url" content="https://paradigm-ai10.github.io/study-home/account/">
+<meta property="og:image" content="https://paradigm-ai10.github.io/study-home/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#FFF4E0">
+<title>隱私說明｜Paradigm 學 AI</title>
+<meta name="description" content="用 Google 登入 Paradigm 學 AI 之後，我們存了什麼、存在哪裡、拿來做什麼，以及怎麼刪掉。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=LXGW+WenKai+TC&family=Outfit:wght@500;600&display=swap">
+<style>
+  /* 外觀跟提案頁同一套：奶油底、葡萄色字。存了什麼那張用登入框的索引卡樣子 */
+  :root {
+    --cream: #FFF4E0; --sheet: #FFFAF0; --grape: #3A2E5C;
+    --grape-2: rgba(58, 46, 92, .78); --grape-3: rgba(58, 46, 92, .74); --line: rgba(58, 46, 92, .18);
+    --coral: #FF6B57; --coral-ink: #C0351F; --sun: #FFC857;
+    --zh: "Huninn", "PingFang TC", "Noto Sans TC", system-ui, sans-serif;
+    --en: "Outfit", "Huninn", system-ui, sans-serif;
+    --hand: "LXGW WenKai TC", "BiauKai", "DFKai-SB", "Huninn", serif;
+    --pad: clamp(16px, 4vw, 56px);
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--cream); }
+  body { margin: 0; background: var(--cream); color: var(--grape); font-family: var(--zh); font-size: 16.5px; line-height: 1.8; letter-spacing: .02em; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 3px solid var(--coral-ink); outline-offset: 3px; border-radius: 4px; }
+  a { color: inherit; }
+  h1, h2, p, ul { margin: 0; }
+  h1, h2 { font-weight: 400; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 var(--pad); overflow-x: clip; }
+
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-top: 18px; }
+  .wordmark { font: 600 13px/1 var(--en); letter-spacing: .26em; text-decoration: none; padding: 8px 0; }
+  .home { text-decoration: none; font-size: 14px; padding: 7px 13px 8px; border-radius: 8px; box-shadow: inset 0 0 0 1.5px var(--grape-3); line-height: 1.2; white-space: nowrap; }
+  .home:hover { box-shadow: inset 0 0 0 1.5px var(--grape); background: var(--sheet); }
+
+  .head { padding: clamp(28px, 6vh, 56px) 0 clamp(20px, 4vh, 32px); border-bottom: 1px solid var(--line); }
+  .head h1 { font-size: clamp(30px, 2.7vw, 38px); line-height: 1.36; letter-spacing: .03em; }
+  .head p { margin-top: 10px; font-size: 16.5px; color: var(--grape-2); max-width: 34em; }
+  .head .date { margin-top: 6px; font: 500 14.5px/1.4 var(--en); letter-spacing: .04em; color: var(--grape-3); }
+
+  .doc { display: grid; grid-template-columns: minmax(0, 36em) minmax(280px, 1fr); gap: 0 56px; padding: clamp(24px, 5vh, 44px) 0 72px; }
+  .doc section { padding: 0 0 30px; }
+  .doc section + section { padding-top: 26px; border-top: 1px solid var(--line); }
+  .doc h2 { font-size: 22px; line-height: 1.45; letter-spacing: .03em; margin-bottom: 8px; }
+  .doc p + p, .doc p + ul, .doc ul + p { margin-top: 10px; }
+  .doc ul { padding-left: 1.2em; }
+  .doc li + li { margin-top: 4px; }
+  .doc li::marker { color: var(--coral); }
+  .mail { font-family: var(--en); font-weight: 500; letter-spacing: .02em; text-decoration-color: var(--coral); text-decoration-thickness: 1.5px; text-underline-offset: 4px; overflow-wrap: anywhere; }
+  .say { font-weight: 400; background: rgba(255, 200, 87, .45); padding: 1px 7px 2px; border-radius: 5px; white-space: nowrap; }
+
+  /* 存了什麼：一張索引卡，珊瑚紅線上面是標題，下面一行一項 */
+  .card {
+    align-self: start; position: sticky; top: 24px; border-radius: 10px; padding: 20px 24px 14px; box-shadow: 0 2px 4px rgba(58, 46, 92, .12), 0 16px 36px -14px rgba(58, 46, 92, .35);
+    background: var(--sheet) linear-gradient(var(--coral), var(--coral)) 0 66px / 100% 2px no-repeat;
+  }
+  .card h2 { font: 400 23px/1.2 var(--hand); letter-spacing: .06em; height: 46px; display: flex; align-items: center; margin: 0 0 4px; }
+  .card ul { list-style: none; padding: 0; margin: 0; }
+  .card li { margin: 0; padding: 6px 0; line-height: 1.6; border-bottom: 1px solid rgba(58, 46, 92, .09); }
+  .card li:last-child { border-bottom: 0; }
+  .card li + li { margin-top: 0; }
+  .card small { display: block; font-size: 14.5px; line-height: 1.4; color: var(--grape-2); }
+  @media (max-width: 860px) {
+    .doc { grid-template-columns: minmax(0, 1fr); }
+    .card { position: static; order: -1; margin-bottom: 32px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="wordmark" href="../crab/rooms/f4/index.html">PARADIGM</a>
+    <a class="home" href="../crab/rooms/f4/index.html">← 回首頁</a>
+  </header>
+  <main>
+    <section class="head">
+      <h1>隱私說明</h1>
+      <p>用 Google 登入 Paradigm 學 AI 之後，我們存了什麼、存在哪裡、拿來做什麼，以及怎麼刪掉。</p>
+      <p class="date">更新日期：2026-11-23</p>
+    </section>
+
+    <div class="doc">
+      <div class="text">
+        <section>
+          <h2>不登入也能用</h2>
+          <p>所有的課不登入也能看、能做。沒登入的時候，你完成了哪些課只記在這台裝置的瀏覽器裡，我們看不到。</p>
+        </section>
+
+        <section>
+          <h2>登入時，Google 給我們什麼</h2>
+          <p>登入用的是 Google 的登入按鈕。登入時 Google 會傳來一份登入證明，我們只留下裡面的固定代號、email、名字和頭像的網址。我們拿不到你的 Google 密碼。</p>
+          <p>打開登入框時，你的瀏覽器會向 Google 的伺服器載入登入按鈕的程式和一套字型。跟任何放了 Google 登入按鈕的網站一樣，Google 會看到這次連線。</p>
+        </section>
+
+        <section>
+          <h2>存了什麼、存在哪裡</h2>
+          <p>「登入後存的東西」那張卡列的就是伺服器上存的全部。這些資料存在 Cloudflare 的資料庫。</p>
+          <p>為了讓你下次打開不用重新登入，你的瀏覽器會記住一組登入憑證和你的名字。伺服器不存憑證本身，只存它的雜湊值（用來核對的一串亂碼）和到期時間。按「登出」就會清掉這台裝置上的。</p>
+          <p>管這個網站的人（Paradigm AI）查得到資料庫裡的這些資料。</p>
+        </section>
+
+        <section>
+          <h2>拿來做什麼</h2>
+          <ul>
+            <li>換一台裝置登入，也看得到你完成的課和你的書桌。</li>
+            <li>算你有多少代幣、換了哪些擺飾。</li>
+            <li>團隊會看每一課有幾個人完成、總共幾個人登入過。團隊用的後台只顯示人數，不顯示是誰。</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>不拿來做什麼</h2>
+          <ul>
+            <li>不寄信給你。</li>
+            <li>不給第三方。</li>
+            <li>不拿來投放廣告。</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>留多久</h2>
+          <p>留到你按「刪除我的資料」為止。</p>
+        </section>
+
+        <section>
+          <h2>怎麼刪掉</h2>
+          <p>登入之後，點右上角你的頭像，選 <b class="say">刪除我的資料</b>，再按一次 <b class="say">確定刪除</b>。伺服器上跟你有關的資料會全部刪掉，不能復原。</p>
+          <p>不方便自己刪，寫信到 <a class="mail" href="mailto:paradigmai1010@gmail.com">paradigmai1010@gmail.com</a>，我們幫你刪。</p>
+        </section>
+
+        <section>
+          <h2>誰在管、怎麼聯絡</h2>
+          <p>這個網站由 Paradigm AI 營運。有任何問題，寫信到 <a class="mail" href="mailto:paradigmai1010@gmail.com">paradigmai1010@gmail.com</a>。</p>
+        </section>
+      </div>
+
+      <aside class="card" aria-labelledby="kept-h">
+        <h2 id="kept-h">登入後存的東西</h2>
+        <ul>
+          <li>Google 給的固定代號<small>用來認出是你</small></li>
+          <li>email</li>
+          <li>名字</li>
+          <li>頭像的網址</li>
+          <li>第一次登入的時間<small>和最近一次使用的時間</small></li>
+          <li>完成的課<small>和每一課完成的時間</small></li>
+          <li>做過 60 秒體驗的時間</li>
+          <li>換到的擺飾<small>和換的時間、花了多少代幣</small></li>
+          <li>擺在書桌上的擺飾<small>和最近一次改的時間</small></li>
+          <li>登入憑證的雜湊值<small>和建立、到期的時間</small></li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+</div>
+</body>
+</html>

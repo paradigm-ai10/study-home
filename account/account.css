@@ -1,0 +1,186 @@
+/* 帳號入口、帳號選單、登入框（account-ui.js 畫的）。
+   每一條規則都掛在 account-ui.js 加上去的 pd-acct 開頭的 class 底下：只載入這個檔、功能沒開，頁面什麼都不會變。
+   配色和字型跟站上一樣：奶油底、葡萄紫、陽光黃、珊瑚紅；粉圓＋Outfit，登入框標題用手寫的霞鶩文楷。 */
+
+.pd-acct, .pd-acct-dlg {
+  --pa-cream: #FFF4E0; --pa-sheet: #FFFAF0; --pa-grape: #3A2E5C;
+  --pa-grape-2: rgba(58, 46, 92, .78); --pa-grape-3: rgba(58, 46, 92, .74); --pa-line: rgba(58, 46, 92, .18);
+  --pa-coral: #FF6B57; --pa-coral-ink: #C0351F; --pa-sun: #FFC857;
+  --pa-zh: "PD Huninn", "Huninn", "PingFang TC", "Noto Sans TC", system-ui, sans-serif;
+  --pa-en: "PD Outfit", "Outfit", "PD Huninn", "Huninn", system-ui, sans-serif;
+  --pa-hand: "PD WenKai", "LXGW WenKai TC", "BiauKai", "DFKai-SB", "PD Huninn", serif;
+  --pa-shadow: 0 1px 2px rgba(14, 10, 30, .34), 0 6px 18px rgba(14, 10, 30, .26);
+  --pa-lift: 0 2px 4px rgba(14, 10, 30, .28), 0 18px 44px -10px rgba(14, 10, 30, .55);
+  font-family: var(--pa-zh); letter-spacing: .02em; -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------- 入口：跟旁邊「切換至簡潔版」那顆同高；按得到的範圍是 44px，但排版上只佔 30px，旁邊的東西不會被推動 */
+.pd-acct { position: relative; display: inline-flex; flex: none; pointer-events: auto; color: var(--pa-grape); }
+.pd-acct-btn {
+  appearance: none; border: 0; background: none; padding: 0; margin: -7px 0; min-height: 44px; min-width: 44px;
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: inherit; font: inherit; letter-spacing: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.pd-acct-chip {
+  display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 13px; border-radius: 6px;
+  font-size: 14.5px; line-height: 1; letter-spacing: .06em; white-space: nowrap;
+  transition: background-color 140ms ease-out, box-shadow 140ms ease-out;
+}
+.pd-acct-chip.is-in { padding: 0 9px 0 4px; gap: 6px; letter-spacing: .03em; }
+.pd-acct-name { max-width: 7.5em; overflow: hidden; text-overflow: ellipsis; padding-bottom: 1px; }
+.pd-acct-ico { display: inline-flex; flex: none; }
+.pd-acct-chip .pd-acct-ico { color: var(--pa-grape-3); }
+.pd-acct-btn[aria-expanded="true"] .pd-acct-chip .pd-acct-ico svg { rotate: 180deg; }
+
+/* 3D 書桌（深色背景）與地圖：奶油色紙片＋影子，跟頁首其他按鈕一樣 */
+.pd-acct--dark .pd-acct-chip, .pd-acct--float .pd-acct-chip { background: var(--pa-cream); box-shadow: var(--pa-shadow); border-radius: 5px; }
+.pd-acct--dark .pd-acct-btn:hover .pd-acct-chip, .pd-acct--float .pd-acct-btn:hover .pd-acct-chip { background: #fff; }
+/* 簡潔版（奶油底）：細框，跟「切換至 3D 版」一樣 */
+.pd-acct--line .pd-acct-chip { height: 32px; border-radius: 8px; box-shadow: inset 0 0 0 1.5px var(--pa-grape-3); }
+.pd-acct--line .pd-acct-btn:hover .pd-acct-chip { box-shadow: inset 0 0 0 1.5px var(--pa-grape); background: var(--pa-sheet); }
+/* 簡潔版在窄螢幕頁首已經排滿：入口放到頁首下面靠右（標題第一行右邊是空的），不擠掉「IG」 */
+@media (max-width: 480px) {
+  .pd-acct--line { position: absolute; z-index: 5; top: 62px; right: var(--pad, 20px); }
+}
+/* 地圖頁沒有頁首：自己浮在右上角 */
+.pd-acct--float { position: fixed; z-index: 25; top: max(14px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); }
+
+.pd-acct-btn:focus-visible { outline: none; }
+.pd-acct-btn:focus-visible .pd-acct-chip { outline: 3px solid var(--pa-coral-ink); outline-offset: 2px; }
+.pd-acct--dark .pd-acct-btn:focus-visible .pd-acct-chip { box-shadow: 0 0 0 2px var(--pa-cream), var(--pa-shadow); }
+
+/* 頭像：載不到就是名字的第一個字放在黃色圓裡 */
+.pd-acct-av {
+  display: inline-grid; place-items: center; flex: none; overflow: hidden; border-radius: 50%;
+  background: var(--pa-sun); color: var(--pa-grape); font-family: var(--pa-zh); line-height: 1;
+}
+.pd-acct-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pd-acct-av.is-s { width: 24px; height: 24px; font-size: 13px; box-shadow: 0 0 0 1.5px rgba(58, 46, 92, .16); }
+.pd-acct-av.is-l { width: 44px; height: 44px; font-size: 20px; box-shadow: 0 0 0 2px var(--pa-cream), 0 0 0 3.5px rgba(58, 46, 92, .18); }
+
+/* 登入、登出、刪除之後的一句話，出現在入口下面幾秒 */
+.pd-acct-toast {
+  position: absolute; top: calc(100% + 12px); right: 0; margin: 0; z-index: 2; pointer-events: none;
+  padding: 9px 14px 10px; border-radius: 8px; background: var(--pa-grape); color: var(--pa-cream);
+  font-size: 15px; line-height: 1.4; letter-spacing: .04em; white-space: nowrap; box-shadow: var(--pa-shadow);
+  opacity: 0; translate: 0 -4px; transition: opacity 180ms ease-out, translate 260ms cubic-bezier(.2, .8, .2, 1);
+}
+.pd-acct-toast:empty { display: none; }
+.pd-acct-toast.is-on { opacity: 1; translate: 0 0; }
+
+/* ---------------- 帳號選單：一張小卡片，貼在入口下面 */
+.pd-acct-menu {
+  position: absolute; inset: auto; top: calc(100% + 6px); right: 0; z-index: 30; margin: 0;
+  width: min(296px, calc(100vw - 24px)); max-height: calc(100vh - 90px); overflow: auto;
+  padding: 16px 12px 10px; border: 0; border-radius: 12px; background: var(--pa-sheet); color: var(--pa-grape);
+  box-shadow: var(--pa-lift); font-family: var(--pa-zh); font-size: 16px; line-height: 1.6; letter-spacing: .02em; text-align: left;
+}
+.pd-acct-menu[popover] { position: fixed; }
+.pd-acct-menu[hidden] { display: none; }
+.pd-acct-menu.is-open { animation: pd-acct-drop 200ms cubic-bezier(.2, .9, .25, 1.15); transform-origin: 90% 0; }
+@keyframes pd-acct-drop { from { opacity: 0; scale: .96; translate: 0 -4px; } }
+.pd-acct-menu p { margin: 0; }
+
+.pd-acct-who { display: flex; align-items: center; gap: 12px; padding: 0 6px 12px; }
+.pd-acct-who-name { font-size: 17px; line-height: 1.4; letter-spacing: .03em; overflow-wrap: anywhere; }
+/* 代幣：像一張黃色的小收據條 */
+.pd-acct-coins {
+  display: flex; align-items: center; gap: 8px; margin: 0 0 8px; padding: 9px 12px; border-radius: 9px;
+  background: rgba(255, 200, 87, .32); font-size: 16px;
+}
+.pd-acct-coins b { margin-left: auto; font: 600 19px/1 var(--pa-en); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+.pd-acct-coins b.is-word { font: 400 15px/1.3 var(--pa-zh); letter-spacing: .02em; }
+.pd-acct .pd-acct-rows { display: grid; padding-top: 6px; border-top: 1px solid var(--pa-line); }
+.pd-acct .pd-acct-row {
+  appearance: none; border: 0; background: none; cursor: pointer; display: flex; align-items: center; width: 100%; min-height: 44px;
+  padding: 0 10px; border-radius: 8px; box-shadow: none; color: var(--pa-grape); font: inherit; letter-spacing: .03em; text-align: left; text-decoration: none;
+}
+.pd-acct .pd-acct-row:hover { background: rgba(58, 46, 92, .06); }
+.pd-acct .pd-acct-row.is-danger { color: var(--pa-coral-ink); }
+.pd-acct .pd-acct-row:focus-visible, .pd-acct-go:focus-visible, .pd-acct-x:focus-visible, .pd-acct-dlg a:focus-visible, .pd-acct-dev input:focus-visible {
+  outline: 3px solid var(--pa-coral-ink); outline-offset: 2px;
+}
+
+/* 刪除前再問一次 */
+.pd-acct-ask { padding: 2px 6px 4px; }
+.pd-acct-ask-h { font-size: 17px; line-height: 1.4; margin-bottom: 8px !important; padding-left: 10px; border-left: 4px solid var(--pa-coral); }
+.pd-acct-ask p + p { margin-top: 6px; }
+.pd-acct-ask p, .pd-acct-card p { text-wrap: pretty; }
+.pd-acct-ask-small { font-size: 15px; color: var(--pa-grape-2); }
+.pd-acct-acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+/* 兩種按鈕：實心（主要的那一個）、細框（次要） */
+.pd-acct-go {
+  appearance: none; border: 0; cursor: pointer; min-height: 44px; padding: 0 16px; border-radius: 9px;
+  font: inherit; font-size: 16px; line-height: 1; letter-spacing: .05em; color: var(--pa-cream); background: var(--pa-grape);
+}
+.pd-acct-go.is-danger { background: var(--pa-coral-ink); }
+.pd-acct-go.is-danger:hover { background: #a42b17; }
+.pd-acct-go.is-alt { background: none; color: var(--pa-grape); box-shadow: inset 0 0 0 1.5px var(--pa-grape-3); }
+.pd-acct-go.is-alt:hover { box-shadow: inset 0 0 0 1.5px var(--pa-grape); background: rgba(58, 46, 92, .05); }
+.pd-acct-go:disabled { opacity: .55; cursor: default; }
+
+.pd-acct-msg { min-height: 1.6em; margin: 8px 0 0; font-size: 15px; color: var(--pa-grape-2); }
+.pd-acct-msg:empty { min-height: 0; margin: 0; }
+.pd-acct-msg.is-err, .pd-acct-note.is-err { color: var(--pa-coral-ink); }
+
+/* ---------------- 登入框：一張索引卡。上面一條珊瑚紅線、下面淡淡的橫線，跟書桌左下角「課程入口」那張卡同一家 */
+.pd-acct-dlg {
+  width: min(420px, calc(100vw - 32px)); max-width: none; max-height: calc(100vh - 32px); margin: auto; padding: 0; border: 0;
+  background: transparent; color: var(--pa-grape); overflow: visible;
+}
+.pd-acct-dlg::backdrop { background: rgba(42, 32, 70, .5); }
+.pd-acct-dlg.is-in .pd-acct-card { animation: pd-acct-card 340ms cubic-bezier(.2, .9, .25, 1.15); }
+.pd-acct-dlg.is-in::backdrop { animation: pd-acct-fade 200ms ease-out; }
+@keyframes pd-acct-card { from { opacity: 0; scale: .95; translate: 0 10px; rotate: -.6deg; } }
+@keyframes pd-acct-fade { from { opacity: 0; } }
+.pd-acct-card {
+  position: relative; max-height: calc(100vh - 32px); overflow: auto; padding: 26px 26px 20px; border-radius: 10px;
+  background: var(--pa-sheet) linear-gradient(var(--pa-coral), var(--pa-coral)) 0 76px / 100% 2px no-repeat;
+  box-shadow: var(--pa-lift);
+  font-size: 16px; line-height: 1.75; letter-spacing: .02em;
+}
+.pd-acct-card p { margin: 0; }
+.pd-acct-x {
+  position: absolute; right: 8px; top: 8px; width: 44px; height: 44px; border: 0; border-radius: 9px; background: none; cursor: pointer;
+  color: var(--pa-grape-3); font: 400 26px/1 var(--pa-en);
+}
+.pd-acct-x:hover { background: rgba(58, 46, 92, .07); color: var(--pa-grape); }
+.pd-acct-h { margin: 0 44px 0 0; height: 50px; display: flex; align-items: center; font: 400 26px/1.2 var(--pa-hand); letter-spacing: .06em; color: var(--pa-grape); }
+.pd-acct-reason { margin-top: 18px !important; padding: 8px 12px 9px; border-radius: 8px; background: rgba(255, 200, 87, .38); }
+.pd-acct-reason[hidden] { display: none; }
+.pd-acct-lead { margin-top: 18px !important; color: var(--pa-grape); }
+.pd-acct-reason:not([hidden]) + .pd-acct-lead { margin-top: 12px !important; }
+/* Google 的按鈕放這裡：先留好高度，按鈕畫出來的時候框不會跳 */
+.pd-acct-gbtn { min-height: 44px; margin-top: 18px; display: flex; align-items: center; }
+/* 還沒接上、連不上這類說明：不像按鈕，是一段左邊有色條的字 */
+.pd-acct-note { width: 100%; font-size: 16px; line-height: 1.6; color: var(--pa-grape-2); padding: 6px 0 6px 12px; border-left: 3px solid var(--pa-line); }
+.pd-acct-note.is-err { border-left-color: var(--pa-coral); }
+.pd-acct-fine { margin-top: 18px !important; padding-top: 12px; border-top: 1px solid var(--pa-line); font-size: 15px; line-height: 1.65; color: var(--pa-grape-2); }
+.pd-acct-fine a { margin-left: .4em; color: var(--pa-grape); text-decoration: underline; text-decoration-color: var(--pa-coral); text-decoration-thickness: 1.5px; text-underline-offset: 4px; white-space: nowrap; }
+
+/* 只在 localhost 出現的假登入：虛線框，一看就知道不是正式的東西 */
+.pd-acct-dev { margin-top: 16px; padding: 10px 12px 12px; border: 1.5px dashed var(--pa-grape-3); border-radius: 9px; background: rgba(255, 255, 255, .5); }
+.pd-acct-dev label { display: block; font-size: 15px; color: var(--pa-grape-2); margin-bottom: 6px; }
+.pd-acct-dev-line { display: flex; gap: 8px; }
+.pd-acct-dev input {
+  flex: 1; min-width: 0; min-height: 44px; padding: 0 12px; border: 0; border-radius: 8px; background: #fff;
+  box-shadow: inset 0 0 0 1.5px var(--pa-grape-3); font: inherit; font-size: 16px; color: var(--pa-grape);
+}
+.pd-acct-dev input::placeholder { color: rgba(58, 46, 92, .5); font-size: 14px; }
+
+/* ---------------- 手機：入口只剩頭像（名字在選單裡看得到） */
+@media (max-width: 560px) {
+  .pd-acct-chip.is-in { padding: 0 6px 0 3px; }
+  .pd-acct-chip.is-in .pd-acct-name { display: none; }
+  .pd-acct-card { padding: 22px 18px 18px; background-position: 0 72px; }
+  .pd-acct-h { font-size: 24px; height: 50px; }
+  .pd-acct-dev-line { flex-wrap: wrap; }
+  .pd-acct-dev input { flex: 1 1 100%; }
+  .pd-acct-dev-line .pd-acct-go { flex: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pd-acct-chip, .pd-acct-toast { transition: none; }
+  .pd-acct-menu.is-open, .pd-acct-dlg.is-in .pd-acct-card, .pd-acct-dlg.is-in::backdrop { animation: none; }
+}

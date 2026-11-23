@@ -21,6 +21,7 @@
 <!-- Learning-map integration, option B (and option C's stand-alone page): the approved map as its own page.
      The map itself is map/embed.html (a wrapper around mindmap/r15-side); this page adds the way back and the progress chip. -->
 <link rel="stylesheet" href="map/map-int.css">
+<link rel="stylesheet" href="../../../account/account.css">
 <style>
   @view-transition { navigation: auto; }
   ::view-transition-old(root) { animation: 200ms ease-out both mp-out; }
@@ -39,6 +40,9 @@
 <script src="../../routes.js"></script>
 <script src="../../../roadmap8.js"></script>
 <script src="map/map-chrome.js"></script>
+<script src="../../../account/endpoint.js" defer></script>
+<script src="../../../account/account.js" defer></script>
+<script src="../../../account/account-ui.js" defer></script>
 <script>
 (() => {
   const Q = new URLSearchParams(location.search), SEEN = 'paradigm.f4.mapSeen';

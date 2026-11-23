@@ -69,7 +69,8 @@
   .seal { position: absolute; z-index: 5; left: 50cqw; top: calc(var(--et) + 24.6cqw); width: 46px; height: 46px; margin: -23px 0 0 -23px;
     border-radius: 50%; background: radial-gradient(circle at 36% 30%, #ff8a78, var(--coral) 46%, #d9412d);
     box-shadow: 0 2px 0 #b9321f, 0 5px 10px rgba(58, 46, 92, .25); display: grid; place-items: center;
-    font: 600 19px/1 var(--en); color: #fff4e0; transition: scale .2s ease-out; pointer-events: none; }
+    font: 600 19px/1 var(--en); color: #fff4e0; transition: scale .2s ease-out; pointer-events: none;
+    backface-visibility: hidden; }   /* 封蠟黏在蓋子尖端，跟著蓋子掀上去，翻到背面就看不到 */
   .s-out .env-b, .s-out .env-f, .s-out .env-flap, .s-out .seal { opacity: 0; visibility: hidden; }   /* 信紙攤開後信封不在桌上 */
 
   .open-btn { position: absolute; z-index: 6; left: 17cqw; top: var(--et); width: 66cqw; height: 44cqw; border: 0; background: none; cursor: pointer; border-radius: 6px; }
@@ -393,6 +394,7 @@ const flap = $('.env-flap'), seal = $('.seal'), env = [$('.env-b'), $('.env-f'),
 const f2 = $('.f2'), f3 = $('.f3'), lsh = $('.lsh'), ash = $('.ash')
 const shade2 = f2.querySelectorAll(':scope > .shade'), shade3 = f3.querySelectorAll(':scope > .shade')
 const moved = [letter, f2, f3, seal, lsh, ash, ...env, ...shade2, ...shade3]   // 動畫會碰的東西，播完要把行內樣式清掉
+const CLEAR = { clearProps: 'transform,transformOrigin,opacity,visibility,zIndex' }
 const OPEN = ['s-flap', 's-out', 's-b', 's-c', 'over', 's-open']             // 信紙攤在桌上時掛的 class
 const RAD = Math.PI / 180
 const fly = { p: 0 }   // 信紙在路上的哪裡：0＝折好在信封裡，1＝攤在桌上
@@ -434,37 +436,50 @@ function paint() {
 
 // 信紙攤在桌上、可以寫的樣子。拆信播完、不播動畫、再寫一封，最後都落在這裡
 function showOpen() {
-  if (window.gsap) gsap.set(moved, { clearProps: 'transform,opacity,visibility,zIndex' })
+  if (window.gsap) gsap.set(moved, CLEAR)
   on(...OPEN)
   if (!fields.includes(document.activeElement)) fields[0].focus({ preventScroll: true })   // 已經點到別格就不搶
   follow(fields.includes(document.activeElement) ? document.activeElement : fields[0], false)
 }
 
-// 拆信：封蠟一彈、蓋子一掀，信紙就從信封口抽出來，一邊飛一邊放大、轉正、攤開，信封同時往下退掉。
-// 全部排在同一條時間軸上互相重疊，中間沒有等待
-const launch = t => 1 - Math.pow(1 - Math.pow(t, 1.6), 2.6)   // 抽出來那一下快，後半段慢慢落定
+// 緩動。travel 是「從一處移到另一處」用的：起步不拖、最後三分之一慢慢貼上去、不回彈（CSS 的 cubic-bezier(.45, 0, .1, 1)）。
+// GSAP 核心沒有 cubic-bezier，自己解一條，省得為了它再載一個外掛
+const bez = (x1, y1, x2, y2) => x => {
+  let lo = 0, hi = 1, t = x
+  for (let i = 0; i < 18; i++) { t = (lo + hi) / 2; 3 * (1 - t) * (1 - t) * t * x1 + 3 * (1 - t) * t * t * x2 + t * t * t < x ? lo = t : hi = t }
+  return 3 * (1 - t) * (1 - t) * t * y1 + 3 * (1 - t) * t * t * y2 + t * t * t
+}
+const travel = bez(.45, 0, .1, 1)
+const launch = t => 1 - Math.pow(1 - Math.pow(t, 1.6), 2.6)   // 信紙抽出來那一下快，後半段慢慢落定
+// 封蠟繞著信封上緣（蓋子的折線）轉，才會跟蓋子尖端黏在一起
+const sealHinge = () => ({ transformPerspective: 900, transformOrigin: `50% ${23 - geo.W * .246}px` })
+const DROP = .27   // 信封往下退多遠（占舞台寬度）：退到掀開的蓋子也整個在攤開的信紙後面
+
+// 拆信：蓋子帶著封蠟一掀，信紙就從信封口抽出來，一邊飛一邊放大、轉正、攤開；信封同時往下滑到信紙後面。
+// 全部排在同一條時間軸上互相重疊，中間沒有等待。實心的東西都用移動的進出場，不做半透明淡出
 function openUp() {
   on('s-flap')
   if (!moving()) return showOpen()
   const { W, fh, fs, et } = geo
   path = route(et + W * .03 - fh * (fs + (1 - fs) * .14), .11); fly.p = 0   // 信封同時在往下退，所以不用抽到那麼高
-  gsap.set(flap, { transformPerspective: 900 })
+  gsap.set(flap, { transformPerspective: 900 }); gsap.set(seal, sealHinge())
   tl = gsap.timeline({ defaults: { ease: 'power2.out' }, onUpdate: paint, onComplete: showOpen })
-    .to(seal, { scale: 1.5, autoAlpha: 0, duration: .16 }, 0)
-    .to(flap, { rotationX: 178, duration: .3 }, 0)
+    .to([flap, seal], { rotationX: 178, duration: .3 }, 0)
     .set(flap, { zIndex: 1 }, .09)                                   // 蓋子掀過 90 度，退到信紙後面
+    .set(seal, { autoAlpha: 0 }, .1)                                 // 這時封蠟已經翻到背面
     .to(fly, { p: 1, duration: .8, ease: launch }, .07)
-    .to(letter, { keyframes: [{ rotation: 5, duration: .26, ease: 'sine.out' }, { rotation: 0, duration: .56, ease: 'back.out(2.4)' }] }, .07)
-    .to(letter, { scale: 1, duration: .68, ease: 'power2.inOut' }, .13)
-    .to(env, { y: W * .11, autoAlpha: 0, duration: .28, ease: 'power2.in' }, .1)
-    .set(letter, { zIndex: 7 }, .375)                                // 整疊離開信封口、信封也淡掉了，換到信封前面
-    .to(f2, { rotationX: 0, duration: .52, ease: 'power2.inOut' }, .13)   // 還在往上抽就開始攤，飛到最高點時剛好往下放
-    .to(f3, { rotationX: 0, duration: .54, ease: 'power2.inOut' }, .18)   // 最下面那片晚半拍，像被帶著甩下來
-    .call(() => { on('s-open'); fields[0].focus({ preventScroll: true }); follow(fields[0], false) }, null, .74)   // 攤平了就可以寫，不等最後那一下晃完
+    .to(letter, { keyframes: [{ rotation: 5, duration: .26, ease: 'sine.out' }, { rotation: 0, duration: .4, ease: 'sine.inOut' }] }, .07)   // 攤平的時候也剛好轉正
+    .to(letter, { scale: 1, duration: .6, ease: travel }, .2)
+    .to(env, { y: W * DROP, duration: .42, ease: 'sine.inOut' }, .1)
+    .set(letter, { zIndex: 7 }, .31)                                 // 整疊離開信封口了，換到信封前面
+    .to(f2, { rotationX: 0, duration: .5, ease: travel }, .17)       // 還在往上抽就開始攤，飛到最高點時剛好往下放
+    .to(f3, { rotationX: 0, duration: .5, ease: travel }, .22)       // 最下面那片晚半拍，像被帶著甩下來
+    .set(env, { autoAlpha: 0 }, .66)                                 // 信封已經整個被信紙蓋住，這時才收掉
+    .call(() => { on('s-open'); fields[0].focus({ preventScroll: true }); follow(fields[0], false) }, null, .74)   // 攤平了就可以寫，不等最後那一點點落定
 }
 $('#open').addEventListener('click', openUp, { once: true })
 
-// 寄信：信紙一邊折一邊縮小飛回信封上方，落進信封、蓋上蓋子、蓋封蠟，停一下再飛走
+// 寄信：信紙一邊折一邊縮小飛回信封上方，落進信封、蓋上蓋子、蓋封蠟，停一下再飛出畫面
 function sendOff() {
   on('sending'); penRest()
   if (tl) tl.progress(1)   // 拆信最後那一下還沒晃完就按寄出：先讓它落定
@@ -474,24 +489,26 @@ function sendOff() {
   const { W, fh, fs, et } = geo
   path = route(et - W * .02 - fh * fs, .05)   // 信封這時已經擺好不動，折好的信要整疊高過信封口才落進去
   gsap.set(letter, { x: 0, y: 0, scale: 1, rotation: 0, zIndex: 7 }); gsap.set([f2, f3], { rotationX: 0 }); gsap.set(lsh, { opacity: 1 })
-  gsap.set(flap, { transformPerspective: 900, rotationX: 178, zIndex: 1 }); gsap.set(env, { y: W * .11, autoAlpha: 0 }); gsap.set(seal, { scale: 1.5, autoAlpha: 0 })
-  off(...OPEN)   // 這一刻起看到的是折頁上那份字
-  tl = gsap.timeline({ defaults: { ease: 'power2.inOut' }, onUpdate: paint, onComplete: done })
+  gsap.set(flap, { transformPerspective: 900, rotationX: 178, zIndex: 1 }); gsap.set(env, { y: W * DROP }); gsap.set(seal, { scale: 1.5, autoAlpha: 0 })
+  off(...OPEN)   // 這一刻起看到的是折頁上那份字；信封原本就藏在信紙後面，信紙折起來才露出來
+  tl = gsap.timeline({ defaults: { ease: travel }, onUpdate: paint, onComplete: done })
     .to(f3, { rotationX: 176, duration: .44 }, 0)
     .to(f2, { rotationX: -176, duration: .46 }, .12)
     .to(fly, { p: 0, duration: .86, ease: 'sine.inOut' }, .1)
     .to(letter, { scale: fs, duration: .5 }, .1)
     .to(letter, { keyframes: [{ rotation: 2.5, duration: .38, ease: 'sine.inOut' }, { rotation: 0, duration: .4, ease: 'sine.inOut' }] }, .1)
-    .to(env, { y: 0, autoAlpha: 1, duration: .36, ease: 'power2.out' }, .2)
+    .to(env, { y: 0, duration: .42, ease: 'sine.inOut' }, .16)       // 信封從信紙後面滑回原位
     .set(letter, { zIndex: 2 }, .61)                                 // 折好的信在信封口正上方，換回信封裡面那一層
     .to(flap, { rotationX: 0, duration: .3 }, .88)
-    .set(flap, { zIndex: 4 }, 1.03)
-    .to(seal, { scale: 1, autoAlpha: 1, duration: .22, ease: 'back.out(2.6)' }, 1.16)   // 蓋子蓋好才蓋章
+    .set(flap, { zIndex: 4 }, .98)
+    .to(seal, { autoAlpha: 1, duration: .06, ease: 'none' }, 1.16)   // 蓋子蓋好才蓋章：封蠟從上面壓下來，壓到底就停
+    .to(seal, { scale: 1, duration: .16, ease: 'power2.in' }, 1.16)
     .set(letter, { autoAlpha: 0 }, 1.4)                              // 信已經在信封裡，跟著一起走
-    .to([...env, seal], { x: W * .46, y: -150, autoAlpha: 0, duration: .5, ease: 'power2.in' }, 1.72)
+    // 寄走：整封信往右上加速飛出畫面，飛多遠等起飛那一刻再量（頁面可能還在捲）
+    .to([...env, seal], { x: W * .2, y: () => -Math.max(W * .6, stage.getBoundingClientRect().top + et + W * .44 + 60), duration: .55, ease: 'power2.in' }, 1.7)
 }
 function done() {
-  if (window.gsap) gsap.set(moved, { clearProps: 'transform,opacity,visibility,zIndex' })
+  if (window.gsap) gsap.set(moved, CLEAR)
   off(...OPEN); on('s-done'); $('#thanks').focus({ preventScroll: true })
 }
 
