@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-22T22:24:39+08:00",
+ "generated": "2026-11-24T17:33:20+08:00",
  "lessons": [
   {
    "code": "L001",
@@ -941,6 +941,19 @@
    "code": "L073",
    "id": "10-E4",
    "title": "其他 Vibe Coding 工具：Lovable、Cursor 對照",
+   "topic": 10,
+   "type": "選修",
+   "first": false,
+   "group": "",
+   "ready": false,
+   "video": "",
+   "case": "",
+   "live": false
+  },
+  {
+   "code": "L140",
+   "id": "10-E5",
+   "title": "Mods 入門：認識 Claude Code 介面外掛與推薦清單",
    "topic": 10,
    "type": "選修",
    "first": false,
