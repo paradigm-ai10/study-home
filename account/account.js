@@ -9,6 +9,8 @@
 
   var OPEN_DEFAULT = false;          // 正式打開那天改成 true：沒設過開關的瀏覽器也看得到登入
   var TIMEOUT = 8000, EVERY = 60000, LATER = 2000, HOUR = 3600000, TODAY_EVERY = 300000;
+  // 沒東西要送、只是想看別台裝置有沒有新的：離上次拿到伺服器的 state 至少這麼久才問一次
+  var PULL_EVERY = 5 * 60 * 1000;
   // 一包最多這麼多；伺服器的上限是 300、400、16 KB，連續獎勵一次只處理 20 筆
   var LIM = { earned: 150, paid: 150, days: 200, streak: 20, chars: 12000, memo: 300 };
   var K = { on: 'paradigm.account.on', acct: 'paradigm.account', owner: 'paradigm.account.owner', pending: 'paradigm.account.pending',
@@ -197,6 +199,7 @@
     Object.keys(prev.skip).forEach(function (k) { if (keys.indexOf(k) < 0) skip[k] = prev.skip[k]; });
     Object.keys(prev.skipDays).forEach(function (k) { if (!has.call(days, k)) skipDays[k] = prev.skipDays[k]; });
     put(K.base, { earned: keys, paid: paidNames, days: days, skip: skip, skipDays: skipDays });
+    lastPull = now();
     meta(st);
     notify();
     emit();
@@ -249,7 +252,7 @@
 
   /* ---------------------------------------------------------------- 登入狀態 */
   var A = { status: 'off', me: null, coins: null, decor: null, earned: null, ready: null };
-  var token = null, kept = false, owned = false, lastOk = 0, lastToday = 0;
+  var token = null, kept = false, owned = false, lastPull = 0, lastToday = 0;
 
   // 狀態、名字、代幣、擺飾真的變了才通知各頁
   var lastSig = null;
@@ -262,7 +265,7 @@
     try { window.dispatchEvent(new window.CustomEvent('pd-account', { detail: { status: A.status } })); } catch (e) { /* 舊瀏覽器 */ }
   }
   function setIn(tok, me) { token = tok; A.status = 'in'; A.me = me; kept = put(K.acct, { token: tok, me: me }); tick(); }
-  function setGuest() { token = null; A.status = 'guest'; A.me = A.coins = A.decor = A.earned = null; lastOk = lastToday = 0; waiting = null; tick(); del(K.acct); del(K.state); }
+  function setGuest() { token = null; A.status = 'guest'; A.me = A.coins = A.decor = A.earned = null; lastPull = lastToday = 0; waiting = null; tick(); del(K.acct); del(K.state); }
   // 只換帳號的資料（名字、代幣、擺飾），不動進度
   function meta(st) {
     A.me = st.me; A.coins = st.coins || null; A.decor = st.decor || null; A.earned = earnedOf(st.earned);
@@ -284,7 +287,7 @@
     if (kept) { var a = get(K.acct, null); if (!a || a.token !== token) return false; }
     return !owned || get(K.owner, null) === A.me.id;
   }
-  function drop() { token = null; A.status = 'guest'; A.me = A.coins = A.decor = A.earned = null; lastOk = lastToday = 0; waiting = null; tick(); emit(); }
+  function drop() { token = null; A.status = 'guest'; A.me = A.coins = A.decor = A.earned = null; lastPull = lastToday = 0; waiting = null; tick(); emit(); }
   // 憑證過期或被拒：當作登出，但進度、owner、base、待送清單都不清
   function gone(tok) { if (token === tok) { setGuest(); emit(); } }
   function alive(tok) { return token === tok && mine(); }
@@ -321,7 +324,7 @@
     });
   }
 
-  // o.keep：頁面要關了；o.pull：60 秒那次，沒東西也要問；o.lazy：計時器或別的分頁觸發的（只差今天的秒數就 5 分鐘一次）
+  // o.keep：頁面要關了；o.lazy：計時器或別的分頁觸發的（只差今天的秒數就 5 分鐘一次）
   function run(tok, o) {
     if (!alive(tok)) { if (token === tok && A.status === 'in') drop(); return Promise.resolve({ ok: false, error: 'auth' }); }
     var snap = snapshot(), p = pending(), keep = o.keep, b = base(), day = today();
@@ -339,7 +342,8 @@
     if (o.lazy && !dels.length && !d.earned.length && !d.paid.length && d.days.length === 1 && d.days[0] === day && has.call(b.days, day) &&
         now() - lastToday < TODAY_EVERY) d.days = [];
     var packs = pack(d);
-    if (!dels.length && !packs.length && !o.pull && now() - lastOk < EVERY) return Promise.resolve({ ok: true });
+    // 沒東西要送：還沒拿過伺服器的 state（開頁面），或離上次拿到超過 5 分鐘，才問一次；收起、關頁面時不問
+    if (!dels.length && !packs.length && (keep || (lastPull && now() - lastPull < PULL_EVERY))) return Promise.resolve({ ok: true });
     var steps = dels.map(function (id) {
       return function () { return call('DELETE', '/earned/' + encodeURIComponent('lesson:' + id), null, tok, keep).then(function (r) { return Object.assign({ id: id }, r); }); };
     }).concat(packs.map(function (body) { return function () { return call('POST', '/sync', body, tok, keep).then(function (r) { return Object.assign({ body: body }, r); }); }; }));
@@ -347,7 +351,7 @@
     var i = 0, bad = null;
     function next() {
       if (i >= steps.length) {
-        if (!bad) { lastOk = now(); tick(); }
+        if (!bad) tick();
         return bad ? { ok: false, error: bad } : { ok: true };
       }
       return steps[i++]().then(function (r) {
@@ -371,28 +375,28 @@
   }
 
   // 已經排著（還沒開始）的就併進去；正在跑的跑完再多跑一次就好
-  var waiting = null, running = null, want = { keep: false, pull: false, eager: false };
+  var waiting = null, running = null, want = { keep: false, eager: false };
   function syncNow(o) {
     o = o || {};
     if (A.status !== 'in') return Promise.resolve({ ok: false, error: A.status === 'off' ? 'off' : 'auth' });
-    want.keep = want.keep || !!o.keep; want.pull = want.pull || !!o.pull; want.eager = want.eager || !o.lazy;
+    want.keep = want.keep || !!o.keep; want.eager = want.eager || !o.lazy;
     if (waiting) return waiting;
     var tok = token, p = (running || Promise.resolve()).then(noop, noop).then(function () {
       waiting = null; running = p;
-      var w = want; want = { keep: false, pull: false, eager: false };
-      return run(tok, { keep: w.keep, pull: w.pull, lazy: !w.eager });
+      var w = want; want = { keep: false, eager: false };
+      return run(tok, { keep: w.keep, lazy: !w.eager });
     }).then(function (r) { if (running === p) running = null; return r; }, function () { if (running === p) running = null; return NET; });
     waiting = p;
     return p;
   }
 
-  /* ---------------------------------------------------------------- 什麼時候對：每 60 秒（看著頁面時）、收起來或關掉時、別的分頁寫了 */
+  /* ---------------------------------------------------------------- 什麼時候對：每 60 秒看一次本機有沒有新的（看著頁面時；只問伺服器的話 5 分鐘一次）、收起來或關掉時、別的分頁寫了 */
   var ticker = null, soon = null;
   function tick() {
     try { window.clearTimeout(ticker); } catch (e) { /* 沒差 */ }
     ticker = null;
     if (A.status !== 'in') return;
-    try { ticker = window.setTimeout(function () { ticker = null; if (A.status !== 'in') return; if (visible()) syncNow({ pull: true, lazy: true }); tick(); }, EVERY); } catch (e) { ticker = null; }
+    try { ticker = window.setTimeout(function () { ticker = null; if (A.status !== 'in') return; if (visible()) syncNow({ lazy: true }); tick(); }, EVERY); } catch (e) { ticker = null; }
   }
   function visible() { try { return !window.document || window.document.visibilityState !== 'hidden'; } catch (e) { return true; } }
   function shown() { try { return !window.document || window.document.visibilityState === 'visible'; } catch (e) { return true; } }
@@ -408,7 +412,11 @@
         soon = window.setTimeout(function () { soon = null; syncNow({ lazy: true }); }, LATER);
       });
       window.addEventListener('pagehide', function () { if (A.status === 'in') syncNow({ keep: true }); });
-      if (window.document) window.document.addEventListener('visibilitychange', function () { if (A.status === 'in' && !visible()) syncNow({ keep: true }); });
+      if (window.document) window.document.addEventListener('visibilitychange', function () {
+        if (A.status !== 'in') return;
+        if (!visible()) syncNow({ keep: true });
+        else if (now() - lastPull >= PULL_EVERY) syncNow({ lazy: true });   // 又看得到了：很久沒問就問一次
+      });
     } catch (e) { /* 舊瀏覽器：只剩開頁面時對 */ }
   }
 
@@ -420,7 +428,7 @@
       if (typeof r.token !== 'string' || !stateOk(r.state)) return NET;
       claim(r.state.me.id);
       setIn(r.token, r.state.me);
-      apply(r.state); lastOk = now();
+      apply(r.state);
       memo(function (s, d) { Object.keys(s).forEach(function (k) { delete s[k]; }); Object.keys(d).forEach(function (k) { delete d[k]; }); });   // 登入後第一次全部再送一次
       return syncNow().then(function () { return { ok: true }; });
     });
@@ -438,6 +446,15 @@
     });
   }
   function leave() { wipe(); setGuest(); emit(); }
+  // 這台還有幾筆伺服器沒收到：完成、代幣交過了沒、哪天有來、待送的取消完成。
+  // 伺服器明講不收的（不收清單裡的）不算；只差某天多學了幾秒也不算
+  function unsent() {
+    var snap = snapshot(), b = base(), n = pending().length;
+    Object.keys(snap.earned).forEach(function (k) { if (!b.earned[k] && !has.call(b.skip, k)) n++; });
+    Object.keys(snap.paid).forEach(function (k) { if (!b.paid[k] && b.earned[k]) n++; });
+    Object.keys(snap.days).forEach(function (k) { if (!has.call(b.days, k) && !has.call(b.skipDays, k)) n++; });
+    return n;
+  }
 
   /* ---------------------------------------------------------------- 對外 */
   var safe = function (fn) {
@@ -447,11 +464,19 @@
   };
   A.signInWith = safe(function (credential) { return signIn({ credential: credential }); });
   A._devSignIn = safe(function (name) { return LOCAL ? signIn({ dev: name }) : Promise.resolve({ ok: false, error: 'off' }); });
-  A.signOut = safe(function () {
+  // 登出前先送一次；送完還有伺服器沒收到的，就不登出、不清東西，回 unsent 和幾筆（opts.force 才照樣清掉）
+  A.signOut = safe(function (opts) {
     if (A.status === 'off') return Promise.resolve({ ok: true });
-    var tok = token;
-    leave();
-    return tok ? call('POST', '/logout', {}, tok).then(function () { return { ok: true }; }) : Promise.resolve({ ok: true });
+    var out = function () {
+      var tok = token;
+      leave();
+      return tok ? call('POST', '/logout', {}, tok).then(function () { return { ok: true }; }) : Promise.resolve({ ok: true });
+    };
+    if (A.status !== 'in' || (opts && opts.force === true)) return out();   // 馬上清，跟以前一樣
+    return syncNow().then(function () {
+      var n = unsent();
+      return n ? { ok: false, error: 'unsent', n: n } : out();
+    });
   });
   A.deleteMe = safe(function () {
     if (A.status !== 'in') return Promise.resolve({ ok: false, error: A.status === 'off' ? 'off' : 'auth' });

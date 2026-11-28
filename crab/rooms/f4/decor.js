@@ -51,20 +51,22 @@ const arr = (v) => (Array.isArray(v) ? v.slice() : []);
 const local = () => { try { const s = JSON.parse(localStorage.getItem(KEY) || '{}'); return s && typeof s === 'object' && !Array.isArray(s) ? s : {}; } catch (e) { return {}; } };
 const putLocal = (part) => { try { localStorage.setItem(KEY, JSON.stringify(Object.assign(local(), part))); } catch (e) { /* private mode */ } };   // 只改給的那幾欄，其他照留
 let acctSent = '', acctFlying = 0;                     // 上次送出去的擺放；還沒回來的 savePlaced 有幾個
+let acctTell = null, acctMerged = false;               // 帳號（2026-11-28）：擺放沒存到時說一聲（main 裡的 tell）；mine.kept 併進了這台訪客時拿到的紀念品
 function acctMine(byId, slots) {                       // 登入：擺飾照伺服器的，paid 照舊看這台；訪客：沒有兌換來的東西，紀念品看這台
   const A = window.PD_ACCOUNT, on = acct() === 'in', d = (on && A.decor) || {}, s = local();
   mine.owned = arr(d.owned).filter((id) => byId[id]); mine.placed = {};
   Object.entries(d.placed || {}).forEach(([slot, id]) => { if (slots[slot] && mine.owned.includes(id)) mine.placed[slot] = id; });
   mine.seen = on ? +d.seen || 0 : +s.seen || 0; mine.kept = on ? arr(d.kept) : arr(s.kept); mine.paid = arr(s.paid);
   acctSent = JSON.stringify([mine.placed, mine.seen, mine.kept]);
+  if (on) { const extra = arr(s.kept).filter((id) => !mine.kept.includes(id)); acctMerged = extra.length > 0; if (acctMerged) mine.kept = mine.kept.concat(extra); }   // 帳號（2026-11-28）：訪客時在這台拿到的紀念品也算這個帳號的，儀式不重播；下次存擺放時一起存上去
 }
 function acctSave() {                                  // 代替 save()：擺放送伺服器（不等它），paid 只寫這台再請 account.js 對一次
   const A = window.PD_ACCOUNT;
   if (acct() === 'guest') { putLocal({ kept: mine.kept }); return; }       // 訪客只會改到紀念品
   if (JSON.stringify(arr(local().paid)) !== JSON.stringify(mine.paid)) { putLocal({ paid: mine.paid }); A.syncNow(); }
   const sig = JSON.stringify([mine.placed, mine.seen, mine.kept]); if (sig === acctSent) return;
-  acctSent = sig; acctFlying++;
-  A.savePlaced(mine.placed, mine.seen, mine.kept).then((r) => { if (!r || !r.ok) acctSent = ''; }, () => { acctSent = ''; }).then(() => { acctFlying--; });
+  acctSent = sig; acctFlying++; const merged = acctMerged;   // 帳號（2026-11-28）
+  A.savePlaced(mine.placed, mine.seen, mine.kept).then((r) => { if (!r || !r.ok) { acctSent = ''; if (acctTell && acct() === 'in') acctTell('擺放沒存到，等一下再試。'); } else if (merged) putLocal({ kept: [] }); }, () => { acctSent = ''; }).then(() => { acctFlying--; });   // 帳號（2026-11-28）：沒存到要說；併進來的紀念品存上去了，這台那份就清掉
 }
 
 async function main() {
@@ -91,16 +93,16 @@ async function main() {
   const allSources = () => sources(cat.currency, { has: (id) => !F4 || !F4.byId || !!F4.byId[id], firstTask: !!(F4 && F4.state.done && F4.state.done.t1), keep: KEEP });
   /* 帳號（2026-11-24）：下面四行外面多包一層：訪客不發幣；登入時只發伺服器收下的（acctUnpaid），花掉的和餘額看伺服器 */
   const unpaid = () => (acct() === 'guest' || !acctReady ? [] : acct() === 'in' ? acctUnpaid() : allSources().filter((x) => !mine.paid.includes(x.key)));
-  const earned = () => (acct() !== 'off' ? allSources().reduce((n, x) => n + x.n, 0) : DEVMODE ? 9999 : DEV && Q.has('coins') ? +Q.get('coins') || 0 : allSources().reduce((n, x) => n + x.n, 0));
+  const earned = () => (acct() === 'in' ? +((window.PD_ACCOUNT.coins || {}).earned) || 0 /* 帳號（2026-11-28）：登入時用伺服器收下的總數，伺服器不收的不算 */ : acct() !== 'off' ? allSources().reduce((n, x) => n + x.n, 0) : DEVMODE ? 9999 : DEV && Q.has('coins') ? +Q.get('coins') || 0 : allSources().reduce((n, x) => n + x.n, 0));
   const spent = () => (acct() === 'in' ? +((window.PD_ACCOUNT.coins || {}).spent) || 0 : mine.owned.reduce((n, id) => n + byId[id].price, 0));
   const balance = () => (acct() === 'in' ? acctBalance() : Math.max(0, earned() - spent()));
   /* 帳號（2026-11-24）：登入時只發伺服器也收下、還值代幣、伺服器也還沒記成給過的那幾筆（金額照伺服器的），結尾的餘額才對得上；
-     這台有伺服器還不知道的，就請 account.js 對一次：同時只對一次，同一批 60 秒內不重問，對的時候先不發，沒對成功就等下次 */
+     這台有伺服器還不知道的，就請 account.js 對一次：同時只對一次，同一筆這一頁只問一次（帳號（2026-11-28）：伺服器不收的那筆不會每 60 秒問一次；沒送到的 account.js 自己會再送），對的時候先不發 */
   let acctSyncing = false; const acctAsked = new Map();
   function acctUnpaid() {
     const A = window.PD_ACCOUNT, have = new Map((A.earned || []).map((e) => [e.key, e]));
     const left = allSources().filter((x) => !mine.paid.includes(x.key)), unknown = left.filter((x) => !have.has(x.key));
-    if (unknown.length && !acctSyncing && unknown.some((x) => !(Date.now() - (acctAsked.get(x.key) || 0) < 60000))) {
+    if (unknown.length && !acctSyncing && unknown.some((x) => !acctAsked.has(x.key))) {   // 帳號（2026-11-28）
       acctSyncing = true; unknown.forEach((x) => acctAsked.set(x.key, Date.now()));
       A.syncNow().then(() => { acctSyncing = false; }, () => { acctSyncing = false; });
     }
@@ -592,6 +594,7 @@ async function main() {
   /* ------------------------------------------------------------------ 佈置模式: the tray */
   const stage = document.getElementById('stage'), ctl = document.getElementById('ctl'), liveP = document.getElementById('live');
   const tell = (s) => { if (liveP) liveP.textContent = s; };
+  acctTell = tell;   // 帳號（2026-11-28）
   const COIN = '<svg class="coin" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2"/><circle cx="8" cy="8" r="4.6"/></svg>';
   const btn = document.createElement('button'); btn.type = 'button'; btn.id = 'btn-decor'; btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', 'decor-tray');
   ctl.prepend(btn); uiReady = true;
@@ -1000,10 +1003,12 @@ async function main() {
     const st = acct(), A = window.PD_ACCOUNT;
     if (st === 'off' && acctWas === 'off') return;
     if (acctRedeeming || acctFlying || showing || paying) { clearTimeout(acctPull.t); acctPull.t = setTimeout(acctPull, 400); return; }   // 正在播或正在送：等一下再對
-    if (st === 'in' && acctWas !== 'in') { acctReady = false; A.syncNow().then(() => { acctReady = true; }); }   // 剛登入：這台的進度送上去之後才發幣
+    const justIn = st === 'in' && acctWas !== 'in';   // 帳號（2026-11-28）
+    if (justIn) { acctReady = false; A.syncNow().then(() => { acctReady = true; }); }   // 剛登入：這台的進度送上去之後才發幣（帳號（2026-11-28）：條件改用 justIn）
     acctWas = st;
     if (st !== 'in' && decorating) decorate(false);
     acctMine(byId, cat.slots);
+    if (justIn && acctMerged) save();   // 帳號（2026-11-28）：剛登入（手上是伺服器剛給的擺飾）就把併進來的紀念品存上去
     for (const slot of Object.keys(live)) if (live[slot].id !== mine.placed[slot]) { if (live[slot].wear) undress(live[slot]); remove(slot); }
     Object.values(mine.placed).forEach((id) => { if (!live[byId[id].slot]) mount(id); });
     acctKeeps(); acctBars(); draw(); drawKeeps();
@@ -1039,7 +1044,8 @@ async function main() {
     if (acctRedeeming) return false; acctRedeeming = true; b.disabled = true;
     let r = null; try { r = await window.PD_ACCOUNT.redeem(it.id); } catch (e) { r = null; } finally { acctRedeeming = false; }
     if (r && r.ok) { mine.owned = mine.owned.filter((id) => id !== it.id); return true; }      // 下面那行會把它加進來
-    const msg = r && r.error === 'poor' ? '代幣不夠' : '暫時連不上，等一下再換';      // 佈置模式看不到螃蟹的話，寫在那顆鈕上 1.8 秒（跟「存成圖片」一樣）
+    if (r && r.error === 'owned') { if (!mine.owned.includes(it.id)) mine.owned.push(it.id); draw(); return false; }   // 帳號（2026-11-28）：伺服器說已經有了（例如另一個分頁剛換）：當作已經擁有
+    const msg = r && r.error === 'poor' ? '代幣不夠' : r && r.error === 'noitem' ? '這件現在不能換' : '暫時連不上，等一下再換';   // 帳號（2026-11-28）：noitem      // 佈置模式看不到螃蟹的話，寫在那顆鈕上 1.8 秒（跟「存成圖片」一樣）
     tell(msg + '。'); draw(); const until = now() + 1.8;
     (function note() { if (now() >= until) { draw(); return; } const nb = shelf.querySelector(`li[data-id="${it.id}"] button`); if (nb) { nb.textContent = msg; nb.disabled = true; } requestAnimationFrame(note); })();   // 中間別的地方重畫也蓋不掉
     return false;

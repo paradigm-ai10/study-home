@@ -22,6 +22,7 @@
 <meta name="description" content="用 Google 登入 Paradigm 學 AI 之後，我們存了什麼、存在哪裡、拿來做什麼，以及怎麼刪掉。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=LXGW+WenKai+TC&family=Outfit:wght@500;600&display=swap">
+<link rel="stylesheet" href="account.css">
 <style>
   /* 外觀跟提案頁同一套：奶油底、葡萄色字。存了什麼那張用登入框的索引卡樣子 */
   :root {
@@ -46,6 +47,7 @@
   .wordmark { font: 600 13px/1 var(--en); letter-spacing: .26em; text-decoration: none; padding: 8px 0; }
   .home { text-decoration: none; font-size: 14px; padding: 7px 13px 8px; border-radius: 8px; box-shadow: inset 0 0 0 1.5px var(--grape-3); line-height: 1.2; white-space: nowrap; }
   .home:hover { box-shadow: inset 0 0 0 1.5px var(--grape); background: var(--sheet); }
+  .top nav { display: flex; align-items: center; gap: 10px; }   /* 登入入口插在「回首頁」左邊 */
 
   .head { padding: clamp(28px, 6vh, 56px) 0 clamp(20px, 4vh, 32px); border-bottom: 1px solid var(--line); }
   .head h1 { font-size: clamp(30px, 2.7vw, 38px); line-height: 1.36; letter-spacing: .03em; }
@@ -84,13 +86,13 @@
 <div class="wrap">
   <header class="top">
     <a class="wordmark" href="../crab/rooms/f4/index.html">PARADIGM</a>
-    <a class="home" href="../crab/rooms/f4/index.html">← 回首頁</a>
+    <nav><a class="home" href="../crab/rooms/f4/index.html">← 回首頁</a></nav>
   </header>
   <main>
     <section class="head">
       <h1>隱私說明</h1>
       <p>用 Google 登入 Paradigm 學 AI 之後，我們存了什麼、存在哪裡、拿來做什麼，以及怎麼刪掉。</p>
-      <p class="date">更新日期：2026-11-23</p>
+      <p class="date">更新日期：2026-11-28</p>
     </section>
 
     <div class="doc">
@@ -103,7 +105,7 @@
         <section>
           <h2>登入時，Google 給我們什麼</h2>
           <p>登入用的是 Google 的登入按鈕。登入時 Google 會傳來一份登入證明，我們只留下裡面的固定代號、email、名字和頭像的網址。我們拿不到你的 Google 密碼。</p>
-          <p>打開登入框時，你的瀏覽器會向 Google 的伺服器載入登入按鈕的程式和一套字型。跟任何放了 Google 登入按鈕的網站一樣，Google 會看到這次連線。</p>
+          <p>打開登入框時，你的瀏覽器會向 Google 的伺服器載入登入按鈕的程式和一套字型。登入之後，每一頁也會向 Google 載入那套字型和你的頭像圖片。跟任何放了 Google 登入按鈕的網站一樣，Google 會看到這些連線。</p>
         </section>
 
         <section>
@@ -111,7 +113,7 @@
           <p>「登入後存的東西」那張卡列的就是伺服器上存的全部。這些資料存在 Cloudflare 的資料庫。</p>
           <p>登入期間，這台裝置上的進度會一直跟伺服器的對齊：完成的課、測驗全對與讀完的章、哪幾天有來與當天的學習時間、連續回來的紀錄，兩邊缺的互相補上。</p>
           <p>每課各自的學習時間、閱讀位置、步驟打勾、程度評估、分享卡的版型選擇不會送到伺服器，只留在這台裝置。</p>
-          <p>為了讓你下次打開不用重新登入，你的瀏覽器會記住一組登入憑證和你的名字。伺服器不存憑證本身，只存它的雜湊值（用來核對的一串亂碼）和到期時間。按「登出」就會清掉這台裝置上的。</p>
+          <p>為了讓你下次打開不用重新登入，你的瀏覽器會記住一組登入憑證、你的名字和頭像的網址。伺服器不存憑證本身，只存它的雜湊值（用來核對的一串亂碼）和到期時間。按「登出」就會清掉這台裝置上的。</p>
           <p>管這個網站的人（Paradigm AI）查得到資料庫裡的這些資料。</p>
         </section>
 
@@ -166,12 +168,15 @@
           <li>連續回來的紀錄<small>連續幾天、從哪一天開始</small></li>
           <li>哪幾筆代幣螃蟹已經交給你了</li>
           <li>換到的擺飾<small>和換的時間、花了多少代幣</small></li>
-          <li>擺在書桌上的擺飾和放上展示台的紀念品<small>和最近一次改的時間</small></li>
+          <li>擺在書桌上的擺飾和放上展示台的紀念品<small>和最近一次改的時間、上次打開佈置時有幾個代幣</small></li>
           <li>登入憑證的雜湊值<small>和建立、到期的時間</small></li>
         </ul>
       </aside>
     </div>
   </main>
 </div>
+<script src="endpoint.js" defer></script>
+<script src="account.js" defer></script>
+<script src="account-ui.js" defer></script>
 </body>
 </html>

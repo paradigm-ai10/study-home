@@ -161,7 +161,9 @@
       menu.appendChild(c);
     }
     var list = el('div', 'pd-acct-rows');
-    list.appendChild(row('button', '登出', '', signOut));
+    var out = row('button', outBusy ? '登出中…' : '登出', '', function () { signOut(); });
+    out.disabled = outBusy;
+    list.appendChild(out);
     list.appendChild(row('button', '刪除我的資料', 'is-danger', askDelete));
     var a = row('a', '隱私說明'); a.href = PRIVACY;
     list.appendChild(a);
@@ -173,7 +175,7 @@
     var h = el('p', 'pd-acct-ask-h', '刪除我的資料'); h.id = 'pd-acct-ask-h';
     box.setAttribute('role', 'group'); box.setAttribute('aria-labelledby', 'pd-acct-ask-h');
     box.appendChild(h);
-    box.appendChild(el('p', null, '刪除之後不能復原。伺服器上這個帳號的完成的課、代幣、擺飾，連同你的名字、email 和頭像，會全部刪掉。'));
+    box.appendChild(el('p', null, '刪除之後不能復原。這個帳號在伺服器上的完成紀錄、代幣、擺飾，連同你的名字、email 和頭像，會全部刪掉。'));
     box.appendChild(el('p', 'pd-acct-ask-small', '這台裝置上的學習進度也會一起清掉。'));
     var msg = el('p', 'pd-acct-msg'); msg.setAttribute('role', 'status'); msg.setAttribute('aria-live', 'polite');
     var acts = el('div', 'pd-acct-acts');
@@ -235,10 +237,43 @@
     });
   }
 
-  function signOut() {
-    closeMenu(true);
-    try { if (window.google && window.google.accounts && window.google.accounts.id) window.google.accounts.id.disableAutoSelect(); } catch (e) { /* 沒差 */ }
-    A.signOut().then(function () { say('已經登出'); });
+  // 登出前 account.js 會先把進度送一次（最多幾秒）：這段時間鈕寫「登出中…」、不能再按
+  var outBusy = false;
+  function signOut(force) {
+    if (outBusy) return;
+    outBusy = true;
+    var b = !force && isMenuOpen() && menu.querySelector('.pd-acct-row');
+    if (b) { b.textContent = '登出中…'; b.disabled = true; }
+    A.signOut(force ? { force: true } : undefined).then(function (r) {
+      outBusy = false;
+      if (r && r.error === 'unsent') {
+        if (A.status !== 'in') { closeMenu(false); btn.focus(); say('登入已經過期。進度還在這台，重新登入就會存上去'); return; }
+        if (!isMenuOpen()) openMenu();
+        askUnsent(r.n);
+        return;
+      }
+      try { if (window.google && window.google.accounts && window.google.accounts.id) window.google.accounts.id.disableAutoSelect(); } catch (e) { /* 沒差 */ }
+      closeMenu(true);
+      say('已經登出');
+    });
+  }
+  // 還有進度沒存到帳號：問一次要不要照樣登出（樣子跟「刪除我的資料」那一頁一樣）
+  function askUnsent(n) {
+    menu.textContent = '';
+    var box = el('div', 'pd-acct-ask');
+    var h = el('p', 'pd-acct-ask-h', '登出'); h.id = 'pd-acct-ask-h';
+    box.setAttribute('role', 'group'); box.setAttribute('aria-labelledby', 'pd-acct-ask-h');
+    box.appendChild(h);
+    box.appendChild(el('p', null, '還有 ' + n + ' 筆進度沒存到帳號。現在登出，這台裝置上的這幾筆會不見。'));
+    var acts = el('div', 'pd-acct-acts');
+    var yes = el('button', 'pd-acct-go is-danger', '還是登出'); yes.type = 'button';
+    var no = el('button', 'pd-acct-go is-alt', '先不登出'); no.type = 'button';
+    no.addEventListener('click', function () { fillMenu(); focusFirst(); });
+    yes.addEventListener('click', function () { yes.disabled = no.disabled = true; signOut(true); });
+    acts.appendChild(yes); acts.appendChild(no);
+    box.appendChild(acts);
+    menu.appendChild(box);
+    no.focus();
   }
 
   /* ---------------------------------------------------------------- 登入框 */
@@ -286,8 +321,10 @@
     if (LOCAL) card.appendChild(devRow());
     card.appendChild(fine);
     dlg.appendChild(card);
-    // 點框外面（背景）就關
-    dlg.addEventListener('click', function (e) { if (e.target === dlg) closeDialog(); });
+    // 點框外面（背景）就關：按下和放開都要在背景上（在框裡按住拖出去放開不算）
+    var downOnBack = false;
+    dlg.addEventListener('pointerdown', function (e) { downOnBack = e.target === dlg; });
+    dlg.addEventListener('click', function (e) { if (e.target === dlg && downOnBack) closeDialog(); downOnBack = false; });
     dlg.addEventListener('close', afterClose);
     // Esc 只關這個框，不要傳到頁面（地圖頁按 Esc 會回首頁）
     dlg.addEventListener('keydown', function (e) { if (e.key === 'Escape') e.stopPropagation(); });
