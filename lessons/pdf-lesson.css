@@ -426,6 +426,11 @@ body.pl-finished .pl-fin .note-done { display: inline; }
 .pl-coin p span { color: rgba(255, 244, 224, .82); }
 .pl-coin a { flex: none; background: var(--sun); color: var(--grape); text-decoration: none; font-size: 14px; padding: 9px 13px; border-radius: 6px; transition: transform 140ms ease-out; }
 .pl-coin a:active { transform: scale(.97); }
+/* 帳號（2026-11-28）：沒登入時得幣提示的「登入」鈕，樣子跟「回首頁佈置」一樣 */
+.pl-coin .pl-coin-go { font: inherit; font-size: 14px; line-height: normal; background: var(--sun); color: var(--grape); padding: 9px 13px; border-radius: 6px; transition: transform 140ms ease-out; }
+.pl-coin .pl-coin-go:active { transform: scale(.97); }
+/* 帳號（2026-11-28）：沒登入時第二行說明為什麼要登入，手機上也留著；提示框改成滿版寬（left:50% 讓它只剩半個螢幕寬，字會一個一個斷行） */
+@media (max-width: 520px) { .pl-coin.pl-coin-guest { width: calc(100vw - 24px); } .pl-coin.pl-coin-guest p span { display: block; } }
 .pl-coin button { flex: none; appearance: none; border: 0; background: none; color: rgba(255, 244, 224, .8); font-size: 20px; line-height: 1; padding: 6px 8px; cursor: pointer; border-radius: 6px; }
 .pl-coin :focus-visible { outline: 2px solid var(--sun); outline-offset: 2px; }
 @media (max-width: 520px) { .pl-coin p span { display: none; } }

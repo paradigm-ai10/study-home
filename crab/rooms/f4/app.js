@@ -123,7 +123,32 @@
   // back from a lesson page (also from the back/forward cache), or a lesson finished in another tab: pick up what changed
   const recheck = () => { if (mergeDone()) { save(); refresh(); } };
   addEventListener('pageshow', (e) => { if (e.persisted) recheck(); });
-  addEventListener('storage', (e) => { if (e.key === 'pd-done') recheck(); });
+  addEventListener('storage', (e) => { if (acctOn() && (e.key === 'pd-done' || e.key === KEY)) acctRefresh(); else if (e.key === 'pd-done') recheck(); });   // 帳號（2026-11-28）：登入功能開著時，pd-done 或 paradigm.f4 變了先讀回 done.t1 再重畫；關著照舊。
+  /* 帳號（2026-11-28）：登入、登出時 account.js 會改 localStorage 裡的 pd-done 和 paradigm.f4 的 done.t1。這頁的狀態放在記憶體、save() 會整份寫回去，
+     所以每次帳號有變（pd-account 事件、上面的 storage 通知），先把 done.t1 讀回記憶體，再照原本的 mergeDone、save、refresh 重畫。功能關著（status 'off'）時這段什麼都不做。 */
+  const acctOn = () => !!(window.PD_ACCOUNT && window.PD_ACCOUNT.status && window.PD_ACCOUNT.status !== 'off');
+  const acctSync = () => { try { if (window.PD_ACCOUNT && window.PD_ACCOUNT.syncNow) window.PD_ACCOUNT.syncNow(); } catch (e) { /* 帳號出錯不影響這頁 */ } };
+  function pullT1() {
+    if (!acctOn() || (Q.has('fresh') && !Q.has('keep'))) return false;
+    let f = null; try { f = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return false; }
+    if (!f || typeof f !== 'object') return false;      // 讀不到就不動記憶體裡的
+    const t = f.done && f.done.t1 > 0 ? f.done.t1 : 0;
+    if ((state.done.t1 || 0) === t) return false;
+    if (t) state.done.t1 = t; else delete state.done.t1;
+    return true;
+  }
+  let acctWas = null;   // 這一頁上次看到的登入狀態：開頁後第一次收到的不算「剛登出」
+  function acctRefresh() {
+    if (!acctOn()) return;
+    const now = window.PD_ACCOUNT.status, out = acctWas === 'in' && now === 'guest'; acctWas = now;
+    const t = pullT1(); const d = mergeDone();
+    // 在這一頁剛登出（in → guest）、課都不在了、又沒做過程度評估：下一步的起點是 nextStep() 從那些課推出來的，一起拿掉，回到第一次來的樣子
+    const s = out && state.start && state.level == null && !state.known.length;
+    if (s) state.start = null;
+    if (t || d || s) { save(); refresh(); }
+  }
+  addEventListener('pd-account', acctRefresh);
+  /* 帳號（2026-11-28）這段到這裡 */
   document.addEventListener('visibilitychange', () => { if (!document.hidden) recheck(); });
   function refresh() {
     const n = nextStep(); const w = weekCount(); const k = state.known.length;
@@ -183,7 +208,7 @@
   }
   function answerTask(v) {
     const first = !state.done.t1;
-    state.done.t1 = state.done.t1 || Date.now(); if (first) did('t1'); save();
+    state.done.t1 = state.done.t1 || Date.now(); if (first) did('t1'); save(); acctSync();   // 帳號（2026-11-28）：記下 60 秒體驗後馬上跟帳號對一次（acctSync）。
     const count = Object.keys(state.done).length;
     show('task', 'solve', `
       <p class="kicker">60 秒體驗</p>

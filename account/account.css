@@ -44,6 +44,13 @@
 }
 /* 地圖頁沒有頁首：自己浮在右上角 */
 .pd-acct--float { position: fixed; z-index: 25; top: max(14px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); }
+/* 課程頁（有 .pl-top 頁首，2026-11-28）：浮在右上角會蓋到「回首頁」、捲動時還會蓋到內文。
+   改成跟著頁首捲走、放在頁首那一行的最右邊，頁首的連結往左讓出入口的寬度（沒登入「登入」約 57px；登入後桌機有名字約 175px、手機只剩頭像） */
+.pl-top ~ .pd-acct--float { position: absolute; top: 17px; right: max(28px, calc((100% - 1180px) / 2 + 28px)); }
+.pl-top:has(~ .pd-acct--float) nav { margin-right: 68px; }
+.pl-top:has(~ .pd-acct--float .is-in) nav { margin-right: 186px; }
+@media (max-width: 900px) { .pl-top ~ .pd-acct--float { right: 16px; } }
+@media (max-width: 560px) { .pl-top:has(~ .pd-acct--float .is-in) nav { margin-right: 56px; } }
 
 .pd-acct-btn:focus-visible { outline: none; }
 .pd-acct-btn:focus-visible .pd-acct-chip { outline: 3px solid var(--pa-coral-ink); outline-offset: 2px; }

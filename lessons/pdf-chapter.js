@@ -4,6 +4,17 @@
 // 2026-11-14 建立。
 // ★ 一章一翻試做版（2026-11-16，Thomas 選 C「讀完才翻」＋改成一章一翻、章末 Take home message）：pdf-lesson.js 的副本。
 //   章內照樣往下捲；讀到章末，Take home message 和「下一章」才出現。翻頁邏輯在 pdf-chapter-core.js。只給 draft-4-4-chapter.html 用。
+/* 帳號（2026-11-28）：照順序載入登入用的 endpoint.js、account.js、account-ui.js 和 account.css，各一次；載不到就停，課程頁照常。功能沒開時它們自己什麼都不做。
+   路徑寫成 '../account/'：上線時 build.py 會把它換成 '../account/'。pdf-lesson.js、pdf-flip.js、lesson-page.js 各有一份一樣的，要一起改。 */
+;(() => {
+  const dir = '../account/'
+  try {
+    if (document.querySelector('[data-pd-acct-load]')) return
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = dir + 'account.css'; l.dataset.pdAcctLoad = ''; document.head.append(l)
+    const next = names => { if (!names.length) return; const s = document.createElement('script'); s.src = dir + names[0]; s.dataset.pdAcctLoad = ''; s.onload = () => next(names.slice(1)); document.head.append(s) }
+    next(['endpoint.js', 'account.js', 'account-ui.js'])
+  } catch (e) { /* 載不到登入也沒關係 */ }
+})();
 (() => {
   const M = window.PDFLESSON, R = window.ROADMAP, P = window.PIXEL, body = document.body
   const $ = (s, el = document) => el.querySelector(s), $$ = (s, el = document) => [...el.querySelectorAll(s)]
@@ -497,14 +508,20 @@
   // ── 完成本課（pd-done，跟首頁共用） ──
   const DONE = () => store.get('pd-done', [])
   const isDone = () => DONE().includes(ID)
-  const setDone = on => { const was = isDone(); let d = DONE().filter(x => x !== ID); if (on) d.push(ID); store.set('pd-done', d); paintDone(); if (on && !was) coinToast(`完成本課，得到 ${COINS_PER_LESSON} 代幣`) }
+  const setDone = on => { const was = isDone(); let d = DONE().filter(x => x !== ID); if (on) d.push(ID); store.set('pd-done', d); acctDone(on); paintDone(); if (on && !was) coinToast(`完成本課，得到 ${COINS_PER_LESSON} 代幣`) }   // 帳號（2026-11-28）：寫完 pd-done 之後告訴帳號（acctDone）。
+  const acctDone = on => { try { const A = window.PD_ACCOUNT; if (A && A.lessonDone) A.lessonDone(ID, on) } catch (e) {} }   // 帳號（2026-11-28）：取消完成一定要經過 lessonDone(ID, false)，不然下次對帳會被補回來；完成時它也會馬上對一次。
+  const acctSync = () => { try { const A = window.PD_ACCOUNT; if (A && A.syncNow) A.syncNow() } catch (e) {} }   // 帳號（2026-11-28）：得到代幣後馬上跟帳號對一次（不等結果）。
   // 完成一課得 10 代幣，可以回首頁佈置書桌（代幣是首頁照 pd-done 算的，這裡只是告訴你；數字要跟 crab/rooms/f4/decor/catalog.json 的 perLesson 一樣）
   const COINS_PER_LESSON = 10, COINS_QUIZ = 5, COINS_CHAPTER = 1     // 測驗全對 perQuiz、讀完一章 perChapter（2026-11-23），同樣要跟 catalog.json 一樣
   let coinTimer = 0
   function coinToast(title, sub = '代幣可以在首頁兌換擺飾，佈置你的書桌。', ms = 9000) {
     let t = $('#pl-coin'); if (!t) { t = document.createElement('div'); t.id = 'pl-coin'; t.className = 'pl-coin'; t.setAttribute('role', 'status'); body.appendChild(t) }
-    t.innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2"/><circle cx="8" cy="8" r="4.6"/></svg><p><b>${title}</b><span>${sub}</span></p><a href="${HOME_URL}">回首頁佈置</a><button type="button" aria-label="關閉">×</button>`
-    $('button', t).onclick = () => t.classList.remove('on')
+    const UI = window.PD_ACCOUNT_UI, guest = !!(window.PD_ACCOUNT && window.PD_ACCOUNT.status === 'guest' && UI && UI.open)   // 帳號（2026-11-28）：沒登入的訪客（功能開著）才換成請他登入；關著、還沒載好、已登入都照舊。
+    if (guest) sub = '登入就能把代幣存起來佈置書桌'   // 帳號（2026-11-28）：沒登入時第二行請他登入。
+    t.classList.toggle('pl-coin-guest', guest)   // 帳號（2026-11-28）：沒登入的提示加記號，手機上第二行照樣顯示（pdf-lesson.css）。
+    t.innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2"/><circle cx="8" cy="8" r="4.6"/></svg><p><b>${title}</b><span>${sub}</span></p>${guest ? '<button type="button" class="pl-coin-go">登入</button>' : `<a href="${HOME_URL}">回首頁佈置</a>`}<button type="button" aria-label="關閉">×</button>`   // 帳號（2026-11-28）：沒登入時「回首頁佈置」換成「登入」鈕。
+    $('button[aria-label]', t).onclick = () => t.classList.remove('on')   // 帳號（2026-11-28）：多了登入鈕，關閉鈕改用 aria-label 找。
+    if (guest) $('.pl-coin-go', t).onclick = () => { if (UI.open('登入就能把上課賺的代幣存起來佈置書桌')) t.classList.remove('on') }   // 帳號（2026-11-28）：按登入開登入框，提示收起來。
     setTimeout(() => t.classList.add('on'), 30)       // 不用 requestAnimationFrame：分頁在背景時它不會跑
     clearTimeout(coinTimer); coinTimer = setTimeout(() => t.classList.remove('on'), ms)
     t.onmouseenter = () => clearTimeout(coinTimer); t.onmouseleave = () => { coinTimer = setTimeout(() => t.classList.remove('on'), 4000) }
@@ -531,7 +548,7 @@
     q.dataset.ok = ok ? '1' : '0'
     if (M.draft || !$$('.quiz', doc).every(x => x.dataset.ok === '1')) return
     const z = store.get('pd-quiz', {}) || {}; if (z[ID]) return
-    z[ID] = 1; store.set('pd-quiz', z); if (fresh) coinToast(`測驗全對，得到 ${COINS_QUIZ} 代幣`, '回首頁時，螃蟹會把代幣交給你。', 6000)
+    z[ID] = 1; store.set('pd-quiz', z); acctSync(); if (fresh) coinToast(`測驗全對，得到 ${COINS_QUIZ} 代幣`, '回首頁時，螃蟹會把代幣交給你。', 6000)   // 帳號（2026-11-28）：記下測驗全對後馬上跟帳號對一次（acctSync）。
   }
   // 考考你（多題，答案寫「答案：1 B　2 B　3 B」，02 起）：每題各自點選項，全部答完或按「直接看答案」才顯示答案那行
   function multiQuiz(q, ans) {
@@ -583,6 +600,7 @@
   }
   $$('[data-done]').forEach(b => b.onclick = () => setDone(!isDone()))
   paintDone()
+  addEventListener('storage', e => { if (e.key === 'pd-done' && window.PD_ACCOUNT && window.PD_ACCOUNT.status !== 'off') paintDone() })   // 帳號（2026-11-28）：登入後帳號把別台完成的課補進 pd-done，按鈕跟著改，免得按下去變成取消。
 
   // 進場：每頁的大區塊捲到才淡入
   if (!reduce) {
@@ -632,7 +650,7 @@
   addEventListener('pl-chapter-read', e => {
     if (M.draft) return
     const c = store.get('pd-chapters', {}) || {}, a = Array.isArray(c[ID]) ? c[ID] : []; if (a.includes(e.detail.i)) return
-    a.push(e.detail.i); c[ID] = a; store.set('pd-chapters', c)
+    a.push(e.detail.i); c[ID] = a; store.set('pd-chapters', c); acctSync()   // 帳號（2026-11-28）：記下讀完一章後馬上跟帳號對一次。
     coinToast(`讀完第 ${e.detail.i + 1} 章，得到 ${COINS_CHAPTER} 代幣`, '回首頁時，螃蟹會把代幣交給你。', 3200)
   })
   // ══ 一章一翻（2026-11-16 試做）══
