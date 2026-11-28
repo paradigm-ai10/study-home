@@ -248,7 +248,7 @@
   function stateOk(st, id) { return isObj(st) && isObj(st.me) && typeof st.me.id === 'string' && !!st.me.id && (id == null || st.me.id === id); }
 
   /* ---------------------------------------------------------------- 登入狀態 */
-  var A = { status: 'off', me: null, coins: null, decor: null, ready: null };
+  var A = { status: 'off', me: null, coins: null, decor: null, earned: null, ready: null };
   var token = null, kept = false, owned = false, lastOk = 0, lastToday = 0;
 
   // 狀態、名字、代幣、擺飾真的變了才通知各頁
@@ -256,17 +256,21 @@
   function emit() {
     if (A.status === 'off') return;
     var sig;
-    try { sig = JSON.stringify([A.status, A.me, A.coins, A.decor]); } catch (e) { sig = String(Math.random()); }
+    try { sig = JSON.stringify([A.status, A.me, A.coins, A.decor, A.earned]); } catch (e) { sig = String(Math.random()); }
     if (sig === lastSig) return;
     lastSig = sig;
     try { window.dispatchEvent(new window.CustomEvent('pd-account', { detail: { status: A.status } })); } catch (e) { /* 舊瀏覽器 */ }
   }
   function setIn(tok, me) { token = tok; A.status = 'in'; A.me = me; kept = put(K.acct, { token: tok, me: me }); tick(); }
-  function setGuest() { token = null; A.status = 'guest'; A.me = A.coins = A.decor = null; lastOk = lastToday = 0; waiting = null; tick(); del(K.acct); del(K.state); }
+  function setGuest() { token = null; A.status = 'guest'; A.me = A.coins = A.decor = A.earned = null; lastOk = lastToday = 0; waiting = null; tick(); del(K.acct); del(K.state); }
   // 只換帳號的資料（名字、代幣、擺飾），不動進度
   function meta(st) {
-    A.me = st.me; A.coins = st.coins || null; A.decor = st.decor || null;
-    put(K.acct, { token: token, me: st.me }); put(K.state, { coins: A.coins, decor: A.decor });
+    A.me = st.me; A.coins = st.coins || null; A.decor = st.decor || null; A.earned = earnedOf(st.earned);
+    put(K.acct, { token: token, me: st.me }); put(K.state, { coins: A.coins, decor: A.decor, earned: A.earned });
+  }
+  // 伺服器收下的每一筆 [{key, n, paid}]：每次給新的陣列，頁面改了也不影響這裡
+  function earnedOf(list) {
+    return Array.isArray(list) ? list.filter(function (e) { return e && typeof e.key === 'string'; }).map(function (e) { return { key: e.key, n: +e.n || 0, paid: !!e.paid }; }) : null;
   }
   // 這台的紀錄屬於誰：換人就先清（同步做完才 await，之後寫的才不會被清掉）
   function claim(id) {
@@ -280,7 +284,7 @@
     if (kept) { var a = get(K.acct, null); if (!a || a.token !== token) return false; }
     return !owned || get(K.owner, null) === A.me.id;
   }
-  function drop() { token = null; A.status = 'guest'; A.me = A.coins = A.decor = null; lastOk = lastToday = 0; waiting = null; tick(); emit(); }
+  function drop() { token = null; A.status = 'guest'; A.me = A.coins = A.decor = A.earned = null; lastOk = lastToday = 0; waiting = null; tick(); emit(); }
   // 憑證過期或被拒：當作登出，但進度、owner、base、待送清單都不清
   function gone(tok) { if (token === tok) { setGuest(); emit(); } }
   function alive(tok) { return token === tok && mine(); }
@@ -499,10 +503,10 @@
       if (acct && typeof acct.token === 'string' && acct.me && typeof acct.me.id === 'string' && acct.me.id) {
         claim(acct.me.id);
         setIn(acct.token, acct.me);
-        if (isObj(last)) { A.coins = last.coins || null; A.decor = last.decor || null; }
+        if (isObj(last)) { A.coins = last.coins || null; A.decor = last.decor || null; A.earned = earnedOf(last.earned); }
         A.ready = syncNow().then(noop, noop);
       }
     }
     emit();
-  } catch (e) { A.status = 'off'; token = null; A.me = A.coins = A.decor = null; }
+  } catch (e) { A.status = 'off'; token = null; A.me = A.coins = A.decor = A.earned = null; }
 })();

@@ -44,7 +44,28 @@ function load() {
   return { owned: Array.isArray(s.owned) ? s.owned : [], placed: s.placed && typeof s.placed === 'object' ? s.placed : {}, seen: +s.seen || 0, paid: Array.isArray(s.paid) ? s.paid : [], kept: Array.isArray(s.kept) ? s.kept : [] };   // paid ＝ 螃蟹已經交給你的那幾筆（coins.js 的 key）
 }
 const mine = load();
-const save = () => { try { if (KEEP) localStorage.setItem(KEY, JSON.stringify(mine)); } catch (e) { /* private mode */ } };
+const save = () => { if (acct() !== 'off') return acctSave(); try { if (KEEP) localStorage.setItem(KEY, JSON.stringify(mine)); } catch (e) { /* private mode */ } };   // 帳號（2026-11-24）：登入或訪客走 acctSave
+/* 帳號（2026-11-24）：登入以後餘額、兌換、擺了什麼聽帳號（PD_ACCOUNT）的；沒有帳號功能（'off'）時上面照舊 */
+const acct = () => { const A = window.PD_ACCOUNT; return !A || A.status === 'off' ? 'off' : A.status === 'in' ? 'in' : 'guest'; };
+const arr = (v) => (Array.isArray(v) ? v.slice() : []);
+const local = () => { try { const s = JSON.parse(localStorage.getItem(KEY) || '{}'); return s && typeof s === 'object' && !Array.isArray(s) ? s : {}; } catch (e) { return {}; } };
+const putLocal = (part) => { try { localStorage.setItem(KEY, JSON.stringify(Object.assign(local(), part))); } catch (e) { /* private mode */ } };   // 只改給的那幾欄，其他照留
+let acctSent = '', acctFlying = 0;                     // 上次送出去的擺放；還沒回來的 savePlaced 有幾個
+function acctMine(byId, slots) {                       // 登入：擺飾照伺服器的，paid 照舊看這台；訪客：沒有兌換來的東西，紀念品看這台
+  const A = window.PD_ACCOUNT, on = acct() === 'in', d = (on && A.decor) || {}, s = local();
+  mine.owned = arr(d.owned).filter((id) => byId[id]); mine.placed = {};
+  Object.entries(d.placed || {}).forEach(([slot, id]) => { if (slots[slot] && mine.owned.includes(id)) mine.placed[slot] = id; });
+  mine.seen = on ? +d.seen || 0 : +s.seen || 0; mine.kept = on ? arr(d.kept) : arr(s.kept); mine.paid = arr(s.paid);
+  acctSent = JSON.stringify([mine.placed, mine.seen, mine.kept]);
+}
+function acctSave() {                                  // 代替 save()：擺放送伺服器（不等它），paid 只寫這台再請 account.js 對一次
+  const A = window.PD_ACCOUNT;
+  if (acct() === 'guest') { putLocal({ kept: mine.kept }); return; }       // 訪客只會改到紀念品
+  if (JSON.stringify(arr(local().paid)) !== JSON.stringify(mine.paid)) { putLocal({ paid: mine.paid }); A.syncNow(); }
+  const sig = JSON.stringify([mine.placed, mine.seen, mine.kept]); if (sig === acctSent) return;
+  acctSent = sig; acctFlying++;
+  A.savePlaced(mine.placed, mine.seen, mine.kept).then((r) => { if (!r || !r.ok) acctSent = ''; }, () => { acctSent = ''; }).then(() => { acctFlying--; });
+}
 
 async function main() {
   const [f2, cat] = await Promise.all([
@@ -54,6 +75,12 @@ async function main() {
   const F4 = window.F4; const { scene, camera, S, L, acts, crabRoot } = f2;
   const canvas = f2.canvas || document.querySelector('#view canvas');
   const items = cat.items, byId = Object.fromEntries(items.map((i) => [i.id, i]));
+  /* 帳號（2026-11-24）：開頁面時已經登入或是訪客，先換成帳號那邊的擺飾；餘額怎麼算、開發者模式只在 'off' */
+  if (acct() !== 'off') acctMine(byId, cat.slots);
+  let acctWas = acct(), acctReady = acct() !== 'in', acctRedeeming = false;     // acctReady：登入後第一次對完才發幣
+  const devOn = () => DEVMODE && acct() === 'off';
+  const acctBalance = () => { const c = window.PD_ACCOUNT.coins; return c && c.balance === null ? Infinity : Math.max(0, +(c && c.balance) || 0); };   // null ＝ 團隊帳號，無限
+  const num = (n) => (n === Infinity ? '無限' : n);
   mine.owned = mine.owned.filter((id) => byId[id]);
   Object.keys(mine.placed).forEach((slot) => { if (!cat.slots[slot] || !mine.owned.includes(mine.placed[slot])) delete mine.placed[slot]; });
 
@@ -62,10 +89,24 @@ async function main() {
   /* 2026-11-23：代幣的來源改由 coins.js 一筆一筆列出來（完成一課、測驗全對、讀完一章、60 秒體驗、連續回來） */
   markVisit(KEEP);
   const allSources = () => sources(cat.currency, { has: (id) => !F4 || !F4.byId || !!F4.byId[id], firstTask: !!(F4 && F4.state.done && F4.state.done.t1), keep: KEEP });
-  const unpaid = () => allSources().filter((x) => !mine.paid.includes(x.key));
-  const earned = () => (DEVMODE ? 9999 : DEV && Q.has('coins') ? +Q.get('coins') || 0 : allSources().reduce((n, x) => n + x.n, 0));
-  const spent = () => mine.owned.reduce((n, id) => n + byId[id].price, 0);
-  const balance = () => Math.max(0, earned() - spent());
+  /* 帳號（2026-11-24）：下面四行外面多包一層：訪客不發幣；登入時只發伺服器收下的（acctUnpaid），花掉的和餘額看伺服器 */
+  const unpaid = () => (acct() === 'guest' || !acctReady ? [] : acct() === 'in' ? acctUnpaid() : allSources().filter((x) => !mine.paid.includes(x.key)));
+  const earned = () => (acct() !== 'off' ? allSources().reduce((n, x) => n + x.n, 0) : DEVMODE ? 9999 : DEV && Q.has('coins') ? +Q.get('coins') || 0 : allSources().reduce((n, x) => n + x.n, 0));
+  const spent = () => (acct() === 'in' ? +((window.PD_ACCOUNT.coins || {}).spent) || 0 : mine.owned.reduce((n, id) => n + byId[id].price, 0));
+  const balance = () => (acct() === 'in' ? acctBalance() : Math.max(0, earned() - spent()));
+  /* 帳號（2026-11-24）：登入時只發伺服器也收下、還值代幣、伺服器也還沒記成給過的那幾筆（金額照伺服器的），結尾的餘額才對得上；
+     這台有伺服器還不知道的，就請 account.js 對一次：同時只對一次，同一批 60 秒內不重問，對的時候先不發，沒對成功就等下次 */
+  let acctSyncing = false; const acctAsked = new Map();
+  function acctUnpaid() {
+    const A = window.PD_ACCOUNT, have = new Map((A.earned || []).map((e) => [e.key, e]));
+    const left = allSources().filter((x) => !mine.paid.includes(x.key)), unknown = left.filter((x) => !have.has(x.key));
+    if (unknown.length && !acctSyncing && unknown.some((x) => !(Date.now() - (acctAsked.get(x.key) || 0) < 60000))) {
+      acctSyncing = true; unknown.forEach((x) => acctAsked.set(x.key, Date.now()));
+      A.syncNow().then(() => { acctSyncing = false; }, () => { acctSyncing = false; });
+    }
+    if (acctSyncing) return [];
+    return left.filter((x) => { const e = have.get(x.key); return e && e.n > 0 && !e.paid; }).map((x) => ({ ...x, n: have.get(x.key).n }));
+  }
 
   /* ------------------------------------------------------------------ small tools */
   let uiReady = false;                                   // the button exists (the first frame runs before it is made: a narrow window used to stop everything here)
@@ -574,7 +615,7 @@ async function main() {
   tray.querySelector('.how').textContent = `完成一課 ${cat.currency.perLesson}、測驗全對 ${cat.currency.perQuiz}、讀完一章 ${cat.currency.perChapter}、60 秒體驗 ${cat.currency.firstTask}；連續幾天回來另外有${cat.currency.name}。`;
   let studio = null, shown = -1;
   // tokens you have not been told about yet (a lesson finished since you last looked): a dot on the button, and the crab mentions it once
-  const fresh = () => (DEVMODE ? 0 : Math.max(0, earned() - mine.seen));
+  const fresh = () => (devOn() ? 0 : Math.max(0, earned() - mine.seen));   // 帳號（2026-11-24）：開發者模式只在 'off' 算數
   let told = false;
 
   function placeMarks() {                                // a small ring at every empty place; the one you are looking at wears its name
@@ -594,13 +635,13 @@ async function main() {
     return bal >= it.price ? { cls: 'buy', label: `兌換`, price: it.price, act: 'buy' } : { cls: 'short', label: `還差 ${it.price - bal}`, price: it.price, dis: true };
   }
   let hold = null;                                       // while the crab is handing tokens over, the button counts up to the real number
-  function drawBtn() { const bal = hold ?? balance(); btn.innerHTML = `佈置<b>${COIN}${bal}</b>`; btn.title = `書桌佈置（${cat.currency.name} ${bal}）`; btn.classList.toggle('has-new', fresh() > 0 && !decorating); }
+  function drawBtn() { if (acct() === 'guest') return acctGuestBtn(); const bal = hold ?? balance(); btn.innerHTML = `佈置<b>${COIN}${num(bal)}</b>`; btn.title = `書桌佈置（${cat.currency.name} ${num(bal)}）`; btn.classList.toggle('has-new', fresh() > 0 && !decorating); }   // 帳號（2026-11-24）：訪客的鈕另外畫；num() 把團隊帳號的無限寫成字
   function draw() {
     const bal = balance();
     drawBtn();
     if (shown < 0) shown = bal;
-    if (shown !== bal && !REDUCED) { const from = shown, t0 = now(); shown = bal; (function roll() { const u = Math.min(1, (now() - t0) / 0.35); purse.innerHTML = `${COIN}<b>${Math.round(lerp(from, bal, easeOut(u)))}</b><span>${cat.currency.name}</span>`; if (u < 1) requestAnimationFrame(roll); })(); }
-    else { shown = bal; purse.innerHTML = `${COIN}<b>${bal}</b><span>${cat.currency.name}</span>`; }
+    if (shown !== bal && !REDUCED && isFinite(shown - bal) /* 帳號（2026-11-24）：無限的不用數上去 */) { const from = shown, t0 = now(); shown = bal; (function roll() { const u = Math.min(1, (now() - t0) / 0.35); purse.innerHTML = `${COIN}<b>${Math.round(lerp(from, bal, easeOut(u)))}</b><span>${cat.currency.name}</span>`; if (u < 1) requestAnimationFrame(roll); })(); }
+    else { shown = bal; purse.innerHTML = `${COIN}<b>${num(bal)}</b><span>${cat.currency.name}</span>`; }   // 帳號（2026-11-24）：團隊帳號寫「無限」
     items.forEach((it) => {
       let li = shelf.querySelector(`li[data-id="${it.id}"]`);
       if (!li) {
@@ -635,19 +676,21 @@ async function main() {
     if (on) {
       if (f2.skipIntro) f2.skipIntro(); if (F4 && F4.card && F4.close) F4.close();
       if (f2.LIFE && f2.LIFE.mode) f2.endLife(false);
-      if (!DEVMODE) { mine.seen = earned(); save(); } told = true;
+      if (!devOn()) { mine.seen = earned(); save(); } told = true;   // 帳號（2026-11-24）：開發者模式只在 'off' 算數
       S.busy = true; camTo(...DECOR_CAM); draw(); pictures(); tell('書桌佈置已開啟。');
       const first = shelf.querySelector('button:not(:disabled)'); if (first) setTimeout(() => first.focus({ preventScroll: true }), 260);
     } else { setHot(null); if (typeof closePick === 'function') closePick(false); S.busy = false; camHome(); btn.focus({ preventScroll: true }); }
   }
-  btn.addEventListener('click', () => decorate(!decorating));
+  btn.addEventListener('click', () => (acct() === 'guest' ? acctSignIn() : decorate(!decorating)));   // 帳號（2026-11-24）：訪客按了開登入框
   tray.querySelector('.done').addEventListener('click', () => decorate(false));
   addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; const pk = tray.querySelector('.decor-pick'); if (pk && !pk.hidden) { closePick(true); return; } if (showing || paying) skip = true; else if (decorating) decorate(false); });   // Esc: the picture chooser first, then 佈置模式
   shelf.addEventListener('click', async (e) => {
-    const b = e.target.closest('button[data-act]'); if (!b || !b.dataset.act || showing) return;
+    const b = e.target.closest('button[data-act]'); if (!b || !b.dataset.act || showing || acctRedeeming) return;   // 帳號（2026-11-24）：兌換的請求還沒回來時不收
     const it = byId[b.closest('li').dataset.id], act = b.dataset.act; setHot(null);
     if (act === 'buy') {
       if (balance() < it.price) return;
+      /* 帳號（2026-11-24）：登入時先請伺服器兌換，換成了才往下播；沒換成就說原因 */
+      if (acct() === 'in' && !(await acctRedeem(it, b))) return;
       mine.owned.push(it.id); mine.placed[it.slot] = it.id; save(); draw(); tell(cat.slots[it.slot].wear ? `已兌換${it.name}，螃蟹穿上了。` : `已兌換${it.name}，放在${cat.slots[it.slot].label}。`);
       await present(it.id, e.detail === 0 ? 'quick' : 'full');       // Enter or Space: the short way (keyboard actions are not made to wait)
     } else if (act === 'put') { mine.placed[it.slot] = it.id; save(); draw(); tell(cat.slots[it.slot].wear ? `螃蟹穿上${it.name}了。` : `${it.name}擺上去了。`); await present(it.id, 'quick'); }
@@ -721,7 +764,7 @@ async function main() {
     }
     hold = null; draw();
     if (moving && !skip) f2.play('hop', { force: true });
-    f2.say(`這次給你 ${total} ${cat.currency.name}，現在有 ${balance()}。按右下角的「佈置」可以換東西。`, { hold: 5 });
+    f2.say(`這次給你 ${total} ${cat.currency.name}，現在有 ${num(balance())}。按右下角的「佈置」可以換東西。`, { hold: 5 });   // 帳號（2026-11-24）：團隊帳號寫「無限」
     await wait(1.6);
     html.classList.remove('is-pay'); payLayer.innerHTML = '';
     if (moving) f2.walkTo(S.crabHome.clone()); else crabRoot.position.copy(S.crabHome);
@@ -744,7 +787,7 @@ async function main() {
   const keeps = cat.keeps || [], KS = cat.keepshelf;
   let keepRoot = null; const seatAt = {};
   const finished = () => { let d = []; try { d = JSON.parse(localStorage.getItem('pd-done') || '[]'); } catch (e) { d = []; } return new Set(d); };
-  const hasKeep = (k, fin = finished()) => !!k.ready && (DEVMODE || fin.has(k.lesson));
+  const hasKeep = (k, fin = finished()) => !!k.ready && (devOn() || fin.has(k.lesson));   // 帳號（2026-11-24）：開發者模式只在 'off' 算數，別改回 DEVMODE（DEV_DEFAULT 是 true，訪客會拿到全部紀念品）
   const keepItem = (k) => ({ ...k, slot: 'keep' });
   async function seatKeep(k) {                           // on its seat, no ceremony
     if (!keepRoot || keepLive.some((e) => e.id === k.id)) return null;
@@ -951,6 +994,61 @@ async function main() {
   addEventListener('storage', (e) => { if (['pd-done', 'pd-quiz', 'pd-chapters', 'pd-awards'].includes(e.key)) draw(); });
   draw();
   Object.values(mine.placed).forEach(mount);
+
+  /* 帳號（2026-11-24）：登入、登出、伺服器的資料變了，就重讀 mine，桌上、螃蟹身上、紀念品台、鈕和擺飾架跟著換（不重播儀式） */
+  function acctPull() {
+    const st = acct(), A = window.PD_ACCOUNT;
+    if (st === 'off' && acctWas === 'off') return;
+    if (acctRedeeming || acctFlying || showing || paying) { clearTimeout(acctPull.t); acctPull.t = setTimeout(acctPull, 400); return; }   // 正在播或正在送：等一下再對
+    if (st === 'in' && acctWas !== 'in') { acctReady = false; A.syncNow().then(() => { acctReady = true; }); }   // 剛登入：這台的進度送上去之後才發幣
+    acctWas = st;
+    if (st !== 'in' && decorating) decorate(false);
+    acctMine(byId, cat.slots);
+    for (const slot of Object.keys(live)) if (live[slot].id !== mine.placed[slot]) { if (live[slot].wear) undress(live[slot]); remove(slot); }
+    Object.values(mine.placed).forEach((id) => { if (!live[byId[id].slot]) mount(id); });
+    acctKeeps(); acctBars(); draw(); drawKeeps();
+  }
+  let keepChain = Promise.resolve();
+  function acctKeeps(again = true) {                      // 紀念品台上只留 mine.kept 裡、而且這台完成過的
+    keepChain = keepChain.then(async () => {
+      if (!keepRoot) return; const fin = finished(), ids = new Set();
+      const drop = (e) => { keepLive.splice(keepLive.indexOf(e), 1); keepRoot.remove(e.root); free(e.root); };
+      // 展示台剛載好時，它自己也在放；同一件被放了兩次就拿掉後來的（正在飛的不動）
+      keepLive.slice().forEach((e) => { const k = keeps.find((x) => x.id === e.id); if (!e.flying && (!k || !hasKeep(k, fin) || !mine.kept.includes(e.id) || ids.has(e.id))) drop(e); else ids.add(e.id); });
+      for (const k of keeps) if (hasKeep(k, fin) && mine.kept.includes(k.id)) await seatKeep(k);
+      if (again) setTimeout(() => acctKeeps(false), 3000);                                  // 再檢查一次重複的
+    }).catch(() => {});
+  }
+  function acctBars() {                                   // 開發者那一排只在 'off'；團隊帳號多一排「清空擺飾」
+    const st = acct(), A = window.PD_ACCOUNT, dev = tray.querySelector('.devbar:not(.acct-team)'), team = st === 'in' && !!(A.me && A.me.team);
+    if (dev) dev.hidden = st !== 'off';
+    let tb = tray.querySelector('.acct-team');
+    if (team && !tb) {
+      tb = document.createElement('p'); tb.className = 'devbar acct-team'; tb.innerHTML = '<b>團隊帳號：代幣無限</b><button type="button">清空擺飾</button>';
+      tray.querySelector('header').after(tb);
+      tb.querySelector('button').addEventListener('click', async (e) => {
+        const b = e.currentTarget; if (showing || paying) return; const r = await window.PD_ACCOUNT.resetDecor(), ok = !!(r && r.ok);
+        tell(ok ? '擺飾已清空。' : '暫時連不上，等一下再試。'); b.textContent = ok ? '清空了' : '暫時連不上'; setTimeout(() => { b.textContent = '清空擺飾'; }, 1800);
+      });
+    }
+    if (tb) tb.hidden = !team;
+  }
+  function acctGuestBtn() { btn.textContent = '登入，佈置你的書桌'; btn.title = '登入就能用上課賺的代幣佈置書桌'; btn.classList.remove('has-new'); }
+  function acctSignIn() { const UI = window.PD_ACCOUNT_UI; if (UI && UI.open) UI.open('登入就能用上課賺的代幣佈置書桌'); }
+  async function acctRedeem(it, b) {                      // true ＝ 伺服器換好了（餘額和 decor 已經更新）
+    if (acctRedeeming) return false; acctRedeeming = true; b.disabled = true;
+    let r = null; try { r = await window.PD_ACCOUNT.redeem(it.id); } catch (e) { r = null; } finally { acctRedeeming = false; }
+    if (r && r.ok) { mine.owned = mine.owned.filter((id) => id !== it.id); return true; }      // 下面那行會把它加進來
+    const msg = r && r.error === 'poor' ? '代幣不夠' : '暫時連不上，等一下再換';      // 佈置模式看不到螃蟹的話，寫在那顆鈕上 1.8 秒（跟「存成圖片」一樣）
+    tell(msg + '。'); draw(); const until = now() + 1.8;
+    (function note() { if (now() >= until) { draw(); return; } const nb = shelf.querySelector(`li[data-id="${it.id}"] button`); if (nb) { nb.textContent = msg; nb.disabled = true; } requestAnimationFrame(note); })();   // 中間別的地方重畫也蓋不掉
+    return false;
+  }
+  addEventListener('pd-account', acctPull);
+  addEventListener('storage', (e) => { if (e.key === KEY && acct() === 'in') mine.paid = arr(local().paid); });
+  if (window.PD_ACCOUNT && window.PD_ACCOUNT.ready) window.PD_ACCOUNT.ready.then(() => { acctReady = true; acctPull(); });
+  acctPull();
+
   window.__decor = { useThing, endUse, usable, use, USES, giveKeep, keeps, keepLive, payout, unpaid, allSources, journal: jr, snapshot, shoot, SHOT, shareText: (over) => shareTextOf(stats(over)), stats, mine, balance, present, putAway, mount, decorate, live, cat, draw, showGhost };
 }
 main().catch((e) => console.info('[decor] not started:', e && e.message));
