@@ -207,3 +207,12 @@ html.is-decor .journal, html.has-map .journal, html.pk-leaving .journal, html.is
 @keyframes share-dim { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .share-sheet, .share-sheet .in { animation: none; } }
 .decor-tray .tabs[hidden] { display: none; }
+
+/* 帳號（2026-11-28）：佈置鈕不出現的排法，「課程入口」卡裡的代幣／登入那一行（app.js 的 acctLineM 加的；功能關著時沒有這個元素） */
+.index .acct-line-m { margin: 2px 0 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 14px; line-height: 1.6; letter-spacing: .03em; color: var(--grape); }
+.index .acct-line-m button {
+  appearance: none; border: 0; cursor: pointer; min-height: 44px; padding: 0 18px; border-radius: 9px;
+  background: var(--grape); color: var(--cream); font-size: 15px; letter-spacing: .05em; line-height: 1;
+}
+.index .acct-line-m button:hover { background: #2b2148; }
+/* 帳號（2026-11-28）這段到這裡 */

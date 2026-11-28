@@ -114,7 +114,7 @@
   .tabs small { font: 600 12.5px/1 var(--en); margin-left: 6px; opacity: .8; }
   .tabs .flag { color: var(--coral-ink); } .tabs [aria-selected=true] .flag { color: var(--sun); }
   .panel { margin-top: 14px; }
-  .panel > h2 { font-size: 23px; letter-spacing: .03em; }
+  .panel > h2, .stats > h2 { font-size: 23px; letter-spacing: .03em; }
   .sub { margin-top: 4px; font-size: 14.5px; color: var(--grape-2); max-width: 46em; }
   .sub a { text-underline-offset: 4px; text-decoration-color: var(--coral); text-decoration-thickness: 1.5px; white-space: nowrap; }
   .none { margin-top: 14px; color: var(--grape-2); }
@@ -417,7 +417,16 @@ function panelOverview() {
     </div>
     <h2 style="margin-top:40px">每個人手上的事</h2>
     ${names.length ? `<ul class="hands">${names.map(n => `<li class="hand"><h3>${esc(n)}<small>${[people[n].length ? `${people[n].length} 課` : '', (side[n] || []).length ? `${side[n].length} 件專案的事` : ''].filter(Boolean).join('、')}</small></h3><ul>${people[n].map(l => `<li><span class="id">${esc(l.id)}</span><span>${esc(l.title)}</span><span class="st">${esc(l.page_stage || '未開始')}</span></li>`).join('')}${(side[n] || []).map(r => `<li><span class="id">${esc(r[0])}</span><span>${esc(r[1])}</span><span class="st">${esc(r[2])}</span></li>`).join('')}</ul></li>`).join('')}</ul>`
-      : '<p class="none">還沒有人認領。到「課程」分頁挑一課，按「我來做」。</p>'}`
+      : '<p class="none">還沒有人認領。到「課程」分頁挑一課，按「我來做」。</p>'}${statsHtml()}`
+}
+// 帳號伺服器的總數（後台拿來的，最多晚 10 分鐘）。沒接上或拿不到時 D.stats 是 null，整塊不出現
+function statsHtml() {
+  const s = D.stats; if (!s) return ''
+  const live = D.lessons.filter(l => l.ready)
+  return `<section class="stats"><h2 style="margin-top:40px">登入的人</h2>
+    <p class="sub">只有總數，看不到是誰。數字最多晚 10 分鐘。</p>
+    <p class="how">登入過的人：<b>${Number(s.users) || 0}</b></p>
+    ${live.length ? `<ul class="legend">${live.map(l => `<li><span class="sq k-grape">${esc(l.id)}</span>完成 <b>${Number((s.lessons || {})[l.id]) || 0}</b> 人</li>`).join('')}</ul>` : ''}</section>`
 }
 
 /* ---------------------------------------------------------------- 課程 */

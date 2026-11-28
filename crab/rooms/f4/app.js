@@ -405,6 +405,35 @@
     return;
   }
 
+  /* 帳號（2026-11-28）：書桌佈置鈕不出現的排法（手機直式等），「課程入口」卡在進度那行下面多一行，字和判斷跟 simple.js 的 acctLine 一樣：
+     登入了寫代幣數，訪客寫登入的好處＋「登入」鈕；功能關著（status 'off'）或帳號程式沒載到，這一行根本不加。
+     佈置鈕不出現＝(a) 寬度 ≤767px：index.html 的 @media (max-width: 767px) 把 .ctl（鈕在裡面）藏起來；或 (b) 直的排法：decor.js 第 561 行
+     `wide = S.layout === 'wide'` 決定 btn.hidden，S.layout 是 study.js fit()（第 1498 行）用 #view 的寬高比算的（< 1.05 就是 'tall'），這裡照抄那個算法。
+     #view 大小一變就重看（study.js 也是用 ResizeObserver 看 #view）。 */
+  {
+    const view = $('#view'), narrow = matchMedia('(max-width: 767px)');
+    const noDecorBtn = () => narrow.matches || (view && view.clientWidth && view.clientHeight ? view.clientWidth / view.clientHeight < 1.05 : false);
+    function acctLineM() {
+      const A = window.PD_ACCOUNT, UI = window.PD_ACCOUNT_UI, st = A && A.status, coins = st === 'in' && A.coins;
+      const k = !noDecorBtn() ? '' : coins ? 'in' : st === 'guest' && UI ? 'guest' : '';
+      let p = $('#acct-line-m');
+      if (!k) { if (p) p.remove(); return; }
+      if (!p) { p = document.createElement('p'); p.id = 'acct-line-m'; p.className = 'acct-line-m'; progressEl.after(p); }
+      if (k === 'in') { p.dataset.k = k; p.textContent = (coins.balance === null ? '你的代幣不限量（團隊帳號）。' : `你有 ${coins.balance} 代幣。`) + '用電腦打開 3D 書桌就能佈置。'; return; }
+      if (p.dataset.k === k) return;   // 已經是訪客那一行：不重畫，按鈕的焦點不會掉
+      p.dataset.k = k; p.textContent = '';
+      const t = document.createElement('span'); t.textContent = '登入後，上課賺的代幣可以佈置你的書桌。';
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = '登入';
+      b.addEventListener('click', () => { if (window.PD_ACCOUNT_UI) window.PD_ACCOUNT_UI.open('登入就能把上課賺的代幣存起來佈置書桌'); });
+      p.append(t, b);
+    }
+    addEventListener('pd-account', acctLineM);
+    document.addEventListener('DOMContentLoaded', acctLineM);
+    if (view && window.ResizeObserver) new ResizeObserver(acctLineM).observe(view); else addEventListener('resize', acctLineM);
+    acctLineM();
+  }
+  /* 帳號（2026-11-28）這段到這裡 */
+
   /* ---------------------------------------------------------------- the live desk: only after the first screen is up, and only if the connection can take it */
   const conn = navigator.connection || {};
   // desktop-first: a narrow desktop window (e.g. a side panel) still gets the live desk; only real touch phones stay on the poster
