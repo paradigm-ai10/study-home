@@ -46,10 +46,15 @@
 .pd-acct--float { position: fixed; z-index: 25; top: max(14px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); }
 /* 課程頁（有 .pl-top 頁首，2026-11-28）：浮在右上角會蓋到「回首頁」、捲動時還會蓋到內文。
    改成跟著頁首捲走、放在頁首那一行的最右邊，頁首的連結往左讓出入口的寬度（沒登入「登入」約 57px；登入後桌機有名字約 175px、手機只剩頭像） */
-.pl-top ~ .pd-acct--float { position: absolute; top: 17px; right: max(28px, calc((100% - 1180px) / 2 + 28px)); }
+/* 不支援 :has() 的瀏覽器（2026-11-28）：連結讓不出位置，入口就放在頁首連結的左邊，不蓋到「回首頁」。
+   連結的寬度是估的：桌機三個連結約 240px、900px 以下只剩「回首頁」約 66px，各再留 12～16px 的間隔 */
+.pl-top ~ .pd-acct--float { position: absolute; top: 17px; right: max(284px, calc((100% - 1180px) / 2 + 284px)); }
+@media (max-width: 900px) { .pl-top ~ .pd-acct--float { right: 94px; } }
+/* 支援 :has()：入口回到最右邊 */
+.pl-top:has(~ .pd-acct--float) ~ .pd-acct--float { right: max(28px, calc((100% - 1180px) / 2 + 28px)); }
 .pl-top:has(~ .pd-acct--float) nav { margin-right: 68px; }
 .pl-top:has(~ .pd-acct--float .is-in) nav { margin-right: 186px; }
-@media (max-width: 900px) { .pl-top ~ .pd-acct--float { right: 16px; } }
+@media (max-width: 900px) { .pl-top:has(~ .pd-acct--float) ~ .pd-acct--float { right: 16px; } }
 @media (max-width: 560px) { .pl-top:has(~ .pd-acct--float .is-in) nav { margin-right: 56px; } }
 
 .pd-acct-btn:focus-visible { outline: none; }
@@ -83,6 +88,8 @@
   box-shadow: var(--pa-lift); font-family: var(--pa-zh); font-size: 16px; line-height: 1.6; letter-spacing: .02em; text-align: left;
 }
 .pd-acct-menu[popover] { position: fixed; }
+/* 地圖頁沒有設 box-sizing：寬度要把左右內距算進去，不然 320px 的手機會超出右邊 12px（2026-11-28） */
+.pd-acct-menu { box-sizing: border-box; }
 .pd-acct-menu[hidden] { display: none; }
 .pd-acct-menu.is-open { animation: pd-acct-drop 200ms cubic-bezier(.2, .9, .25, 1.15); transform-origin: 90% 0; }
 @keyframes pd-acct-drop { from { opacity: 0; scale: .96; translate: 0 -4px; } }
@@ -185,6 +192,10 @@
   .pd-acct-dev-line { flex-wrap: wrap; }
   .pd-acct-dev input { flex: 1 1 100%; }
   .pd-acct-dev-line .pd-acct-go { flex: 1; }
+}
+/* 320px 的小手機：標題「登入 Paradigm 學 AI」放不下一行，第二行會壓到珊瑚紅線；字縮小一點維持一行（2026-11-28） */
+@media (max-width: 360px) {
+  .pd-acct-h { font-size: 20px; letter-spacing: .03em; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -65,4 +65,25 @@
   $('#shade').addEventListener('click', () => F4.close());
   F4.on('state', render);
   render();
+
+  /* 帳號（2026-11-28）：登入功能開著時，「學習進度」紙條最後多一行：登入了寫代幣數，訪客寫登入的好處＋「登入」鈕。
+     功能關著（status 'off'）或帳號的程式沒載到，這一行根本不加。帳號程式比這支晚載入，所以聽 pd-account，也在 DOMContentLoaded 再看一次（那時 account-ui.js 也到了）。 */
+  function acctLine() {
+    const A = window.PD_ACCOUNT, UI = window.PD_ACCOUNT_UI, st = A && A.status, coins = st === 'in' && A.coins;
+    const k = coins ? 'in' : st === 'guest' && UI ? 'guest' : '';
+    let p = $('#acct-line');
+    if (!k) { if (p) p.remove(); return; }
+    if (!p) { p = document.createElement('p'); p.id = 'acct-line'; p.className = 'acct-line'; $('#note-count').after(p); }
+    if (k === 'in') { p.dataset.k = k; p.textContent = (coins.balance === null ? '你的代幣不限量（團隊帳號）。' : `你有 ${coins.balance} 代幣。`) + '用電腦打開 3D 書桌就能佈置。'; return; }
+    if (p.dataset.k === k) return;   // 已經是訪客那一行：不重畫，按鈕的焦點不會掉
+    p.dataset.k = k; p.textContent = '';
+    const t = document.createElement('span'); t.textContent = '登入後，上課賺的代幣可以佈置你的書桌。';
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = '登入';
+    b.addEventListener('click', () => { if (window.PD_ACCOUNT_UI) window.PD_ACCOUNT_UI.open('登入就能把上課賺的代幣存起來佈置書桌'); });
+    p.append(t, b);
+  }
+  addEventListener('pd-account', acctLine);
+  document.addEventListener('DOMContentLoaded', acctLine);
+  acctLine();
+  /* 帳號（2026-11-28）這段到這裡 */
 })();

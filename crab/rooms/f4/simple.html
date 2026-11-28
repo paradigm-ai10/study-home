@@ -108,6 +108,11 @@
   .strip i.is-known { background: var(--grape); box-shadow: none; }
   .strip i.is-next { background: var(--cream); box-shadow: inset 0 0 0 2px var(--grape); }
   .note .count { margin-top: 8px; font-size: 14px; line-height: 1.6; }
+  /* 帳號（2026-11-28）：紙條最後的代幣／登入那一行（simple.js 的 acctLine 加的，只在登入功能開著時出現） */
+  .note .acct-line { margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(58, 46, 92, .32); display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 15.5px; line-height: 1.6; text-wrap: pretty; }
+  .note .acct-line button { appearance: none; border: 0; cursor: pointer; background: none; min-height: 44px; padding: 0 18px; border-radius: 8px; box-shadow: inset 0 0 0 1.5px var(--grape-3); font-size: 15px; line-height: 1; }
+  .note .acct-line button:hover { box-shadow: inset 0 0 0 1.5px var(--grape); background: var(--sheet); }
+  /* 帳號（2026-11-28）這段到這裡 */
 
   /* ---------- the map on the left, the other things on the right ---------- */
   .rule { border: 0; border-top: 1px solid var(--line); margin: 0; }
