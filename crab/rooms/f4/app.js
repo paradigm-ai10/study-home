@@ -409,10 +409,15 @@
      登入了寫代幣數，訪客寫登入的好處＋「登入」鈕；功能關著（status 'off'）或帳號程式沒載到，這一行根本不加。
      佈置鈕不出現＝(a) 寬度 ≤767px：index.html 的 @media (max-width: 767px) 把 .ctl（鈕在裡面）藏起來；或 (b) 直的排法：decor.js 第 561 行
      `wide = S.layout === 'wide'` 決定 btn.hidden，S.layout 是 study.js fit()（第 1498 行）用 #view 的寬高比算的（< 1.05 就是 'tall'），這裡照抄那個算法。
-     #view 大小一變就重看（study.js 也是用 ResizeObserver 看 #view）。 */
+     #view 大小一變就重看（study.js 也是用 ResizeObserver 看 #view）。
+     (c) 留在海報版：html 有 is-poster（這支下面的 load3D 決定不載 3D 或 study.js 載不進來、study.js 的 fallback() 放棄 3D 時才加，跟 is-3d 不會同時有）；
+     decor.js 第 72 行要等 is-3d 才做佈置鈕，所以這時鈕永遠不會出現。3D 還在載的時候兩個都沒有，這一行不會先閃。
+     但寬版海報（>767px、橫的）的「課程入口」卡是貼著底部往上長的，畫面矮的話，多這一行會蓋到「開始 60 秒體驗」和「已有基礎？」，
+     所以只在視窗高 ≥740px 時加。740 是量出來的：最高的情況（訪客那一行 72px＋「已完成」那行，1440 寬）卡片頂端
+     在高 700 時跟「已有基礎？」貼在一起、720 時隔 15px、740 時隔 34px（1024 寬多 13px）。 */
   {
-    const view = $('#view'), narrow = matchMedia('(max-width: 767px)');
-    const noDecorBtn = () => narrow.matches || (view && view.clientWidth && view.clientHeight ? view.clientWidth / view.clientHeight < 1.05 : false);
+    const view = $('#view'), narrow = matchMedia('(max-width: 767px)'), roomy = matchMedia('(min-height: 740px)');   // 帳號（2026-11-28）：roomy 見上面
+    const noDecorBtn = () => narrow.matches || (view && view.clientWidth && view.clientHeight ? view.clientWidth / view.clientHeight < 1.05 : false) || (html.classList.contains('is-poster') && roomy.matches);   // 帳號（2026-11-28）：加上海報版（夠高才加）
     function acctLineM() {
       const A = window.PD_ACCOUNT, UI = window.PD_ACCOUNT_UI, st = A && A.status, coins = st === 'in' && A.coins;
       const k = !noDecorBtn() ? '' : coins ? 'in' : st === 'guest' && UI ? 'guest' : '';
@@ -430,6 +435,9 @@
     addEventListener('pd-account', acctLineM);
     document.addEventListener('DOMContentLoaded', acctLineM);
     if (view && window.ResizeObserver) new ResizeObserver(acctLineM).observe(view); else addEventListener('resize', acctLineM);
+    roomy.addEventListener('change', acctLineM);   // 帳號（2026-11-28）：#view 最少 560 高，視窗在 560 以下變高變矮時 #view 不會變，所以另外聽高度
+    let posterWas = false;   // 帳號（2026-11-28）：is-poster 是載入後才加的，加上去那一刻重看一次（其他 class 變了不管）
+    new MutationObserver(() => { const p = html.classList.contains('is-poster'); if (p !== posterWas) { posterWas = p; acctLineM(); } }).observe(html, { attributes: true, attributeFilter: ['class'] });   // 帳號（2026-11-28）
     acctLineM();
   }
   /* 帳號（2026-11-28）這段到這裡 */
